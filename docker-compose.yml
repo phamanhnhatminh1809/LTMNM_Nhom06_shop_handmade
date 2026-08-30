@@ -1,0 +1,40 @@
+services:
+  # Web Service: Apache HTTP Server
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ltmnm_shop_handmade_web
+    restart: always
+    ports:
+      - "8080:80"                      # Truy cập web qua: http://localhost:8080
+    volumes:
+      - ./frontend/src:/var/www/html            # Ánh xạ code PHP vào web root của Apache
+    depends_on:
+      - db
+    networks:
+      - app_network
+
+  # Database Service: MySQL 8.0
+  db:
+    image: mysql:8.0
+    container_name: ltmnm_shop_handmade_mysql_db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: ltmnm_shop_handmade
+    ports:
+      - "3307:3306"
+    volumes:
+      - ./backend/src/database/schemas/shop_handmade_schema.sql:/docker-entrypoint-initdb.d/01_shop_handmade_schema.sql
+      - ./backend/src/database/seeders/shop_handmade_seeder.sql:/docker-entrypoint-initdb.d/02_shop_handmade_seeder.sql
+      - db_data:/var/lib/mysql
+    networks:
+      - app_network
+
+volumes:
+  db_data:
+
+networks:
+  app_network:
+    driver: bridge
