@@ -21,5 +21,5 @@ Team FE lập trình riêng ở một nhánh và lập trình ở thư mục fro
 Team BE lập trình riêng ở một nhánh và merge vào nhánh main ngay khi xong chức năng
 
 ### Quy trình làm việc
-Team FE LUÔN LUÔN pull và rebase code từ nhánh main về nhánh hiện tại trước khi bắt đầu code
+Team FE LUÔN LUÔN pull và rebase code từ nhánh main về nhánh hiện tại trước khi bắt đầu code \
 Team BE khi xong một chức năng ở nhánh hiện tại merge ngay vào nhánh main
