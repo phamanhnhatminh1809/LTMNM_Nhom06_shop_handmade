@@ -39,30 +39,17 @@ INSERT INTO categories (id, name, slug) VALUES
 (5, 'Quà tặng lưu niệm', 'qua-tang-luu-niem');
 
 -- Bảng products
-INSERT INTO products (id, code, name, description, instruction_preserve, image, price, stock_quantity) VALUES 
-(1, 'SP001', 'Áo len đan tay', 'Áo len đan thủ công từ sợi len cừu mềm mại, giữ ấm tốt.', 'Giặt tay bằng nước lạnh, không dùng máy sấy.', '/images/products/sp001.jpg', 350000.00, 50),
-(2, 'SP002', 'Vòng tay Macrame', 'Vòng tay đan chéo phong cách boho, dây cotton bền chắc.', 'Tránh tiếp xúc với hóa chất tẩy rửa mạnh.', '/images/products/sp002.jpg', 45000.00, 100),
-(3, 'SP003', 'Cốc gốm vẽ tay', 'Cốc gốm nung nhiệt độ cao, họa tiết hoa nhí nặn nổi.', 'Rửa bằng mút mềm, dùng được trong lò vi sóng.', '/images/products/sp003.jpg', 120000.00, 30),
-(4, 'SP004', 'Ví da nam handmade', 'Ví da bò sáp thật khâu tay 100%, thiết kế tối giản.', 'Dùng xi đánh da chuyên dụng khi bị xước.', '/images/products/sp004.jpg', 550000.00, 20),
-(5, 'SP005', 'Móc khóa len Amigurumi', 'Móc khóa hình gấu dâu đan bằng len cotton dệt.', 'Bọc trong túi lưới nếu giặt bằng máy.', '/images/products/sp005.jpg', 35000.00, 200),
-(6, 'SP006', 'Dây chuyền bạc đính đá', 'Dây chuyền bạc 925 chế tác thủ công nguyên khối.', 'Bảo quản trong hộp kín khi không sử dụng.', '/images/products/sp006.jpg', 250000.00, 15),
-(7, 'SP007', 'Túi xách sợi thô', 'Túi xách đi biển đan từ sợi thô dệt kim, dáng tote rộng rãi.', 'Chỉ giặt hấp hoặc lau bằng khăn ẩm.', '/images/products/sp007.jpg', 450000.00, 10),
-(8, 'SP008', 'Nến thơm tinh dầu thiên nhiên', 'Nến đậu nành hương hoa hồng và gỗ đàn hương 200g.', 'Cắt bấc 0.5cm trước mỗi lần đốt để không bị khói đen.', '/images/products/sp008.jpg', 180000.00, 40),
-(9, 'SP009', 'Sổ tay da bọc gáy', 'Sổ tay vintage giấy kraft dày dặn, bìa da bò khắc laser.', 'Tránh để ở nơi ẩm ướt, mốc.', '/images/products/sp009.jpg', 220000.00, 25),
-(10, 'SP010', 'Bình gốm cắm hoa men chảy', 'Bình gốm dáng cao, men chảy tự nhiên độc bản.', 'Cẩn thận khi cầm nắm, lau bằng khăn mềm.', '/images/products/sp010.jpg', 380000.00, 5);
-
--- Bảng category_product (Liên kết Sản phẩm và Danh mục)
-INSERT INTO category_product (id, product_id, category_id) VALUES 
-(1, 1, 1), -- Áo len -> Đồ len
-(2, 2, 2), -- Vòng tay -> Trang sức
-(3, 3, 3), -- Cốc gốm -> Gốm sứ
-(4, 4, 4), -- Ví da -> Đồ da
-(5, 5, 1), -- Móc khóa len -> Đồ len
-(6, 5, 5), -- Móc khóa len -> Quà tặng
-(7, 6, 2), -- Dây chuyền bạc -> Trang sức
-(8, 8, 5), -- Nến thơm -> Quà tặng
-(9, 9, 4), -- Sổ tay da -> Đồ da
-(10, 10, 3); -- Bình gốm -> Gốm sứ
+INSERT INTO products (id, code, category_id, name, description, instruction_preserve, image, price, stock_quantity) VALUES 
+(1, 1,'SP001', 'Áo len đan tay', 'Áo len đan thủ công từ sợi len cừu mềm mại, giữ ấm tốt.', 'Giặt tay bằng nước lạnh, không dùng máy sấy.', '/images/products/sp001.jpg', 350000.00, 50),
+(2, 2,'SP002', 'Vòng tay Macrame', 'Vòng tay đan chéo phong cách boho, dây cotton bền chắc.', 'Tránh tiếp xúc với hóa chất tẩy rửa mạnh.', '/images/products/sp002.jpg', 45000.00, 100),
+(3, 3,'SP003', 'Cốc gốm vẽ tay', 'Cốc gốm nung nhiệt độ cao, họa tiết hoa nhí nặn nổi.', 'Rửa bằng mút mềm, dùng được trong lò vi sóng.', '/images/products/sp003.jpg', 120000.00, 30),
+(4, 4,'SP004', 'Ví da nam handmade', 'Ví da bò sáp thật khâu tay 100%, thiết kế tối giản.', 'Dùng xi đánh da chuyên dụng khi bị xước.', '/images/products/sp004.jpg', 550000.00, 20),
+(5, 1,'SP005', 'Móc khóa len Amigurumi', 'Móc khóa hình gấu dâu đan bằng len cotton dệt.', 'Bọc trong túi lưới nếu giặt bằng máy.', '/images/products/sp005.jpg', 35000.00, 200),
+(6, 5,'SP006', 'Dây chuyền bạc đính đá', 'Dây chuyền bạc 925 chế tác thủ công nguyên khối.', 'Bảo quản trong hộp kín khi không sử dụng.', '/images/products/sp006.jpg', 250000.00, 15),
+(7, 5,'SP007', 'Túi xách sợi thô', 'Túi xách đi biển đan từ sợi thô dệt kim, dáng tote rộng rãi.', 'Chỉ giặt hấp hoặc lau bằng khăn ẩm.', '/images/products/sp007.jpg', 450000.00, 10),
+(8, 5,'SP008', 'Nến thơm tinh dầu thiên nhiên', 'Nến đậu nành hương hoa hồng và gỗ đàn hương 200g.', 'Cắt bấc 0.5cm trước mỗi lần đốt để không bị khói đen.', '/images/products/sp008.jpg', 180000.00, 40),
+(9, 4,'SP009', 'Sổ tay da bọc gáy', 'Sổ tay vintage giấy kraft dày dặn, bìa da bò khắc laser.', 'Tránh để ở nơi ẩm ướt, mốc.', '/images/products/sp009.jpg', 220000.00, 25),
+(10,3,'SP010', 'Bình gốm cắm hoa men chảy', 'Bình gốm dáng cao, men chảy tự nhiên độc bản.', 'Cẩn thận khi cầm nắm, lau bằng khăn mềm.', '/images/products/sp010.jpg', 380000.00, 5);
 
 -- Bảng orders
 INSERT INTO orders (id, code, user_id, shipping_name, shipping_phone, shipping_address, total_amount, status) VALUES 
