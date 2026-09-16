@@ -1,4 +1,21 @@
 services:
+  # App Service: PHP CLI & Composer (Backend Development / CLI Tools)
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.app
+    container_name: ltmnm_shop_handmade_app
+    restart: always
+    working_dir: /var/www/backend
+    volumes:
+      - ./backend:/var/www/backend
+    depends_on:
+      - db
+    networks:
+      - app_network
+    stdin_open: true
+    tty: true
+
   # Web Service: Apache HTTP Server
   web:
     build:
