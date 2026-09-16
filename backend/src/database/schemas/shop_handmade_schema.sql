@@ -18,7 +18,6 @@ SET FOREIGN_KEY_CHECKS = 0;
 
 DROP TABLE IF EXISTS order_items;
 DROP TABLE IF EXISTS orders;
-DROP TABLE IF EXISTS category_product;
 DROP TABLE IF EXISTS products;
 DROP TABLE IF EXISTS categories;
 DROP TABLE IF EXISTS users;
@@ -75,6 +74,7 @@ CREATE TABLE categories (
 CREATE TABLE products (
     id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     code VARCHAR(50) NOT NULL COMMENT 'e.g., SP001',
+    category_id BIGINT UNSIGNED NOT NULL,
     name VARCHAR(255) NOT NULL,
     description TEXT,
     instruction_preserve TEXT COMMENT 'Hướng dẫn bảo quản',
@@ -84,22 +84,9 @@ CREATE TABLE products (
     created_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (id),
-    UNIQUE KEY (code)
+    UNIQUE KEY (code),
+    CONSTRAINT fk_products_category_id FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE RESTRICT ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
-
--- Table: category_product
--- Description: Pivot table mapping products to categories (N-N relationship)
-CREATE TABLE category_product (
-    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-    product_id BIGINT UNSIGNED NOT NULL,
-    category_id BIGINT UNSIGNED NOT NULL,
-    PRIMARY KEY (id),
-    UNIQUE KEY (product_id, category_id),
-    CONSTRAINT fk_category_product_product_id FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE ON UPDATE CASCADE,
-    CONSTRAINT fk_category_product_category_id FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
 
 -- Table: orders
 -- Description: Stores customer orders and shipping information
