@@ -6,9 +6,9 @@ services:
       dockerfile: Dockerfile.app
     container_name: ltmnm_shop_handmade_app
     restart: always
-    working_dir: /var/www/backend
+    working_dir: /var/www/html
     volumes:
-      - ./backend:/var/www/backend
+      - .:/var/www/html
     depends_on:
       - db
     networks:
