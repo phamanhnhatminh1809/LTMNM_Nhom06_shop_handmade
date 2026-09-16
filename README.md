@@ -57,7 +57,15 @@ docker compose exec app composer -v
 - **Tối ưu hoặc cập nhật lại autoload**:
   ```bash
   docker compose exec app composer dump-autoload
+
+  # Hoặc tối ưu hóa hiệu năng (tạo classmap tĩnh):
+  docker compose exec app composer dump-autoload -o
   ```
+  > **Khi nào cần chạy lệnh này?**
+  > - **Khi sửa cấu hình `autoload` / `autoload-dev` trong `composer.json`**: Ví dụ khi bổ sung namespace mới (như ánh xạ `"App\\Features\\": "backend/src/features/"`), thêm đường dẫn `files` (helper functions) hoặc `classmap`.
+  > - **Khi gặp lỗi `Class ... not found` hoặc `Target class [...] does not exist`**: Mặc dù PSR-4 tự động tải file theo quy ước đặt tên, nhưng khi mới tạo class, helper, seeder hoặc migration mới mà hệ thống chưa nhận diện được, chạy lệnh này để Composer quét và cập nhật lại danh sách autoload.
+  > - **Sau khi kéo code mới về (`git pull`) hoặc chuyển nhánh (`git checkout`)**: Nếu nhánh mới có thêm class mới hoặc cập nhật cấu trúc namespace từ các thành viên khác.
+  > - **Khi muốn tối ưu tốc độ tải trang / hiệu năng (Production)**: Sử dụng cờ `-o` (hoặc `--optimize`) để gom tất cả quy tắc PSR-4 thành classmap tĩnh, giúp PHP nạp class nhanh hơn đáng kể.
 
 ### Chạy trực tiếp terminal bên trong container `app`
 Nếu  muốn vào thẳng môi trường dòng lệnh bên trong container để thực hiện nhiều lệnh liên tục:
