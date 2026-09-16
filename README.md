@@ -1,7 +1,11 @@
-### Khởi chạy lần đầu tiên
+### Khởi chạy lần đầu tiên (dùng khi mới clone project về lần đầu hoặc có thay đổi trong Dockerfile)
 docker compose up -d --build
 
-### Chạy lệnh này mỗi khi pull code từ github về
+### Khởi động lại docker (dùng khi pull code mới về)
+docker compose restart 
+
+### Khởi động lại docker kèm build lại cơ sở dữ liệu. (Dùng lệnh này khi có thay đổi về cơ sở dữ liệu ở file shop_handmade_schema.sql)
+#### Cảnh báo: Lệnh này sẽ XÓA HẾT dữ liệu hiện tại trong database local!
 docker compose down -v ; docker compose up -d
 
 ### Truy cập local host
