@@ -13,5 +13,5 @@ RUN apt-get update && apt-get install -y \
 # Cài đặt Composer từ official image
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Thư mục làm việc mặc định trong container
-WORKDIR /var/www/backend
+# Thư mục làm việc mặc định trong container (chứa toàn bộ source Laravel)
+WORKDIR /var/www/html

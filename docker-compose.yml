@@ -1,5 +1,5 @@
 services:
-  # App Service: PHP CLI & Composer (Backend Development / CLI Tools)
+  # App Service: Laravel API Server & Backend CLI Tools
   app:
     build:
       context: .
@@ -7,8 +7,14 @@ services:
     container_name: ltmnm_shop_handmade_app
     restart: always
     working_dir: /var/www/html
+    ports:
+      - "8000:8000"                      # API Backend: http://localhost:8000/api/...
     volumes:
       - .:/var/www/html
+    environment:
+      DB_HOST: db
+      DB_PORT: 3306
+    command: php artisan serve --host=0.0.0.0 --port=8000
     depends_on:
       - db
     networks:

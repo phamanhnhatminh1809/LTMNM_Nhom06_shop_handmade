@@ -5,7 +5,7 @@
 | Service | Tên Container | Vai trò & Công nghệ | Địa chỉ / Port |
 | :--- | :--- | :--- | :--- |
 | **`web`** | `ltmnm_shop_handmade_web` | Apache Web Server + PHP 8.2 (chạy ứng dụng Frontend) | `http://localhost:8080` |
-| **`app`** | `ltmnm_shop_handmade_app` | PHP 8.2 CLI + Composer (phục vụ Backend & chạy lệnh dòng lệnh) | Thư mục làm việc: `/var/www/backend` |
+| **`app`** | `ltmnm_shop_handmade_app` | Laravel API Server + PHP 8.2 CLI + Composer | `http://localhost:8000` (API) \| Thư mục: `/var/www/html` |
 | **`db`** | `ltmnm_shop_handmade_mysql_db` | MySQL 8.0 Database | Cổng `3307` (Host) -> `3306` (Container) |
 
 ---
@@ -35,9 +35,9 @@ docker compose down -v ; docker compose up -d
 
 ---
 
-## Hướng dẫn sử dụng Container `app` (PHP CLI & Composer cho Backend)
+## Hướng dẫn sử dụng Container `app` (Laravel API Backend, PHP CLI & Composer)
 
-Container `app` được cấu hình để ánh xạ trực tiếp thư mục `backend` trên máy của bạn vào `/var/www/backend` trong container.
+Container `app` được cấu hình để ánh xạ toàn bộ mã nguồn dự án vào `/var/www/html` trong container (vừa chạy Laravel API Server tại cổng `8000`, vừa phục vụ chạy lệnh `artisan`, `composer` và hỗ trợ toàn bộ cấu trúc `backend/src/features/`).
 
 ### Kiểm tra môi trường PHP & Composer
 ```bash
@@ -79,6 +79,7 @@ docker compose exec app bash
 ## Truy cập hệ thống
 
 - **Trang chủ Website (Frontend)**: [http://localhost:8080](http://localhost:8080)
+- **API Backend (Laravel)**: [http://localhost:8000](http://localhost:8000) (ví dụ health check: `http://localhost:8000/up`)
 
 ---
 
