@@ -1,15 +1,21 @@
 <?php
 /**
- * Header - Top bar thông báo
+ * Header - Top bar giống chus.vn
  */
 ?>
 <div class="top-bar">
     <div class="container top-bar__inner">
-        <span>🚚 Miễn phí vận chuyển cho đơn từ 300.000đ</span>
-        <div class="top-bar__links">
+        <div class="top-bar__left">
+            <a href="#">Seller Center</a>
+            <span class="top-bar__sep">|</span>
+            <a href="#" class="lang-link">🇻🇳 Tiếng Việt ▾</a>
+        </div>
+        <div class="top-bar__right">
+            <a href="#">Blogs</a>
+            <span class="top-bar__sep">|</span>
             <a href="?route=login">Đăng nhập</a>
+            <span class="top-bar__sep">|</span>
             <a href="?route=register">Đăng ký</a>
-            <a href="#">Hotline: 0123 456 789</a>
         </div>
     </div>
 </div>

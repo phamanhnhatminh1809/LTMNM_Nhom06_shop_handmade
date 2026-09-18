@@ -116,4 +116,11 @@
     /* ===== LAYOUT ===== */
     --container-max: 1440px;
     --header-height: 72px;
+        /* ===== CHUS-STYLE LAYOUT ===== */
+    --header-search-width: 480px;
+    --banner-height: 520px;
+    --banner-height-md: 400px;
+    --banner-height-sm: 280px;
+    --zalo-bg: #0068ff;
+    --zalo-size: 56px;
 }
