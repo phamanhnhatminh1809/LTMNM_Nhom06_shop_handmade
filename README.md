@@ -1,105 +1,84 @@
-# LTMNM Nhóm 06 - Shop Handmade
+# 🧶 LTMNM Nhóm 06 - Shop Handmade 
 
-## Kiến trúc các Container
+Dự án website thương mại điện tử đồ thủ công **Shop Handmade**, được xây dựng trên nền tảng **Laravel 12** theo kiến trúc chuẩn **MVC (Model - View - Controller)**.
 
-| Service | Tên Container | Vai trò & Công nghệ | Địa chỉ / Port |
+---
+
+## Kiến Trúc Hệ Thống 
+
+- **M (Model)**: `app/Models/` (`Category`, `Product`, `User`, `Role`, `Order`, `OrderItem`) sử dụng Eloquent ORM kết nối MySQL.
+- **V (View)**: `resources/views/` sử dụng Blade Template Engine kế thừa layout (`layouts/app.blade.php`, `layouts/admin.blade.php`, `layouts/auth.blade.php`).
+- **C (Controller)**: `app/Http/Controllers/` (`HomeController`, `ProductController`, `AuthController`, `Admin\DashboardController`, `Admin\ProductController`).
+- **R (Routes)**: `routes/web.php` với cấu trúc URL RESTful.
+- **Tài nguyên tĩnh (Assets)**: `public/css/`, `public/js/`, `public/images/`.
+
+---
+
+## Hướng dẫn chạy dự án
+
+### Cách 1: Chạy bằng Laragon / PHP Local (Nhanh nhất)
+1. Mở **Laragon** -> Nhấn **Start All** (Apache & MySQL).
+2. Tạo database `ltmnm_shop_handmade` trong MySQL (nếu chưa có).
+3. Mở Terminal tại thư mục dự án và chạy:
+   ```bash
+   # Cài đặt dependencies (nếu chưa có vendor)
+   composer install
+
+   # Chạy Migration và nạp 50 sản phẩm mẫu từ Seeder
+   php artisan migrate:fresh --seed
+
+   # Khởi chạy server phát triển
+   php artisan serve
+   ```
+4. Truy cập website: [http://localhost:8000](http://localhost:8000)
+
+---
+
+### Cách 2: Chạy bằng Docker Compose
+1. Đảm bảo **Docker Desktop** đang chạy.
+2. Khởi động hệ thống container:
+   ```bash
+   docker compose up -d --build
+   ```
+3. Chạy migration và seed dữ liệu bên trong container `app`:
+   ```bash
+   docker compose exec app php artisan migrate:fresh --seed
+   ```
+4. Truy cập website:
+   - **Laravel App (Artisan)**: [http://localhost:8000](http://localhost:8000)
+   - **Web Apache Server**: [http://localhost:8080](http://localhost:8080)
+   
+5. Để thực hiện các lệnh php/composer trực tiếp trong docker
+   docker compose exec -it app bash
+---
+
+## Các đường dẫn chính
+
+| Trang | URL | Chức năng |
+| :--- | :--- | :--- |
+| **Trang chủ** | `/` | Banner slider, danh mục, sản phẩm nổi bật & mới nhất |
+| **Danh sách sản phẩm** | `/products` | Lọc theo danh mục, khoảng giá, sắp xếp, tìm kiếm, phân trang |
+| **Chi tiết sản phẩm** | `/products/{id}` | Gallery ảnh, giá, tồn kho, mô tả, sản phẩm liên quan |
+| **Đăng nhập** | `/login` | Đăng nhập tài khoản, modal khôi phục mật khẩu OTP |
+| **Đăng ký** | `/register` | Đăng ký tài khoản thành viên mới |
+| **Giới thiệu** | `/about` | Giới thiệu cửa hàng đồ handmade |
+| **Liên hệ** | `/contact` | Thông tin liên hệ, hotline, địa chỉ |
+| **Tổng quan Admin** | `/admin/dashboard` | 5 thẻ chỉ số, biểu đồ Chart.js doanh thu & danh mục, đơn gần đây |
+| **Quản lý SP Admin** | `/admin/products` | Bảng quản lý sản phẩm, tồn kho, modal thêm sản phẩm |
+
+---
+
+## 🔑 Tài khoản thử nghiệm
+
+| Vai trò | Email / Username | Mật khẩu | Quyền hạn |
 | :--- | :--- | :--- | :--- |
-| **`web`** | `ltmnm_shop_handmade_web` | Apache Web Server + PHP 8.2 (chạy ứng dụng Frontend) | `http://localhost:8080` |
-| **`app`** | `ltmnm_shop_handmade_app` | Laravel API Server + PHP 8.2 CLI + Composer | `http://localhost:8000` (API) \| Thư mục: `/var/www/html` |
-| **`db`** | `ltmnm_shop_handmade_mysql_db` | MySQL 8.0 Database | Cổng `3307` (Host) -> `3306` (Container) |
+| **Quản trị viên (Admin)** | `admin@shophandmade.com` / `shop_admin` | `password123` | Quản trị toàn bộ hệ thống, kho hàng, đơn hàng |
+| **Khách hàng mẫu** | `test_customer@gmail.com` / `test_customer` | `password123` | Mua sắm, theo dõi đơn hàng |
 
 ---
 
-## Hướng dẫn khởi chạy Docker
+## 🗄️ Kết nối cơ sở dữ liệu mysql
 
-### Khởi chạy lần đầu tiên (hoặc khi có thay đổi Dockerfile/docker-compose)
-```bash
-docker compose up -d --build
-```
-
-### Khởi động lại docker (dùng khi pull code mới về)
-```bash
-docker compose restart
-```
-
-### Dừng hệ thống container
-```bash
-docker compose down
-```
-
-### 4. Khởi động lại kèm RESET toàn bộ cơ sở dữ liệu (Re-seed DB)
-> **Cảnh báo:** Lệnh này sẽ **XÓA SẠCH** toàn bộ dữ liệu trong volume database và khởi tạo lại từ đầu theo 2 file schema & seeder!
-```bash
-docker compose down -v ; docker compose up -d
-```
-
----
-
-## Hướng dẫn sử dụng Container `app` (Laravel API Backend, PHP CLI & Composer)
-
-Container `app` được cấu hình để ánh xạ toàn bộ mã nguồn dự án vào `/var/www/html` trong container (vừa chạy Laravel API Server tại cổng `8000`, vừa phục vụ chạy lệnh `artisan`, `composer` và hỗ trợ toàn bộ cấu trúc `backend/src/features/`).
-
-### Kiểm tra môi trường PHP & Composer
-```bash
-docker compose exec app php -v
-docker compose exec app composer -v
-```
-
-### Quản lý thư viện PHP với Composer
-- **Cài đặt toàn bộ dependencies** (khi có `composer.json`):
-  ```bash
-  docker compose exec app composer install
-  ```
-- **Cài đặt thêm thư viện mới**:
-  ```bash
-  docker compose exec app composer require <tên-package>
-  ```
-- **Tối ưu hoặc cập nhật lại autoload**:
-  ```bash
-  docker compose exec app composer dump-autoload
-
-  # Hoặc tối ưu hóa hiệu năng (tạo classmap tĩnh):
-  docker compose exec app composer dump-autoload -o
-  ```
-  > **Khi nào cần chạy lệnh này?**
-  > - **Khi sửa cấu hình `autoload` / `autoload-dev` trong `composer.json`**: Ví dụ khi bổ sung namespace mới (như ánh xạ `"App\\Features\\": "backend/src/features/"`), thêm đường dẫn `files` (helper functions) hoặc `classmap`.
-  > - **Khi gặp lỗi `Class ... not found` hoặc `Target class [...] does not exist`**: Mặc dù PSR-4 tự động tải file theo quy ước đặt tên, nhưng khi mới tạo class, helper, seeder hoặc migration mới mà hệ thống chưa nhận diện được, chạy lệnh này để Composer quét và cập nhật lại danh sách autoload.
-  > - **Sau khi kéo code mới về (`git pull`) hoặc chuyển nhánh (`git checkout`)**: Nếu nhánh mới có thêm class mới hoặc cập nhật cấu trúc namespace từ các thành viên khác.
-  > - **Khi muốn tối ưu tốc độ tải trang / hiệu năng (Production)**: Sử dụng cờ `-o` (hoặc `--optimize`) để gom tất cả quy tắc PSR-4 thành classmap tĩnh, giúp PHP nạp class nhanh hơn đáng kể.
-
-### Chạy trực tiếp terminal bên trong container `app`
-Nếu  muốn vào thẳng môi trường dòng lệnh bên trong container để thực hiện nhiều lệnh liên tục:
-```bash
-docker compose exec app bash
-```
-*(Gõ `exit` để quay trở về terminal máy chủ)*
-
----
-
-## Truy cập hệ thống
-
-- **Trang chủ Website (Frontend)**: [http://localhost:8080](http://localhost:8080)
-- **API Backend (Laravel)**: [http://localhost:8000](http://localhost:8000) (ví dụ health check: `http://localhost:8000/up`)
-
----
-
-## Kết nối cơ sở dữ liệu MySQL (DBeaver, DataGrip, Navicat, v.v.)
-
-- **Host**: `localhost` (hoặc `127.0.0.1`)
-- **Port**: `3307`
+- **Chạy Local (Laragon)**: Port `3306` | User `root` | Password: ` ` (trống)
+- **Chạy Docker**: Port `3307` (Host) -> `3306` (Container) | User `root` | Password `root`
 - **Database**: `ltmnm_shop_handmade`
-- **Username**: `root`
-- **Password**: `root`
-- **Lưu ý cấu hình driver (DBeaver)**: Đặt thuộc tính `allowPublicKeyRetrieval: True`, kiểu kết nối `Connect by: Host`.
-
----
-
-## Không gian lập trình quy trình làm việc
-
-### Không gian lập trình
-- **Team FE**: Lập trình riêng ở một nhánh và làm việc trong thư mục `frontend` (chỉ merge vào nhánh `main` khi có yêu cầu).
-- **Team BE**: Lập trình riêng ở một nhánh và làm việc trong thư mục `backend`, merge vào nhánh `main` ngay khi hoàn thành chức năng.
-
-### Quy trình làm việc
-- **Team FE**: **LUÔN LUÔN** `git pull` và `git rebase` code từ nhánh `main` về nhánh hiện tại trước khi bắt đầu code.
-- **Team BE**: Khi hoàn thành một chức năng ở nhánh tính năng, thực hiện merge ngay vào nhánh `main`.

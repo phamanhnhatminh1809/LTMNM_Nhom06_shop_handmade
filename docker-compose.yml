@@ -1,5 +1,5 @@
 services:
-  # App Service: Laravel API Server & Backend CLI Tools
+  # App Service: Laravel CLI & Artisan Server
   app:
     build:
       context: .
@@ -8,12 +8,16 @@ services:
     restart: always
     working_dir: /var/www/html
     ports:
-      - "8000:8000"                      # API Backend: http://localhost:8000/api/...
+      - "8000:8000"                      # Laravel App: http://localhost:8000
     volumes:
       - .:/var/www/html
     environment:
+      DB_CONNECTION: mysql
       DB_HOST: db
       DB_PORT: 3306
+      DB_DATABASE: ltmnm_shop_handmade
+      DB_USERNAME: root
+      DB_PASSWORD: root
     command: php artisan serve --host=0.0.0.0 --port=8000
     depends_on:
       - db
@@ -22,7 +26,7 @@ services:
     stdin_open: true
     tty: true
 
-  # Web Service: Apache HTTP Server
+  # Web Service: Apache HTTP Server serving Laravel Public
   web:
     build:
       context: .
@@ -30,9 +34,20 @@ services:
     container_name: ltmnm_shop_handmade_web
     restart: always
     ports:
-      - "8080:80"                      # Truy cập web qua: http://localhost:8080
+      - "8080:80"                      # Truy cập web qua Apache: http://localhost:8080
     volumes:
-      - ./frontend/src:/var/www/html            # Ánh xạ code PHP vào web root của Apache
+      - .:/var/www/html
+    environment:
+      DB_CONNECTION: mysql
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_DATABASE: ltmnm_shop_handmade
+      DB_USERNAME: root
+      DB_PASSWORD: root
+    command: >
+      bash -c "sed -ri -e 's!/var/www/html!/var/www/html/public!g' /etc/apache2/sites-available/*.conf &&
+               sed -ri -e 's!/var/www/!/var/www/html/public!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf &&
+               apache2-foreground"
     depends_on:
       - db
     networks:
@@ -49,8 +64,6 @@ services:
     ports:
       - "3307:3306"
     volumes:
-      - ./backend/src/database/schemas/shop_handmade_schema.sql:/docker-entrypoint-initdb.d/01_shop_handmade_schema.sql
-      - ./backend/src/database/seeders/shop_handmade_seeder.sql:/docker-entrypoint-initdb.d/02_shop_handmade_seeder.sql
       - db_data:/var/lib/mysql
     networks:
       - app_network

@@ -1,0 +1,786 @@
+@import url('https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,opsz,wght@0,6..12,300;0,6..12,400;0,6..12,600;0,6..12,700;0,6..12,800;1,6..12,400;1,6..12,600&family=Playfair+Display:ital,wght@0,600;0,700;1,500;1,600&display=swap');
+
+:root {
+    --color-surface: #fff8f6;
+    --color-surface-dim: #ecd5cd;
+    --color-surface-container-lowest: #ffffff;
+    --color-on-surface: #251914;
+    --color-on-surface-variant: #55423e;
+    --color-outline: #89726d;
+    --color-outline-variant: #dcc1ba;
+    --color-primary: #792a16;
+    --color-primary-container: #98412b;
+    --color-on-primary-container: #ffc8bb;
+    --color-secondary-container: #fbd9cc;
+    --color-tertiary-container: #49624e;
+    --color-border-muted: #dcc1ba;
+    --font-main: 'Nunito Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-heading: 'Playfair Display', Georgia, serif;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: var(--font-main);
+    background-color: var(--color-surface);
+    color: var(--color-on-surface);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Tùy chỉnh màu khi quét khối bôi đen chữ */
+::selection {
+    background-color: #ffc8bb;
+    color: #792a16;
+}
+
+::-moz-selection {
+    background-color: #ffc8bb;
+    color: #792a16;
+}
+
+/* Header */
+.auth-header {
+    width: 100%;
+    background-color: var(--color-surface-container-lowest);
+    border-bottom: 1px solid var(--color-outline-variant);
+    padding: 12px 0;
+}
+
+.auth-header-container {
+    width: 100%;
+    padding: 0 40px;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+.auth-header .brand-logo img {
+    height: 56px;
+    width: auto;
+    display: block;
+}
+
+/* Main Container */
+.auth-main {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px 20px 40px;
+    background: radial-gradient(circle at 50% 38%, rgba(251, 217, 204, 0.35) 0%, rgba(255, 248, 246, 0.85) 60%, var(--color-surface) 100%);
+}
+
+.auth-card {
+    width: 100%;
+    max-width: 980px;
+    background-color: var(--color-surface-container-lowest);
+    border-radius: 20px;
+    border: 1px solid rgba(220, 193, 186, 0.75);
+    box-shadow:
+        0 4px 12px rgba(121, 42, 22, 0.04),
+        0 16px 36px rgba(121, 42, 22, 0.08),
+        0 30px 60px rgba(37, 25, 20, 0.06);
+    display: flex;
+    overflow: hidden;
+    min-height: 650px;
+    transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.auth-card:hover {
+    /* Hiệu ứng nổi khi hover chuột */
+    transform: translateY(-2px);
+    box-shadow:
+        0 6px 16px rgba(121, 42, 22, 0.06),
+        0 22px 46px rgba(121, 42, 22, 0.11),
+        0 36px 72px rgba(37, 25, 20, 0.08);
+}
+
+/* Cột Trái: Banner nghệ thuật gọi file ảnh auth-banner.png */
+.auth-banner-col {
+    flex: 0 0 45%;
+    position: relative;
+    background-color: #2b1710;
+    background-image:
+        linear-gradient(180deg, rgba(74, 31, 19, 0.65) 0%, rgba(37, 25, 20, 0.90) 100%),
+        url('/assets/images/auth-banner.png');
+    background-size: cover;
+    background-position: center;
+    padding: 44px 32px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    color: #ffffff;
+}
+
+.banner-content-top .banner-heading {
+    font-family: var(--font-heading);
+    font-size: 30px;
+    font-weight: 700;
+    line-height: 1.35;
+    margin-bottom: 16px;
+    color: #ffffff;
+}
+
+.banner-content-top .banner-heading .text-artisan-highlight {
+    color: #ffb4a2;
+    font-style: italic;
+    font-weight: 600;
+}
+
+.banner-content-top .banner-desc {
+    font-size: 13.5px;
+    line-height: 1.65;
+    color: rgba(255, 248, 246, 0.88);
+    font-weight: 400;
+}
+
+.banner-divider {
+    border: none;
+    border-top: 1px solid rgba(255, 255, 255, 0.15);
+    margin: 20px 0;
+}
+
+/* Feature Badges bên cột banner */
+.banner-features {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.feature-badge-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    background: rgba(255, 255, 255, 0.04);
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 12px;
+    padding: 12px 14px;
+    transition: background 0.3s ease, transform 0.2s ease, border-color 0.3s ease;
+}
+
+.feature-badge-item:hover {
+    background: rgba(255, 255, 255, 0.09);
+    border-color: rgba(255, 255, 255, 0.22);
+    transform: translateX(3px);
+}
+
+.feature-badge-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.08);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 1px;
+}
+
+.feature-badge-icon i,
+.feature-badge-icon svg {
+    font-size: 17px;
+    color: #ffffff;
+}
+
+.feature-badge-text h4 {
+    font-size: 13px;
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 3px;
+}
+
+.feature-badge-text p {
+    font-size: 11.5px;
+    color: rgba(255, 255, 255, 0.82);
+    line-height: 1.4;
+}
+
+.banner-quote {
+    font-size: 11.5px;
+    font-style: italic;
+    color: rgba(255, 255, 255, 0.65);
+    margin-top: 16px;
+    line-height: 1.4;
+}
+
+/* Cột Phải: Form xác thực */
+.auth-form-col {
+    flex: 0 0 55%;
+    padding: 38px 44px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    background-color: var(--color-surface-container-lowest);
+    animation: fadeInForm 0.2s ease-out;
+}
+
+@keyframes fadeInForm {
+    from {
+        opacity: 0.35;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+/* Tabs Container */
+.auth-tabs {
+    display: flex;
+    gap: 32px;
+    border-bottom: 1.5px solid var(--color-outline-variant);
+    margin-bottom: 26px;
+    position: relative;
+}
+
+.auth-tab-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding-bottom: 12px;
+    font-size: 14px;
+    font-weight: 700;
+    text-decoration: none;
+    color: var(--color-outline);
+    position: relative;
+    transition: color 0.2s ease;
+}
+
+.auth-tab-link:hover {
+    color: var(--color-primary);
+}
+
+.auth-tab-link.active {
+    color: var(--color-primary);
+}
+
+.auth-tab-link.active::after {
+    content: '';
+    position: absolute;
+    bottom: -1.5px;
+    left: 0;
+    right: 0;
+    height: 2.5px;
+    background-color: var(--color-primary);
+    border-radius: 2px 2px 0 0;
+}
+
+.auth-tab-link svg {
+    width: 17px;
+    height: 17px;
+    stroke: currentColor;
+    transition: transform 0.2s ease;
+}
+
+.auth-tab-link:hover svg {
+    transform: scale(1.08);
+}
+
+/* Tiêu đề Form */
+.form-title-area {
+    margin-bottom: 20px;
+}
+
+.form-main-title {
+    font-size: 23px;
+    font-weight: 800;
+    color: var(--color-on-surface);
+    margin-bottom: 6px;
+}
+
+.form-sub-title {
+    font-size: 13px;
+    color: var(--color-outline);
+}
+
+/* Layout Form Controls */
+.auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.form-row {
+    display: flex;
+    gap: 14px;
+}
+
+.form-row .form-group {
+    flex: 1;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-label {
+    font-size: 11.5px;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    color: #493a36;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+}
+
+.form-label .required {
+    color: var(--color-primary);
+    margin-left: 2px;
+}
+
+.input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.input-icon-left {
+    position: absolute;
+    left: 14px;
+    color: var(--color-outline);
+    display: flex;
+    align-items: center;
+    pointer-events: none;
+}
+
+.input-icon-left i,
+.input-icon-left svg {
+    font-size: 16px;
+    width: 17px;
+    height: 17px;
+}
+
+.form-control {
+    width: 100%;
+    height: 44px;
+    padding: 0 14px;
+    font-size: 13.5px;
+    font-family: var(--font-main);
+    color: var(--color-on-surface);
+    background-color: #ffffff;
+    border: 1px solid var(--color-outline-variant);
+    border-radius: 8px;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.form-control.has-icon-left {
+    padding-left: 40px;
+}
+
+.form-control.has-icon-right {
+    padding-right: 40px;
+}
+
+.form-control:focus {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(121, 42, 22, 0.12);
+}
+
+.form-control::placeholder {
+    color: #ab958f;
+    font-size: 13px;
+}
+
+/* Nút ẩn hiện mật khẩu */
+.btn-toggle-pwd {
+    position: absolute;
+    right: 12px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--color-outline);
+    display: flex;
+    align-items: center;
+    padding: 4px;
+}
+
+.btn-toggle-pwd:hover {
+    color: var(--color-primary);
+}
+
+.btn-toggle-pwd i,
+.btn-toggle-pwd svg {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+}
+
+/* Form Options */
+.form-options {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 12.5px;
+    margin-top: 2px;
+}
+
+.checkbox-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--color-on-surface-variant);
+    cursor: pointer;
+    user-select: none;
+}
+
+.checkbox-label input[type="checkbox"] {
+    accent-color: var(--color-primary);
+    width: 15px;
+    height: 15px;
+    cursor: pointer;
+}
+
+.link-forgot {
+    color: var(--color-outline);
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.2s;
+}
+
+.link-forgot:hover {
+    color: var(--color-primary);
+    text-decoration: underline;
+}
+
+/* Nút Submit */
+.btn-submit {
+    height: 46px;
+    background-color: var(--color-primary);
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    font-size: 14.5px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: background-color 0.2s, transform 0.1s;
+    margin-top: 6px;
+    box-shadow: 0 3px 8px rgba(121, 42, 22, 0.25);
+}
+
+.btn-submit:hover {
+    background-color: var(--color-primary-container);
+}
+
+.btn-submit:active {
+    transform: translateY(1px);
+}
+
+/* Chuyển đổi login/register */
+.switch-auth-link {
+    text-align: center;
+    font-size: 13px;
+    color: var(--color-outline);
+    margin-top: 6px;
+}
+
+.switch-auth-link a {
+    color: var(--color-primary);
+    font-weight: 700;
+    text-decoration: underline;
+}
+
+.switch-auth-link a:hover {
+    color: var(--color-primary-container);
+}
+
+/* Footer */
+.auth-footer {
+    width: 100%;
+    background-color: var(--color-surface-container-lowest);
+    border-top: 1px solid var(--color-outline-variant);
+    padding: 18px 16px;
+    margin-top: auto;
+}
+
+.auth-footer-container {
+    width: 100%;
+    max-width: 980px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.auth-footer p {
+    font-size: 12.5px;
+    color: var(--color-outline);
+    font-weight: 500;
+    letter-spacing: 0.01em;
+}
+
+/* Modal Popup quên mật khẩu */
+.modal-backdrop-custom {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(37, 25, 20, 0.6);
+    backdrop-filter: blur(4px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    padding: 20px;
+    opacity: 0;
+    transition: opacity 0.25s ease;
+}
+
+.modal-backdrop-custom.show {
+    display: flex;
+    opacity: 1;
+}
+
+.modal-box-custom {
+    background: #ffffff;
+    border-radius: 16px;
+    width: 100%;
+    max-width: 440px;
+    padding: 32px 28px;
+    box-shadow: 0 15px 40px rgba(121, 42, 22, 0.15);
+    border: 1px solid var(--color-outline-variant);
+    transform: scale(0.94);
+    transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+    position: relative;
+}
+
+.modal-backdrop-custom.show .modal-box-custom {
+    transform: scale(1);
+}
+
+.modal-close-btn {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    background: none;
+    border: none;
+    font-size: 22px;
+    color: var(--color-outline);
+    cursor: pointer;
+    line-height: 1;
+    padding: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    transition: color 0.2s, background-color 0.2s;
+    z-index: 10;
+}
+
+.modal-close-btn:hover {
+    color: var(--color-primary);
+    background-color: var(--color-surface-container-high);
+}
+
+.modal-icon-circle {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background-color: var(--color-secondary-container);
+    color: var(--color-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    margin-bottom: 16px;
+    line-height: 1;
+}
+
+.modal-icon-circle i {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+}
+
+.modal-title {
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--color-on-surface);
+    margin-bottom: 8px;
+}
+
+.modal-desc {
+    font-size: 13px;
+    color: var(--color-outline);
+    line-height: 1.5;
+    margin-bottom: 20px;
+}
+
+/* Steps Indicator */
+.modal-steps-indicator {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 22px;
+    padding-bottom: 14px;
+    padding-right: 36px;
+    border-bottom: 1px dashed var(--color-outline-variant);
+}
+
+.step-dot {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--color-outline);
+}
+
+.step-dot span {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background-color: var(--color-surface-container-high);
+    color: var(--color-outline);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+}
+
+.step-dot.active {
+    color: var(--color-primary);
+}
+
+.step-dot.active span {
+    background-color: var(--color-primary);
+    color: #ffffff;
+}
+
+.step-dot.completed {
+    color: #059669;
+}
+
+.step-dot.completed span {
+    background-color: #059669;
+    color: #ffffff;
+}
+
+.step-line {
+    flex: 1;
+    height: 2px;
+    background-color: var(--color-outline-variant);
+    margin: 0 8px;
+}
+
+/* OTP 6 Digits */
+.otp-inputs-wrapper {
+    display: flex;
+    gap: 8px;
+    justify-content: space-between;
+    margin-top: 8px;
+}
+
+.otp-digit {
+    width: 48px;
+    height: 52px;
+    text-align: center;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--color-on-surface);
+    border: 1.5px solid var(--color-outline-variant);
+    border-radius: 10px;
+    background-color: var(--color-surface-container-lowest);
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.otp-digit:focus {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(121, 42, 22, 0.12);
+}
+
+.otp-resend-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 12px;
+    font-size: 12px;
+    color: var(--color-outline);
+}
+
+.btn-resend-otp {
+    background: none;
+    border: none;
+    color: var(--color-primary);
+    font-weight: 700;
+    cursor: pointer;
+    font-size: 12px;
+    padding: 0;
+}
+
+.btn-resend-otp:disabled {
+    color: var(--color-outline);
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+/* Outline Button */
+.btn-outline-custom {
+    padding: 12px 18px;
+    background: transparent;
+    border: 1.5px solid var(--color-outline-variant);
+    border-radius: 10px;
+    color: var(--color-on-surface);
+    font-size: 13.5px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color 0.2s, border-color 0.2s;
+}
+
+.btn-outline-custom:hover {
+    background-color: var(--color-surface-container-high);
+    border-color: var(--color-outline);
+}
+
+/* Animation cho từng bước */
+.forgot-step-content {
+    animation: fadeInStep 0.25s ease forwards;
+}
+
+@keyframes fadeInStep {
+    from {
+        opacity: 0;
+        transform: translateY(4px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive */
+@media (max-width: 860px) {
+    .auth-card {
+        flex-direction: column;
+        max-width: 500px;
+    }
+
+    .auth-banner-col {
+        flex: none;
+        padding: 30px 24px;
+    }
+
+    .auth-form-col {
+        flex: none;
+        padding: 30px 24px;
+    }
+
+    .form-row {
+        flex-direction: column;
+        gap: 15px;
+    }
+}

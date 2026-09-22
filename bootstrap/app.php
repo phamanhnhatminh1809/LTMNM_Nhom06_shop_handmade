@@ -10,11 +10,6 @@ return Application::configure(basePath: dirname(__DIR__))
         web: __DIR__.'/../routes/web.php',
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
-        then: function () {
-            Route::prefix('api')
-                ->middleware('throttle:60,1')
-                ->group(base_path('backend/src/features/products/Routes/products.routes.php'));
-        },
     )
     ->withMiddleware(function (Middleware $middleware): void {
         //
