@@ -58,6 +58,34 @@ class OrderSeeder extends Seeder
                     ['product_id' => 48, 'quantity' => 1, 'unit_price' => 230000.00, 'total_price' => 230000.00],
                 ]
             ],
+            [
+                'id' => 4,
+                'code' => 'ORD-9020',
+                'user_id' => 2,
+                'shipping_name' => 'Nguyễn Văn An',
+                'shipping_phone' => '0912345678',
+                'shipping_address' => '123 Đường Nguyễn Huệ, Quận 1, TP.HCM',
+                'total_amount' => 540000.00,
+                'status' => 'completed',
+                'items' => [
+                    ['product_id' => 1, 'quantity' => 1, 'unit_price' => 250000.00, 'total_price' => 250000.00],
+                    ['product_id' => 7, 'quantity' => 1, 'unit_price' => 290000.00, 'total_price' => 290000.00],
+                ]
+            ],
+            [
+                'id' => 5,
+                'code' => 'ORD-9019',
+                'user_id' => 3,
+                'shipping_name' => 'Trần Thị Bình',
+                'shipping_phone' => '0923456789',
+                'shipping_address' => '456 Lê Duẩn, Quận Hải Châu, Đà Nẵng',
+                'total_amount' => 760000.00,
+                'status' => 'completed',
+                'items' => [
+                    ['product_id' => 3, 'quantity' => 2, 'unit_price' => 180000.00, 'total_price' => 360000.00],
+                    ['product_id' => 12, 'quantity' => 1, 'unit_price' => 400000.00, 'total_price' => 400000.00],
+                ]
+            ],
         ];
 
         foreach ($orders as $orderData) {
