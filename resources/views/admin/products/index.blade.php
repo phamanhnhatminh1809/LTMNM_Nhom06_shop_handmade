@@ -7,6 +7,36 @@
 @endphp
 
 @section('content')
+{{--
+    ================================================================
+    [BACKEND ĐÃ CÓ] — Cập nhật dành cho Frontend
+    ================================================================
+    Backend đã bổ sung thêm các action sau (chưa có trước đây):
+
+    1. XEM CHI TIẾT sản phẩm:
+       Route: GET /admin/products/{product}  → admin.products.show
+       View : resources/views/admin/products/show.blade.php
+
+    2. FORM SỬA sản phẩm:
+       Route: GET  /admin/products/{product}/edit  → admin.products.edit
+              PUT  /admin/products/{product}        → admin.products.update
+       View : resources/views/admin/products/edit.blade.php
+
+    3. FORM TẠO sản phẩm (trang riêng, thay cho modal):
+       Route: GET  /admin/products/create  → admin.products.create
+              POST /admin/products          → admin.products.store
+       View : resources/views/admin/products/create.blade.php
+
+    4. XÓA sản phẩm:
+       Route: DELETE /admin/products/{product}  → admin.products.destroy
+       Cần form với @method('DELETE')
+
+    Các nút trong bảng hiện tại:
+      - Nút "Xem ngoài web" (btn-action-view + bi-eye): đã đúng → route('products.show', $prod->id)
+      - Nút "Chỉnh sửa" (btn-action-view + bi-pencil): cần wire vào → route('admin.products.edit', $prod)
+    ================================================================
+--}}
+
 <!-- Top Bar -->
 <div class="admin-top-bar">
     <div class="page-main-title">

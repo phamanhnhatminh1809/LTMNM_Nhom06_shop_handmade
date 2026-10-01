@@ -33,31 +33,93 @@ class ProductController extends Controller
         return view('admin.products.index', compact('products', 'categories'));
     }
 
+    /**
+     * Hiển thị form tạo sản phẩm mới.
+     */
+    public function create(): View
+    {
+        $categories = Category::all();
+        return view('admin.products.create', compact('categories'));
+    }
+
     public function store(Request $request): RedirectResponse
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'code' => 'required|string|max:50|unique:products,code',
-            'category_id' => 'required|exists:categories,id',
-            'price' => 'required|numeric|min:0',
-            'old_price' => 'nullable|numeric|min:0',
-            'stock_quantity' => 'required|integer|min:0',
-            'description' => 'nullable|string',
+            'name'                 => 'required|string|max:255',
+            'code'                 => 'required|string|max:50|unique:products,code',
+            'category_id'          => 'required|exists:categories,id',
+            'price'                => 'required|numeric|min:0',
+            'old_price'            => 'nullable|numeric|min:0',
+            'stock_quantity'       => 'required|integer|min:0',
+            'description'          => 'nullable|string',
+            'instruction_preserve' => 'nullable|string',
+            'is_featured'          => 'nullable|boolean',
         ]);
 
         $validated['slug'] = Str::slug($validated['name']) . '-' . Str::random(5);
-        $validated['image'] = 'assets/images/products/tui-01.jpg'; // default
+        $validated['image'] = 'assets/images/products/tui-01.jpg'; // default placeholder
         $validated['rating'] = 5.0;
         $validated['sold'] = 0;
+        $validated['is_featured'] = $request->boolean('is_featured');
 
         Product::create($validated);
 
-        return redirect()->route('admin.products.index')->with('success', 'Thêm sản phẩm thành công!');
+        return redirect()->route('admin.products.index')
+            ->with('success', 'Thêm sản phẩm thành công!');
+    }
+
+    /**
+     * Xem chi tiết sản phẩm (trong admin).
+     */
+    public function show(Product $product): View
+    {
+        $product->load('category');
+        return view('admin.products.show', compact('product'));
+    }
+
+    /**
+     * Hiển thị form chỉnh sửa sản phẩm.
+     */
+    public function edit(Product $product): View
+    {
+        $categories = Category::all();
+        return view('admin.products.edit', compact('product', 'categories'));
+    }
+
+    /**
+     * Lưu thông tin sản phẩm đã chỉnh sửa.
+     */
+    public function update(Request $request, Product $product): RedirectResponse
+    {
+        $validated = $request->validate([
+            'name'                 => 'required|string|max:255',
+            'code'                 => 'required|string|max:50|unique:products,code,' . $product->id,
+            'category_id'          => 'required|exists:categories,id',
+            'price'                => 'required|numeric|min:0',
+            'old_price'            => 'nullable|numeric|min:0',
+            'stock_quantity'       => 'required|integer|min:0',
+            'description'          => 'nullable|string',
+            'instruction_preserve' => 'nullable|string',
+            'is_featured'          => 'nullable|boolean',
+        ]);
+
+        // Tái sinh slug nếu tên thay đổi
+        if ($product->name !== $validated['name']) {
+            $validated['slug'] = Str::slug($validated['name']) . '-' . Str::random(5);
+        }
+
+        $validated['is_featured'] = $request->boolean('is_featured');
+
+        $product->update($validated);
+
+        return redirect()->route('admin.products.index')
+            ->with('success', 'Cập nhật sản phẩm "' . $product->name . '" thành công!');
     }
 
     public function destroy(Product $product): RedirectResponse
     {
         $product->delete();
-        return redirect()->route('admin.products.index')->with('success', 'Đã xóa sản phẩm thành công!');
+        return redirect()->route('admin.products.index')
+            ->with('success', 'Đã xóa sản phẩm thành công!');
     }
 }
