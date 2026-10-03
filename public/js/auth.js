@@ -83,19 +83,30 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function startResendCountdown() {
-        if (!resendCountdown || !btnResendOtp) return;
-        let timeLeft = 60;
-        btnResendOtp.disabled = true;
-        resendCountdown.textContent = timeLeft;
+    function startResendCountdown(duration = 60) {
+        if (!btnResendOtp) return;
 
-        if (countdownTimer) clearInterval(countdownTimer);
+        if (countdownTimer) {
+            clearInterval(countdownTimer);
+            countdownTimer = null;
+        }
+
+        let timeLeft = duration;
+        btnResendOtp.disabled = true;
+        btnResendOtp.innerHTML = `Gửi lại mã (<span id="resend-countdown">${timeLeft}</span>s)`;
 
         countdownTimer = setInterval(() => {
             timeLeft -= 1;
-            resendCountdown.textContent = timeLeft;
+            const spanEl = document.getElementById('resend-countdown');
+            if (spanEl) {
+                spanEl.textContent = timeLeft;
+            } else {
+                btnResendOtp.innerHTML = `Gửi lại mã (<span id="resend-countdown">${timeLeft}</span>s)`;
+            }
+
             if (timeLeft <= 0) {
                 clearInterval(countdownTimer);
+                countdownTimer = null;
                 btnResendOtp.disabled = false;
                 btnResendOtp.textContent = 'Gửi lại mã OTP';
             }
@@ -186,19 +197,61 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Submit Bước 1: Nhập email -> chuyển sang OTP
+    function getCsrfToken() {
+        return document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+    }
+
+    let savedOtp = '';
+
+    // Submit Bước 1: Nhập email -> gửi OTP qua backend
     if (formStep1) {
-        formStep1.addEventListener('submit', (e) => {
+        formStep1.addEventListener('submit', async (e) => {
             e.preventDefault();
             const emailInput = document.getElementById('forgot-email');
-            savedEmail = emailInput ? emailInput.value : '';
-            if (displayTargetEmail) displayTargetEmail.textContent = savedEmail;
+            savedEmail = emailInput ? emailInput.value.trim() : '';
+            if (!savedEmail) return;
 
-            // Xóa trắng OTP cũ
-            otpDigits.forEach(d => d.value = '');
+            const submitBtn = formStep1.querySelector('button[type="submit"]');
+            const originalBtnHtml = submitBtn ? submitBtn.innerHTML : '';
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<span>Đang gửi mã OTP...</span>';
+            }
 
-            switchStep(2);
-            startResendCountdown();
+            try {
+                const response = await fetch('/forgot-password/send-otp', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': getCsrfToken(),
+                        'Accept': 'application/json',
+                    },
+                    body: JSON.stringify({ email: savedEmail }),
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    if (displayTargetEmail) displayTargetEmail.textContent = savedEmail;
+                    otpDigits.forEach(d => d.value = '');
+                    switchStep(2);
+                    startResendCountdown();
+
+                    if (data.dev_otp) {
+                        console.log('%c[Shop Handmade] MÃ OTP KIỂM THỬ: ' + data.dev_otp, 'font-size: 16px; font-weight: bold; color: #e76f51;');
+                    }
+                } else {
+                    alert(data.message || 'Không thể gửi mã OTP. Vui lòng thử lại!');
+                }
+            } catch (err) {
+                console.error(err);
+                alert('Có lỗi kết nối đến máy chủ. Vui lòng thử lại sau!');
+            } finally {
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalBtnHtml;
+                }
+            }
         });
     }
 
@@ -211,15 +264,46 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Nút gửi lại mã OTP
     if (btnResendOtp) {
-        btnResendOtp.addEventListener('click', () => {
-            startResendCountdown();
-            alert(`Mã xác thực OTP mới đã được gửi lại tới: ${savedEmail}`);
+        btnResendOtp.addEventListener('click', async () => {
+            if (!savedEmail) return;
+            btnResendOtp.disabled = true;
+            btnResendOtp.textContent = 'Đang gửi mã mới...';
+
+            try {
+                const response = await fetch('/forgot-password/send-otp', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': getCsrfToken(),
+                        'Accept': 'application/json',
+                    },
+                    body: JSON.stringify({ email: savedEmail }),
+                });
+
+                const data = await response.json();
+                if (response.ok && data.success) {
+                    alert('Mã OTP mới đã được gửi lại tới email của bạn!');
+                    startResendCountdown(60);
+                    if (data.dev_otp) {
+                        console.log('%c[Shop Handmade] MÃ OTP MỚI: ' + data.dev_otp, 'font-size: 16px; font-weight: bold; color: #e76f51;');
+                    }
+                } else {
+                    alert(data.message || 'Gửi lại mã thất bại!');
+                    btnResendOtp.disabled = false;
+                    btnResendOtp.textContent = 'Gửi lại mã OTP';
+                }
+            } catch (err) {
+                console.error(err);
+                alert('Có lỗi kết nối khi gửi lại mã OTP!');
+                btnResendOtp.disabled = false;
+                btnResendOtp.textContent = 'Gửi lại mã OTP';
+            }
         });
     }
 
-    // Submit Bước 2: Nhập OTP -> Xác thực -> chuyển sang Bước 3
+    // Submit Bước 2: Nhập OTP -> Gọi API xác thực OTP
     if (formStep2) {
-        formStep2.addEventListener('submit', (e) => {
+        formStep2.addEventListener('submit', async (e) => {
             e.preventDefault();
             let otpVal = '';
             otpDigits.forEach(d => otpVal += d.value);
@@ -229,25 +313,100 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            // Chuyển sang bước 3: Đặt mật khẩu mới
-            switchStep(3);
+            const submitBtn = formStep2.querySelector('button[type="submit"]');
+            const originalBtnHtml = submitBtn ? submitBtn.innerHTML : '';
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<span>Đang xác thực...</span>';
+            }
+
+            try {
+                const response = await fetch('/forgot-password/verify-otp', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': getCsrfToken(),
+                        'Accept': 'application/json',
+                    },
+                    body: JSON.stringify({ email: savedEmail, otp: otpVal }),
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    savedOtp = otpVal;
+                    switchStep(3);
+                } else {
+                    alert(data.message || 'Mã OTP không hợp lệ hoặc đã hết hạn!');
+                }
+            } catch (err) {
+                console.error(err);
+                alert('Có lỗi xảy ra khi xác thực OTP!');
+            } finally {
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalBtnHtml;
+                }
+            }
         });
     }
 
-    // Submit Bước 3: Đổi mật khẩu mới
+    // Submit Bước 3: Đổi mật khẩu mới qua API
     if (formStep3) {
-        formStep3.addEventListener('submit', (e) => {
+        formStep3.addEventListener('submit', async (e) => {
             e.preventDefault();
             const newPwd = document.getElementById('new-password').value;
             const confirmNewPwd = document.getElementById('confirm-new-password').value;
+
+            if (newPwd.length < 8) {
+                alert('Mật khẩu mới phải có tối thiểu 8 ký tự!');
+                return;
+            }
 
             if (newPwd !== confirmNewPwd) {
                 alert('Mật khẩu xác nhận không khớp! Vui lòng kiểm tra lại.');
                 return;
             }
 
-            // Chuyển sang màn hình thành công
-            switchStep(4);
+            const submitBtn = formStep3.querySelector('button[type="submit"]');
+            const originalBtnHtml = submitBtn ? submitBtn.innerHTML : '';
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<span>Đang đổi mật khẩu...</span>';
+            }
+
+            try {
+                const response = await fetch('/forgot-password/reset', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': getCsrfToken(),
+                        'Accept': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        email: savedEmail,
+                        otp: savedOtp,
+                        password: newPwd,
+                        password_confirmation: confirmNewPwd,
+                    }),
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    switchStep(4);
+                } else {
+                    alert(data.message || 'Không thể đặt lại mật khẩu!');
+                }
+            } catch (err) {
+                console.error(err);
+                alert('Có lỗi xảy ra khi cập nhật mật khẩu mới!');
+            } finally {
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalBtnHtml;
+                }
+            }
         });
     }
 

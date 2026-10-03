@@ -82,3 +82,10 @@ Dự án website thương mại điện tử đồ thủ công **Shop Handmade**
 - **Chạy Local (Laragon)**: Port `3306` | User `root` | Password: ` ` (trống)
 - **Chạy Docker**: Port `3307` (Host) -> `3306` (Container) | User `root` | Password `root`
 - **Database**: `ltmnm_shop_handmade`
+
+---
+
+## Cấu hình dịch vụ gửi Email (OTP Quên mật khẩu)
+
+Chi tiết các bước cấu hình Google App Password và thiết lập file `.env` xem tại tài liệu:
+[docs/HUONG_DAN_CAU_HINH_EMAIL_OTP.md](docs/HUONG_DAN_CAU_HINH_EMAIL_OTP.md)

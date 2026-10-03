@@ -13,7 +13,9 @@
                     <a href="{{ route('admin.dashboard') }}"><strong>Quản trị</strong></a>
                     <span class="top-bar__sep">|</span>
                 @endif
-                <span>Chào, <strong>{{ Auth::user()->full_name }}</strong></span>
+                <a href="{{ route('profile.show') }}" style="color: inherit; text-decoration: none;">
+                    Chào, <strong>{{ Auth::user()->full_name }}</strong>
+                </a>
                 <span class="top-bar__sep">|</span>
                 <form action="{{ route('logout') }}" method="POST" style="display:inline;">
                     @csrf
