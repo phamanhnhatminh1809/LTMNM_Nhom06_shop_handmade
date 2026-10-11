@@ -48,108 +48,118 @@ body {
     width: 100%;
 }
 
-/* Sidebar trượt thu gọn/mở rộng */
+/* Sidebar trượt thu gọn/mở rộng như KLCN */
 .admin-sidebar {
-    width: var(--sidebar-collapsed-width);
-    background-color: #fcf4f1;
+    width: var(--sidebar-expanded-width);
+    background-color: #f9f4f1;
     border-right: 1px solid var(--color-outline-variant);
-    display: flex;
-    flex-direction: column;
     position: sticky;
     top: 0;
     height: 100vh;
-    padding: 24px 14px;
-    overflow-x: hidden;
-    overflow-y: hidden;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
+    padding: 0;
+    overflow: visible !important;
     flex-shrink: 0;
     z-index: 1000;
-    transition: width 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), padding 0.3s ease, box-shadow 0.3s ease;
-    scroll-behavior: smooth;
+    user-select: none;
+    transition: width 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
-/* Ẩn scrollbar */
-.admin-sidebar::-webkit-scrollbar {
-    width: 0px;
-    height: 0px;
-    display: none;
-}
-
-/* Khi hover chuột vào sidebar trượt mở rộng */
-.admin-sidebar:hover {
-    width: var(--sidebar-expanded-width);
-    padding: 24px 16px;
-    box-shadow: 6px 0 25px rgba(121, 42, 22, 0.09);
+/* Khung cuộn nội dung độc lập bên trong sidebar */
+.sidebar-scroll-container {
+    width: 100%;
+    height: 100%;
+    padding: 16px 12px 14px;
+    display: flex;
+    flex-direction: column;
     overflow-y: auto;
+    overflow-x: hidden;
+    scroll-behavior: smooth;
     scrollbar-width: thin;
-    scrollbar-color: rgba(137, 114, 109, 0.4) transparent;
+    scrollbar-color: rgba(137, 114, 109, 0.3) transparent;
 }
 
-/* Tùy chỉnh thanh cuộn khi hover */
-.admin-sidebar:hover::-webkit-scrollbar {
-    width: 5px;
-    display: block;
+/* Tùy chỉnh thanh cuộn của sidebar khi mở rộng */
+.sidebar-scroll-container::-webkit-scrollbar {
+    width: 6px;
 }
 
-.admin-sidebar:hover::-webkit-scrollbar-track {
+.sidebar-scroll-container::-webkit-scrollbar-track {
     background: transparent;
 }
 
-.admin-sidebar:hover::-webkit-scrollbar-thumb {
-    background-color: rgba(137, 114, 109, 0.3);
-    border-radius: 10px;
+.sidebar-scroll-container::-webkit-scrollbar-thumb {
+    background-color: #ebdcd7;
+    border-radius: 9999px;
 }
 
-.admin-sidebar:hover::-webkit-scrollbar-thumb:hover {
+.sidebar-scroll-container::-webkit-scrollbar-thumb:hover {
     background-color: var(--color-outline);
 }
 
-/* Logo đầu sidebar: Khi thu gọn thì ẩn đẩy icon lên trên */
-.sidebar-header {
-    display: none;
-    margin-bottom: 0;
-}
-
-/* Khi hover chuột vào sidebar: hiện logo ngang */
-.admin-sidebar:hover .sidebar-header {
+/* Nút bấm thu gọn / trượt ra đặt tại mép phải sidebar giống KLCN */
+.btn-sidebar-toggle {
+    position: absolute;
+    right: -14px;
+    top: 24px;
+    z-index: 1050;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background-color: #ffffff;
+    border: 1px solid var(--color-outline-variant);
+    box-shadow: 0 2px 8px rgba(121, 42, 22, 0.14);
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 100%;
-    margin-bottom: 22px;
-    padding: 0 6px;
-    animation: fadeInLogo 0.3s ease forwards;
+    color: var(--color-primary);
+    cursor: pointer;
+    outline: none;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    padding: 0;
 }
 
-@keyframes fadeInLogo {
-    from {
-        opacity: 0;
-        transform: translateY(-6px);
-    }
+.btn-sidebar-toggle:hover {
+    background-color: #faede7;
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(121, 42, 22, 0.2);
+}
 
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+.btn-sidebar-toggle:active {
+    transform: scale(0.95);
+}
+
+.btn-sidebar-toggle i {
+    font-size: 13px;
+    font-weight: 800;
+    -webkit-text-stroke: 0.8px currentColor;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Trạng thái mở rộng (mặc định) */
+.admin-sidebar .sidebar-header {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    width: 100%;
+    margin-bottom: 16px;
+    padding: 4px 6px;
 }
 
 .sidebar-brand-logo {
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
     width: 100%;
 }
 
 .sidebar-brand-logo img {
-    width: 100%;
-    max-width: 210px;
-    height: auto;
-    max-height: 52px;
+    height: 44px;
+    max-width: 218px;
     object-fit: contain;
+    object-position: left;
     display: block;
-    border-radius: 0;
-    box-shadow: none;
 }
 
 .sidebar-nav {
@@ -165,38 +175,27 @@ body {
     flex-direction: column;
 }
 
-/* Link Menu: Mặc định thu gọn căn giữa thành ô vuông cân đối */
+/* Link Menu: Mở rộng mặc định */
 .nav-link {
     display: flex;
     align-items: center;
-    justify-content: center;
-    width: 44px;
-    height: 44px;
-    margin: 0 auto;
-    padding: 0;
+    justify-content: flex-start;
+    width: 100%;
+    height: 40px;
+    padding: 0 14px;
+    gap: 12px;
     border-radius: 12px;
-    color: var(--color-on-surface-variant);
+    color: #4a352f;
     text-decoration: none;
     font-size: 13.5px;
     font-weight: 700;
     white-space: nowrap;
     position: relative;
     border: 1px solid transparent;
-    transition: width 0.25s ease, padding 0.25s ease, background-color 0.2s ease, color 0.2s ease, border-radius 0.2s ease, transform 0.18s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    transition: all 0.2s ease-out;
 }
 
-/* Khi hover sidebar: mở rộng item thành full width, căn lề trái */
-.admin-sidebar:hover .nav-link {
-    width: 100%;
-    height: 42px;
-    padding: 0 14px;
-    justify-content: flex-start;
-    gap: 12px;
-    margin: 0;
-    border-radius: 10px;
-}
-
-/* Icon in đậm, căn giữa */
+/* Icon in đậm */
 .nav-link i {
     font-size: 18px;
     color: var(--color-outline);
@@ -207,193 +206,155 @@ body {
     justify-content: center;
     flex-shrink: 0;
     -webkit-text-stroke: 0.4px currentColor;
-    transition: color 0.2s, transform 0.18s;
+    transition: transform 0.2s ease, color 0.2s ease;
 }
 
-/* Hiệu ứng nổi cao cấp khi hover vào tab menu sidebar (giống các nút công cụ) */
+/* Hiệu ứng hover menu khi mở rộng */
 .nav-link:hover {
     background-color: #faede7;
-    border-color: #ebdcd7;
     color: var(--color-primary);
-    box-shadow: 0 4px 12px rgba(121, 42, 22, 0.08);
-    transform: translateY(-1.5px);
+    transform: translateX(4px);
 }
 
 .nav-link:hover i {
     color: var(--color-primary);
+    transform: scale(1.1);
 }
 
 /* Item Active */
 .nav-link.active {
-    background-color: #ebd3ca;
+    background-color: #edd9d1;
     color: var(--color-primary);
-    box-shadow: 0 2px 6px rgba(121, 42, 22, 0.06);
-}
-
-.nav-link.active:hover {
-    background-color: #ebd3ca;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 14px rgba(121, 42, 22, 0.12);
+    font-weight: 800;
+    box-shadow: 0 1px 3px rgba(121, 42, 22, 0.08);
 }
 
 .nav-link.active i {
     color: var(--color-primary);
-    -webkit-text-stroke: 0.5px var(--color-primary);
+    -webkit-text-stroke: 0.6px var(--color-primary);
 }
 
-/* Chữ trong menu: Ẩn khi thu gọn, hiện khi hover */
+/* Chữ trong menu */
 .nav-text {
-    opacity: 0;
-    visibility: hidden;
-    max-width: 0;
-    overflow: hidden;
-    transform: translateX(-6px);
-    transition: opacity 0.2s ease, transform 0.2s ease, max-width 0.2s ease;
-}
-
-.admin-sidebar:hover .nav-text {
     opacity: 1;
     visibility: visible;
     max-width: 200px;
-    transform: translateX(0);
-}
-
-/* Tiêu đề nhóm: Mặc định thu gọn ẩn */
-.nav-group-title {
-    font-size: 10.5px;
-    font-weight: 800;
-    letter-spacing: 0.06em;
-    color: var(--color-outline);
-    margin: 0;
-    height: 0;
-    line-height: 0;
-    padding: 0;
-    white-space: nowrap;
-    opacity: 0;
-    visibility: hidden;
     overflow: hidden;
-    transition: opacity 0.2s ease, height 0.2s ease, margin 0.2s ease;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    transition: opacity 0.2s ease, max-width 0.2s ease;
 }
 
-/* Khi hover sidebar: hiện lại tiêu đề nhóm */
-.admin-sidebar:hover .nav-group-title {
+/* Tiêu đề nhóm */
+.nav-group-title {
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    color: #a4918c;
+    text-transform: uppercase;
+    margin: 12px 0 6px 14px;
+    white-space: nowrap;
     opacity: 1;
     visibility: visible;
-    height: auto;
-    line-height: normal;
-    margin: 10px 0 6px 14px;
+    transition: opacity 0.2s ease, margin 0.2s ease;
 }
 
 .nav-list {
     list-style: none;
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 6px;
 }
 
 /* Profile dưới cùng sidebar */
 .sidebar-footer {
     margin-top: auto;
-    padding-top: 16px;
+    padding-top: 14px;
     border-top: 1px solid var(--color-outline-variant);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
 }
 
 .admin-profile-card {
-    background: #f4ded7;
+    background: #edd9d1;
     border-radius: 12px;
-    width: 44px;
-    height: 44px;
-    margin: 0 auto 12px;
-    padding: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-    transition: width 0.25s ease, padding 0.25s ease, justify-content 0.2s;
-}
-
-.admin-sidebar:hover .admin-profile-card {
     width: 100%;
     height: auto;
-    margin: 0 0 12px 0;
+    margin-bottom: 4px;
     padding: 8px 12px;
+    display: flex;
+    align-items: center;
     justify-content: flex-start;
     gap: 10px;
+    overflow: hidden;
+    transition: all 0.2s ease;
 }
 
 .profile-avatar {
     width: 32px;
     height: 32px;
     border-radius: 50%;
-    background-color: var(--color-primary);
+    background-color: #6a2412;
     color: #ffffff;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 15px;
     flex-shrink: 0;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .profile-info {
-    opacity: 0;
-    visibility: hidden;
-    max-width: 0;
+    opacity: 1;
+    visibility: visible;
+    max-width: 160px;
     overflow: hidden;
     white-space: nowrap;
     transition: opacity 0.2s ease, max-width 0.2s ease;
 }
 
-.admin-sidebar:hover .profile-info {
-    opacity: 1;
-    visibility: visible;
-    max-width: 150px;
-}
-
 .profile-info .profile-name {
-    font-size: 13px;
+    font-size: 12px;
     font-weight: 800;
-    color: var(--color-on-surface);
+    color: var(--color-primary);
+    line-height: 1.2;
 }
 
 .profile-info .profile-role {
     font-size: 11px;
-    color: var(--color-outline);
+    font-weight: 600;
+    color: #89726d;
+    line-height: 1.2;
 }
 
 .sidebar-actions {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 6px;
 }
 
 .action-link {
     display: flex;
     align-items: center;
-    justify-content: center;
-    width: 44px;
-    height: 40px;
-    margin: 0 auto;
+    justify-content: flex-start;
+    width: 100%;
+    height: 38px;
+    padding: 0 14px;
+    gap: 12px;
     font-size: 12.5px;
     font-weight: 700;
-    color: var(--color-on-surface-variant);
+    color: #4a352f;
     text-decoration: none;
     border-radius: 10px;
     white-space: nowrap;
-    transition: width 0.25s ease, padding 0.25s ease, background-color 0.2s, color 0.2s;
-}
-
-.admin-sidebar:hover .action-link {
-    width: 100%;
-    margin: 0;
-    padding: 8px 14px;
-    justify-content: flex-start;
-    gap: 12px;
+    transition: all 0.2s ease;
 }
 
 .action-link i {
-    font-size: 18px;
-    width: 22px;
-    height: 22px;
+    font-size: 17px;
+    width: 20px;
+    height: 20px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -402,8 +363,9 @@ body {
 }
 
 .action-link:hover {
-    background-color: rgba(251, 217, 204, 0.4);
+    background-color: #faede7;
     color: var(--color-primary);
+    transform: translateX(4px);
 }
 
 .action-link.text-danger {
@@ -417,6 +379,82 @@ body {
 
 .action-link.text-danger:hover {
     background-color: #ffdad6;
+}
+
+/* Trạng thái thu gọn sidebar */
+.admin-sidebar.collapsed {
+    width: var(--sidebar-collapsed-width);
+    overflow: visible !important;
+}
+
+.admin-sidebar.collapsed .sidebar-scroll-container {
+    padding: 20px 8px 14px;
+    overflow-x: hidden;
+}
+
+.admin-sidebar.collapsed .sidebar-header {
+    display: none;
+}
+
+.admin-sidebar.collapsed .nav-group-title {
+    opacity: 0;
+    height: 0;
+    margin: 4px 0;
+    overflow: hidden;
+    border-bottom: 1px solid rgba(235, 220, 215, 0.6);
+}
+
+.admin-sidebar.collapsed .nav-link {
+    width: 44px;
+    height: 40px;
+    margin: 0 auto;
+    padding: 0;
+    justify-content: center;
+    border-radius: 12px;
+}
+
+.admin-sidebar.collapsed .nav-link:hover {
+    transform: scale(1.08);
+}
+
+.admin-sidebar.collapsed .nav-text {
+    opacity: 0;
+    visibility: hidden;
+    max-width: 0;
+    display: none;
+}
+
+.admin-sidebar.collapsed .admin-profile-card {
+    width: 44px;
+    height: 44px;
+    margin: 0 auto 4px;
+    padding: 0;
+    justify-content: center;
+    background: transparent;
+}
+
+.admin-sidebar.collapsed .admin-profile-card:hover {
+    transform: scale(1.08);
+}
+
+.admin-sidebar.collapsed .profile-info {
+    opacity: 0;
+    visibility: hidden;
+    max-width: 0;
+    display: none;
+}
+
+.admin-sidebar.collapsed .action-link {
+    width: 44px;
+    height: 38px;
+    margin: 0 auto;
+    padding: 0;
+    justify-content: center;
+    border-radius: 10px;
+}
+
+.admin-sidebar.collapsed .action-link:hover {
+    transform: scale(1.08);
 }
 
 /* Main Content */
@@ -1280,7 +1318,7 @@ body {
     vertical-align: middle;
 }
 
-/* Hiệu ứng hover cả dòng bảng Đơn hàng (Đổi nền êm ái, không đẩy ngang gây thanh cuộn) */
+/* Hiệu ứng hover cả dòng bảng Đơn hàng */
 .admin-data-table tbody tr {
     cursor: pointer;
     transition: background-color 0.2s ease;
@@ -1425,8 +1463,8 @@ body {
     }
 }
 
-/* ==================== QUẢN LÝ SẢN PHẨM (PRODUCTS PAGE) ==================== */
-/* 1. Welcome Card Sản Phẩm (Nền be hồng nhạt ấm áp #fcf2ee theo chuẩn thiết kế) */
+/* Trang quản lý sản phẩm*/
+/* Welcome Card Sản Phẩm */
 .product-welcome-card {
     background: #fcf2ee;
     border: 1px solid #f7ded6;
@@ -1476,7 +1514,7 @@ body {
     font-size: 16px;
 }
 
-/* 2. Thanh Công Cụ Tìm Kiếm & Bộ Lọc (Khung nền be bao bọc chung các nút con nền trắng) */
+/* Thanh Công Cụ Tìm Kiếm & Bộ Lọc */
 .product-filter-bar {
     background: #fcf2ee;
     border: 1px solid #f7ded6;
@@ -1569,7 +1607,7 @@ body {
     gap: 10px;
 }
 
-/* Dropdown Danh Mục (Nền trắng nổi trên thanh be) */
+/* Dropdown Danh Mục */
 .filter-dropdown-wrapper {
     position: relative;
 }
@@ -1653,7 +1691,7 @@ body {
     padding-left: 19px;
 }
 
-/* Nút Bộ lọc nâng cao & Xuất file (Nền trắng nổi trên thanh be) */
+/* Nút Bộ lọc nâng cao & Xuất file */
 .filter-btn-outline {
     padding: 9px 16px;
     background: #ffffff;
@@ -1689,7 +1727,7 @@ body {
     color: var(--color-primary);
 }
 
-/* 3. Bảng Dữ Liệu Sản Phẩm */
+/* Bảng Dữ Liệu Sản Phẩm */
 .product-table-card {
     background: var(--color-surface-container-lowest);
     border: 1px solid rgba(235, 220, 215, 0.85);
@@ -1805,7 +1843,7 @@ body {
     font-family: var(--font-main);
 }
 
-/* Cột Danh Mục (Màu chữ #765D53 chuẩn theo yêu cầu) */
+/* Cột Danh Mục */
 .category-pill {
     display: inline-block;
     padding: 4px 10px;
@@ -1817,7 +1855,7 @@ body {
     white-space: nowrap;
 }
 
-/* Cột Giá Bán (Màu #ba1a1a chuẩn DESIGN.md theo yêu cầu) */
+/* Cột Giá Bán */
 .price-value-text {
     font-size: 13.5px;
     font-weight: 800;
@@ -1911,7 +1949,7 @@ body {
     color: var(--color-danger);
 }
 
-/* 4. Phân Trang (Pagination Footer) */
+/* Phân Trang */
 .product-pagination-footer {
     display: flex;
     align-items: center;
@@ -1997,7 +2035,7 @@ body {
     padding: 0 4px;
 }
 
-/* 5. Trạng thái không tìm thấy sản phẩm (Empty State) */
+/* Trạng thái không tìm thấy sản phẩm */
 .empty-state-box {
     display: flex;
     flex-direction: column;
@@ -2060,8 +2098,8 @@ body {
     box-shadow: 0 6px 18px rgba(121, 42, 22, 0.28);
 }
 
-/* ==================== DRAWER BỘ LỌC NÂNG CAO ==================== */
-/* 1. Lớp phủ Backdrop toàn màn hình */
+/* Drawer lọc nâng cao */
+/* Lớp phủ Backdrop toàn màn hình */
 .filter-drawer-overlay {
     position: fixed;
     top: 0;
@@ -2081,7 +2119,7 @@ body {
     visibility: visible;
 }
 
-/* 2. Khung Drawer trượt từ mép phải */
+/* Khung Drawer trượt từ mép phải */
 .filter-drawer {
     position: fixed;
     top: 0;
@@ -2149,7 +2187,7 @@ body {
     transform: scale(1.1);
 }
 
-/* Body Drawer (Cuộn mượt) */
+/* Body Drawer */
 .drawer-body {
     flex: 1;
     overflow-y: auto;
@@ -2324,7 +2362,7 @@ body {
     background-color: var(--color-primary);
 }
 
-/* Custom Dropdown Sắp xếp theo trong Drawer (đồng bộ như dropdown Danh mục) */
+/* Custom Dropdown Sắp xếp theo trong Drawer */
 .drawer-custom-select-wrapper {
     position: relative;
     width: 100%;
@@ -2475,9 +2513,7 @@ body {
     box-shadow: 0 6px 18px rgba(121, 42, 22, 0.28);
 }
 
-/* ==========================================================================
-   4. MODAL THÊM SẢN PHẨM MỚI (ADD PRODUCT MODAL)
-   ========================================================================== */
+/* Modal thêm mới sản phẩm */
 .product-modal-overlay {
     position: fixed;
     top: 0;
@@ -2521,7 +2557,7 @@ body {
     transform: scale(1) translateY(0);
 }
 
-/* 4.1 Header Modal */
+/* Header Modal */
 .product-modal-header {
     display: flex;
     align-items: flex-start;
@@ -2582,7 +2618,7 @@ body {
     transform: scale(1.08);
 }
 
-/* 4.2 Thân Modal (2 Cột, Cuộn mượt, Đường chia đôi chính giữa) */
+/* Thân Modal */
 .product-modal-body {
     flex: 1;
     overflow-y: auto;
@@ -2988,7 +3024,7 @@ body {
     color: #2e7d32;
 }
 
-/* 4.3 Cột Phải: Hình ảnh, Trạng thái, Bảo quản */
+/* Cột Phải: Hình ảnh, Trạng thái, Bảo quản */
 .image-upload-section {
     display: flex;
     flex-direction: column;
@@ -3130,7 +3166,7 @@ body {
     font-weight: 500;
 }
 
-/* Nhóm Trạng thái đăng bán (3 thẻ Radio ngang) */
+/* Nhóm Trạng thái đăng bán */
 .status-radio-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -3213,7 +3249,7 @@ body {
     box-shadow: 0 0 0 3px rgba(121, 42, 22, 0.08);
 }
 
-/* 4.4 Footer Modal */
+/* Footer Modal */
 .product-modal-footer {
     display: flex;
     align-items: center;
@@ -3285,9 +3321,7 @@ body {
     box-shadow: 0 6px 18px rgba(121, 42, 22, 0.28);
 }
 
-/* ==========================================================================
-   5. MODAL THÊM BIẾN THỂ SẢN PHẨM (LAYERED MODAL)
-   ========================================================================== */
+/* Modal thêm biến thể sản phẩm */
 
 .variant-modal-overlay {
     position: fixed;
@@ -3306,7 +3340,7 @@ body {
     opacity: 0;
     visibility: hidden;
     transition: opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1),
-                visibility 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        visibility 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .variant-modal-overlay.show {
@@ -3442,7 +3476,7 @@ body {
     white-space: nowrap;
 }
 
-/* Khối phân mục (Section Cards) */
+/* Khối phân mục */
 .variant-section-card {
     background-color: #ffffff;
     border: 1px solid #ebdcd7;
@@ -3531,7 +3565,7 @@ body {
     border-color: var(--color-primary);
 }
 
-/* Ô nhập có ký hiệu đơn vị (suffix: đ, chiếc) */
+/* Ô nhập có ký hiệu đơn vị (đ, chiếc) */
 .input-with-suffix {
     position: relative;
     display: flex;
@@ -3604,10 +3638,7 @@ body {
     box-shadow: 0 6px 16px rgba(121, 42, 22, 0.28);
 }
 
-/* ==========================================================================
-   6. MODAL THÊM DANH MỤC MỚI (ADD CATEGORY MODAL)
-   ========================================================================== */
-
+/* Modal thêm danh mục mới */
 .category-modal-overlay {
     position: fixed;
     top: 0;
@@ -3625,7 +3656,7 @@ body {
     opacity: 0;
     visibility: hidden;
     transition: opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1),
-                visibility 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        visibility 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .category-modal-overlay.show {
@@ -3815,4 +3846,4 @@ body {
     opacity: 0.92;
     transform: translateY(-1.5px);
     box-shadow: 0 6px 16px rgba(121, 42, 22, 0.28);
-}
+}

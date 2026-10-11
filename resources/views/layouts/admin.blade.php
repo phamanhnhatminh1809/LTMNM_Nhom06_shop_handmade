@@ -18,6 +18,7 @@
         </main>
     </div>
 
+    <script src="{{ asset('js/admin/sidebar.js') }}"></script>
     @stack('scripts')
 </body>
 </html>

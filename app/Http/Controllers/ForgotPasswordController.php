@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\Mail;
 class ForgotPasswordController extends Controller
 {
     /**
-     * Bước 1: Tiếp nhận email và gửi mã OTP 6 số qua email.
+     * B1: Nhận email và gửi mã OTP 6 số qua email.
      */
     public function sendOtp(Request $request): JsonResponse
     {
@@ -44,13 +44,13 @@ class ForgotPasswordController extends Controller
             ], 403);
         }
 
-        // Sinh mã OTP 6 chữ số
+        // Sinh mã OTP 6 số
         $otp = str_pad((string) random_int(100000, 999999), 6, '0', STR_PAD_LEFT);
 
         // Xóa các mã OTP cũ của email này để đảm bảo chỉ có 1 mã hợp lệ gần nhất
         PasswordResetOtp::where('email', $email)->delete();
 
-        // Lưu mã OTP mới với thời gian hết hạn là 10 phút
+        // Lưu mã OTP mới với thời gian hết hạn là 10p
         PasswordResetOtp::create([
             'email' => $email,
             'otp' => $otp,
@@ -82,7 +82,7 @@ class ForgotPasswordController extends Controller
     }
 
     /**
-     * Bước 2: Xác thực mã OTP 6 chữ số.
+     * B2: Xác thực mã OTP 6 số.
      */
     public function verifyOtp(Request $request): JsonResponse
     {
@@ -126,18 +126,25 @@ class ForgotPasswordController extends Controller
     }
 
     /**
-     * Bước 3: Đặt lại mật khẩu mới cho tài khoản.
+     * B3: Đặt lại mật khẩu mới.
      */
     public function resetPassword(Request $request): JsonResponse
     {
         $request->validate([
             'email' => 'required|email',
             'otp' => 'required|string|size:6',
-            'password' => 'required|string|min:8|confirmed',
+            'password' => [
+                'required',
+                'string',
+                'min:8',
+                'confirmed',
+                'regex:/[^a-zA-Z0-9]/',
+            ],
         ], [
             'email.required' => 'Thiếu thông tin email.',
             'password.required' => 'Vui lòng nhập mật khẩu mới.',
             'password.min' => 'Mật khẩu mới phải có tối thiểu 8 ký tự.',
+            'password.regex' => 'Mật khẩu mới phải chứa ít nhất 1 ký tự đặc biệt (ví dụ: @, #, $, %, !...).',
             'password.confirmed' => 'Xác nhận mật khẩu mới không khớp.',
         ]);
 

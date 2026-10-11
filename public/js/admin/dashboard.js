@@ -160,16 +160,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Tự cuộn lên đầu khi rê chuột ra khỏi Sidebar
-    const adminSidebar = document.querySelector('.admin-sidebar');
-    if (adminSidebar) {
-        adminSidebar.addEventListener('mouseleave', () => {
-            adminSidebar.scrollTo({
-                top: 0,
-                behavior: 'smooth'
-            });
-        });
-    }
+
 
     // Xử lý Dropdown / Popover chọn khoảng thời gian
     const dateFilterContainer = document.querySelector('.date-filter-container');
