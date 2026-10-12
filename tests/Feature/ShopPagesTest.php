@@ -86,14 +86,16 @@ class ShopPagesTest extends TestCase
 
     public function test_admin_dashboard_is_accessible(): void
     {
-        $response = $this->get('/admin/dashboard');
+        $admin = User::where('username', 'admin')->first();
+        $response = $this->actingAs($admin)->get('/admin/dashboard');
         $response->assertStatus(200);
         $response->assertSee('TỔNG QUAN HỆ THỐNG');
     }
 
     public function test_admin_products_is_accessible(): void
     {
-        $response = $this->get('/admin/products');
+        $admin = User::where('username', 'admin')->first();
+        $response = $this->actingAs($admin)->get('/admin/products');
         $response->assertStatus(200);
         $response->assertSee('QUẢN LÝ SẢN PHẨM');
     }

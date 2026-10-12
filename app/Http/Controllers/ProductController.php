@@ -35,6 +35,11 @@ class ProductController extends Controller
             $query->where('price', '<=', (float) $maxPrice);
         }
 
+        $minRating = $request->input('min_rating');
+        if ($minRating !== null && is_numeric($minRating)) {
+            $query->where('rating', '>=', (float) $minRating);
+        }
+
         switch ($sort) {
             case 'price_asc':
                 $query->orderBy('price', 'asc');
@@ -71,8 +76,8 @@ class ProductController extends Controller
     public function show(string|int $id): View
     {
         $product = is_numeric($id)
-            ? Product::with('category')->findOrFail((int) $id)
-            : Product::with('category')->where('slug', $id)->firstOrFail();
+            ? Product::with(['category', 'reviews.user'])->findOrFail((int) $id)
+            : Product::with(['category', 'reviews.user'])->where('slug', $id)->firstOrFail();
 
         $related = Product::where('category_id', $product->category_id)
             ->where('id', '!=', $product->id)

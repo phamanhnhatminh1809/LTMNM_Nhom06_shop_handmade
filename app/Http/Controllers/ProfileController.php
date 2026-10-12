@@ -30,7 +30,7 @@ class ProfileController extends Controller
     }
 
     /**
-     * Cập nhật Họ tên, Số điện thoại, Địa chỉ.
+     * Cập nhật Họ tên, Email, Số điện thoại, Địa chỉ.
      */
     public function update(Request $request): RedirectResponse|JsonResponse
     {
@@ -38,17 +38,23 @@ class ProfileController extends Controller
 
         $validated = $request->validate([
             'full_name' => 'required|string|max:100',
-            'phone'     => 'nullable|string|max:20',
+            'email'     => 'required|email|max:100|unique:users,email,' . $user->id,
+            'phone'     => ['nullable', 'string', 'max:20', 'regex:/^[0-9+\s\-]{8,20}$/'],
             'address'   => 'nullable|string|max:500',
         ], [
             'full_name.required' => 'Họ và tên không được để trống.',
             'full_name.max'      => 'Họ và tên tối đa 100 ký tự.',
+            'email.required'     => 'Địa chỉ email không được để trống.',
+            'email.email'        => 'Địa chỉ email không đúng định dạng.',
+            'email.unique'       => 'Địa chỉ email này đã được sử dụng bởi tài khoản khác.',
+            'phone.regex'        => 'Số điện thoại không đúng định dạng.',
             'phone.max'          => 'Số điện thoại tối đa 20 ký tự.',
             'address.max'        => 'Địa chỉ tối đa 500 ký tự.',
         ]);
 
         $user->update([
             'full_name' => $validated['full_name'],
+            'email'     => $validated['email'],
             'phone'     => $validated['phone'] ?? null,
             'address'   => $validated['address'] ?? null,
         ]);

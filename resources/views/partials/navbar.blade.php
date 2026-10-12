@@ -1,7 +1,13 @@
 @php
     $categories = $categories ?? \App\Models\Category::all();
     $currentRouteName = Route::currentRouteName();
-    $cartCount = $cartCount ?? 0;
+    $cartCount = 0;
+    try {
+        $activeCart = \App\Models\Cart::getActiveCart();
+        $cartCount = $activeCart ? (int) $activeCart->total_quantity : 0;
+    } catch (\Throwable $e) {
+        $cartCount = 0;
+    }
     $searchQuery = request('q', '');
     $currentCategory = request('category', '');
 @endphp
@@ -13,7 +19,6 @@
         </button>
 
         <a href="{{ route('home') }}" class="logo">
-            <span class="logo__icon">🧶</span>
             <span class="logo__text">Shop<strong>Handmade</strong></span>
         </a>
 
@@ -27,7 +32,7 @@
             </button>
         </form>
 
-        <a href="#" class="cart-btn" aria-label="Giỏ hàng">
+        <a href="{{ route('cart.index') }}" class="cart-btn" aria-label="Giỏ hàng">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <circle cx="9" cy="21" r="1"></circle>
                 <circle cx="20" cy="21" r="1"></circle>
@@ -59,33 +64,33 @@
 <aside class="sidebar-drawer" id="sidebarDrawer">
     <div class="sidebar-drawer__header">
         <h3>Danh mục</h3>
-        <button class="sidebar-drawer__close" onclick="toggleSidebar()" aria-label="Đóng">✕</button>
+        <button class="sidebar-drawer__close" onclick="toggleSidebar()" aria-label="Đóng">x</button>
     </div>
 
     <nav class="sidebar-drawer__nav">
         <ul>
-            <li><a href="{{ route('home') }}">🏠 Trang chủ</a></li>
-            <li><a href="{{ route('products.index') }}">📦 Tất cả sản phẩm</a></li>
+            <li><a href="{{ route('home') }}">Trang chủ</a></li>
+            <li><a href="{{ route('products.index') }}">Tất cả sản phẩm</a></li>
             <li class="sidebar-drawer__divider"></li>
             @foreach($categories as $cat)
                 <li>
                     <a href="{{ route('products.index', ['category' => $cat->slug]) }}">
-                        {{ $cat->icon ?? '🧶' }} {{ $cat->name }}
+                        {{ $cat->name }}
                     </a>
                 </li>
             @endforeach
             <li class="sidebar-drawer__divider"></li>
-            <li><a href="{{ route('about') }}">ℹ️ Giới thiệu</a></li>
-            <li><a href="{{ route('contact') }}">📞 Liên hệ</a></li>
+            <li><a href="{{ route('about') }}">Giới thiệu</a></li>
+            <li><a href="{{ route('contact') }}">Liên hệ</a></li>
         </ul>
     </nav>
 
     <div class="sidebar-drawer__footer">
-        <p>📞 Hotline: <strong>0123 456 789</strong></p>
+        <p>Hotline: <strong>0123 456 789</strong></p>
         <div class="sidebar-drawer__socials">
-            <a href="#" aria-label="Facebook">📘</a>
-            <a href="#" aria-label="Instagram">📷</a>
-            <a href="#" aria-label="TikTok">🎵</a>
+            <a href="#" aria-label="Facebook">Facebook</a>
+            <a href="#" aria-label="Instagram">Instagram</a>
+            <a href="#" aria-label="TikTok">TikTok</a>
         </div>
     </div>
 </aside>

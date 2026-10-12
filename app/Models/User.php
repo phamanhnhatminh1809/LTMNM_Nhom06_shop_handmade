@@ -52,6 +52,11 @@ class User extends Authenticatable
         return $this->hasMany(Review::class);
     }
 
+    public function carts(): HasMany
+    {
+        return $this->hasMany(Cart::class);
+    }
+
     public function isAdmin(): bool
     {
         return $this->role && $this->role->name === 'admin';
