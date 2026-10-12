@@ -14,6 +14,7 @@ class UserProfileAndAuthTest extends TestCase
     use RefreshDatabase;
 
     protected User $customer;
+    protected User $admin;
 
     protected function setUp(): void
     {
@@ -32,6 +33,45 @@ class UserProfileAndAuthTest extends TestCase
             'address'   => '123 Đường Thủ Công, Hà Nội',
             'is_active' => true,
         ]);
+
+        $roleAdmin = Role::find(1);
+        $this->admin = User::create([
+            'role_id'   => $roleAdmin->id,
+            'username'  => 'admin_user',
+            'email'     => 'admin_user@gmail.com',
+            'password'  => Hash::make('admin_password123'),
+            'full_name' => 'Quản trị viên Hệ thống',
+            'phone'     => '0901234567',
+            'address'   => 'Trụ sở Shop Handmade',
+            'is_active' => true,
+        ]);
+    }
+
+    /**
+     * Khách vãng lai chưa đăng nhập bị chuyển hướng về login khi vào admin
+     */
+    public function test_guest_cannot_access_admin_dashboard(): void
+    {
+        $response = $this->get('/admin/dashboard');
+        $response->assertRedirect('/login');
+    }
+
+    /**
+     * Tài khoản Customer không được phép truy cập khu vực Admin (403 Forbidden)
+     */
+    public function test_customer_cannot_access_admin_dashboard(): void
+    {
+        $response = $this->actingAs($this->customer)->get('/admin/dashboard');
+        $response->assertStatus(403);
+    }
+
+    /**
+     * Tài khoản Admin truy cập bình thường khu vực Admin
+     */
+    public function test_admin_can_access_admin_dashboard(): void
+    {
+        $response = $this->actingAs($this->admin)->get('/admin/dashboard');
+        $response->assertStatus(200);
     }
 
     /**
@@ -56,12 +96,13 @@ class UserProfileAndAuthTest extends TestCase
     }
 
     /**
-     * 3. Người dùng cập nhật họ tên, số điện thoại, địa chỉ thành công
+     * 3. Người dùng cập nhật họ tên, email, số điện thoại, địa chỉ thành công
      */
     public function test_user_can_update_profile_information(): void
     {
         $response = $this->actingAs($this->customer)->put('/profile', [
             'full_name' => 'Nguyễn Văn Update',
+            'email'     => 'updated_user@gmail.com',
             'phone'     => '0911223344',
             'address'   => '456 Phố Mới, TP. Hồ Chí Minh',
         ]);
@@ -69,8 +110,56 @@ class UserProfileAndAuthTest extends TestCase
         $response->assertRedirect('/profile');
         $this->customer->refresh();
         $this->assertEquals('Nguyễn Văn Update', $this->customer->full_name);
+        $this->assertEquals('updated_user@gmail.com', $this->customer->email);
         $this->assertEquals('0911223344', $this->customer->phone);
         $this->assertEquals('456 Phố Mới, TP. Hồ Chí Minh', $this->customer->address);
+    }
+
+    /**
+     * Người dùng không thể đổi sang email đã được tài khoản khác sử dụng
+     */
+    public function test_user_cannot_update_profile_with_duplicate_email(): void
+    {
+        $response = $this->actingAs($this->customer)->put('/profile', [
+            'full_name' => 'Nguyễn Văn Test',
+            'email'     => 'admin_user@gmail.com',
+            'phone'     => '0987654321',
+            'address'   => '123 Đường Thủ Công, Hà Nội',
+        ]);
+
+        $response->assertSessionHasErrors(['email']);
+        $this->customer->refresh();
+        $this->assertEquals('test_user@gmail.com', $this->customer->email);
+    }
+
+    /**
+     * Bắt lỗi khi email không đúng định dạng
+     */
+    public function test_user_cannot_update_profile_with_invalid_email_format(): void
+    {
+        $response = $this->actingAs($this->customer)->put('/profile', [
+            'full_name' => 'Nguyễn Văn Test',
+            'email'     => 'not-a-valid-email',
+            'phone'     => '0987654321',
+            'address'   => '123 Đường Thủ Công, Hà Nội',
+        ]);
+
+        $response->assertSessionHasErrors(['email']);
+    }
+
+    /**
+     * Bắt lỗi khi số điện thoại không đúng định dạng
+     */
+    public function test_user_cannot_update_profile_with_invalid_phone_format(): void
+    {
+        $response = $this->actingAs($this->customer)->put('/profile', [
+            'full_name' => 'Nguyễn Văn Test',
+            'email'     => 'test_user@gmail.com',
+            'phone'     => 'abcdef123',
+            'address'   => '123 Đường Thủ Công, Hà Nội',
+        ]);
+
+        $response->assertSessionHasErrors(['phone']);
     }
 
     /**

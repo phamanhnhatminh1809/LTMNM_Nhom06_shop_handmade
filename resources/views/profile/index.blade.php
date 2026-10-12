@@ -95,11 +95,14 @@
                         </div>
 
                         <div>
-                            <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: var(--color-on-surface-variant);">
-                                Email (Liên kết tài khoản)
+                            <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: var(--color-on-surface);">
+                                Địa chỉ Email <span style="color: #ef4444;">*</span>
                             </label>
-                            <input type="email" value="{{ $user->email }}" disabled
-                                   style="width: 100%; padding: 10px 14px; background: #f3f4f6; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 14px; color: #6b7280; box-sizing: border-box;">
+                            <input type="email" name="email" value="{{ old('email', $user->email) }}" required
+                                   style="width: 100%; padding: 10px 14px; border: 1px solid var(--color-outline, #d1d5db); border-radius: 8px; font-size: 14px; box-sizing: border-box;">
+                            @error('email')
+                                <span style="color: #ef4444; font-size: 12px; margin-top: 4px; display: block;">{{ $message }}</span>
+                            @enderror
                         </div>
                     </div>
 
@@ -176,9 +179,14 @@
             <!-- Card 3: Tóm tắt đơn hàng gần đây -->
             @if(isset($recentOrders) && $recentOrders->isNotEmpty())
             <section style="background: var(--color-surface, #ffffff); border-radius: 16px; padding: 28px; border: 1px solid var(--color-outline-variant, #f0eae1); box-shadow: 0 4px 16px rgba(0,0,0,0.03);">
-                <div style="margin-bottom: 16px;">
-                    <h2 style="margin: 0; font-size: 18px; font-weight: 700; color: var(--color-on-surface);">Đơn hàng gần đây</h2>
-                    <p style="margin: 2px 0 0; font-size: 13px; color: var(--color-on-surface-variant);">Theo dõi trạng thái đơn hàng của bạn</p>
+                <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 16px;">
+                    <div>
+                        <h2 style="margin: 0; font-size: 18px; font-weight: 700; color: var(--color-on-surface);">Đơn hàng gần đây</h2>
+                        <p style="margin: 2px 0 0; font-size: 13px; color: var(--color-on-surface-variant);">Theo dõi trạng thái các đơn hàng bạn đã đặt</p>
+                    </div>
+                    <a href="{{ route('orders.index') }}" style="font-size: 13px; font-weight: 600; color: var(--color-primary); text-decoration: none;">
+                        Xem tất cả đơn hàng &rarr;
+                    </a>
                 </div>
 
                 <div style="overflow-x: auto;">
@@ -189,12 +197,17 @@
                                 <th style="padding: 10px;">NGÀY ĐẶT</th>
                                 <th style="padding: 10px;">TỔNG TIỀN</th>
                                 <th style="padding: 10px;">TRẠNG THÁI</th>
+                                <th style="padding: 10px; text-align: right;">CHI TIẾT</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach($recentOrders as $order)
                                 <tr style="border-bottom: 1px solid var(--color-outline-variant, #f0eae1);">
-                                    <td style="padding: 12px 10px; font-weight: 600;">{{ $order->code }}</td>
+                                    <td style="padding: 12px 10px; font-weight: 600;">
+                                        <a href="{{ route('orders.show', $order->id) }}" style="color: inherit; text-decoration: none;">
+                                            #{{ $order->code }}
+                                        </a>
+                                    </td>
                                     <td style="padding: 12px 10px; color: var(--color-on-surface-variant);">{{ $order->created_at->format('d/m/Y H:i') }}</td>
                                     <td style="padding: 12px 10px; font-weight: 600; color: var(--color-primary);">{{ number_format($order->total_amount, 0, ',', '.') }}đ</td>
                                     <td style="padding: 12px 10px;">
@@ -210,6 +223,11 @@
                                         <span style="display: inline-block; padding: 3px 8px; border-radius: 12px; font-size: 11px; font-weight: 600; background: {{ $st['bg'] }}; color: {{ $st['color'] }};">
                                             {{ $st['label'] }}
                                         </span>
+                                    </td>
+                                    <td style="padding: 12px 10px; text-align: right;">
+                                        <a href="{{ route('orders.show', $order->id) }}" style="font-size: 12px; font-weight: 600; color: var(--color-primary); text-decoration: none;">
+                                            Xem
+                                        </a>
                                     </td>
                                 </tr>
                             @endforeach

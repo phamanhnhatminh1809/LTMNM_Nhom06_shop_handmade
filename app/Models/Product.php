@@ -82,4 +82,14 @@ class Product extends Model
             $q->where('slug', $categorySlug);
         });
     }
+
+    /**
+     * Tự động tính toán lại điểm đánh giá trung bình từ các đánh giá thực tế.
+     */
+    public function recalculateRating(): void
+    {
+        $avg = (float) $this->reviews()->avg('rating');
+        $this->rating = $avg > 0 ? round($avg, 1) : 5.0;
+        $this->save();
+    }
 }

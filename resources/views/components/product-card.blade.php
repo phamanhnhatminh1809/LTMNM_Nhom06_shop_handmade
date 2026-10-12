@@ -21,7 +21,7 @@
             <a href="{{ route('products.show', $product->id) }}">{{ $product->name }}</a>
         </h3>
         <div class="product-card__rating">
-            ⭐ {{ $product->rating }} · Đã bán {{ $product->sold }}
+            Đánh giá: {{ $product->rating }} · Đã bán {{ $product->sold }}
         </div>
         <div class="product-card__price">
             <span class="price">{{ number_format($product->price, 0, ',', '.') }}đ</span>
