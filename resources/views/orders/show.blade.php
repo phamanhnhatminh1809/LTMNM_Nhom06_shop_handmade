@@ -1,4 +1,4 @@
-@extends('layouts.app')
+﻿@extends('layouts.app')
 
 @section('title', 'Chi tiết đơn hàng #' . $order->code)
 
@@ -89,7 +89,7 @@
                                 $img = $item->product->image ?? null;
                                 $imgSrc = $img 
                                     ? (str_starts_with($img, 'http') ? $img : asset(ltrim($img, '/')))
-                                    : asset('images/logo.png');
+                                    : asset('assets/images/logo.png');
                             @endphp
                             <tr style="border-bottom: 1px solid var(--color-outline-variant, #f0eae1);">
                                 <td style="padding: 14px 10px;">
@@ -98,7 +98,7 @@
                                             <a href="{{ route('products.show', $item->product_id) }}" style="flex-shrink: 0;">
                                                 <img src="{{ $imgSrc }}" alt="{{ $item->product->name }}" 
                                                      style="width: 54px; height: 54px; object-fit: cover; border-radius: 8px; border: 1px solid #f0eae1;"
-                                                     onerror="this.src='{{ asset('images/logo.png') }}'">
+                                                     onerror="this.src='{{ asset('assets/images/logo.png') }}'">
                                             </a>
                                             <div>
                                                 <a href="{{ route('products.show', $item->product_id) }}" 

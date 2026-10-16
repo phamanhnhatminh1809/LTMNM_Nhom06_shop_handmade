@@ -1,4 +1,4 @@
-@extends('layouts.app')
+﻿@extends('layouts.app')
 
 @section('title', 'Đơn hàng của tôi')
 
@@ -109,12 +109,12 @@
                                 $img = $item->product->image ?? null;
                                 $imgSrc = $img 
                                     ? (str_starts_with($img, 'http') ? $img : asset(ltrim($img, '/')))
-                                    : asset('images/logo.png');
+                                    : asset('assets/images/logo.png');
                             @endphp
                             <div style="display: flex; gap: 14px; align-items: center;">
                                 <img src="{{ $imgSrc }}" alt="{{ $item->product->name ?? 'Sản phẩm' }}" 
                                      style="width: 56px; height: 56px; object-fit: cover; border-radius: 8px; border: 1px solid #f0eae1; flex-shrink: 0;"
-                                     onerror="this.src='{{ asset('images/logo.png') }}'">
+                                     onerror="this.src='{{ asset('assets/images/logo.png') }}'">
                                 <div style="flex-grow: 1; min-width: 0;">
                                     <div style="font-weight: 600; font-size: 14px; color: var(--color-on-surface); line-height: 1.4;">
                                         {{ $item->product->name ?? 'Sản phẩm' }}

@@ -1,4 +1,4 @@
-@extends('layouts.admin')
+﻿@extends('layouts.admin')
 
 @section('title', 'Quản lý sản phẩm')
 
@@ -135,7 +135,7 @@
                         </td>
                         <td>
                             <div class="customer-cell">
-                                <img src="{{ $prodImg }}" class="stock-thumb" alt="{{ $prod->name }}" onerror="this.src='{{ asset('images/logo.png') }}'">
+                                <img src="{{ $prodImg }}" class="stock-thumb" alt="{{ $prod->name }}" onerror="this.src='{{ asset('assets/images/logo.png') }}'">
                                 <div class="customer-info-box">
                                     <div class="c-name" style="font-weight: 700;">{{ $prod->name }}</div>
                                     @if($prod->is_featured)

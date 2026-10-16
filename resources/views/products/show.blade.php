@@ -1,4 +1,4 @@
-@extends('layouts.app')
+﻿@extends('layouts.app')
 
 @section('title', $product->name)
 
@@ -32,7 +32,7 @@
     <div class="container product-detail">
         <div class="product-gallery">
             <div class="gallery-main">
-                <img id="mainImage" src="{{ $mainImgUrl }}" alt="{{ $product->name }}" onerror="this.src='{{ asset('images/logo.png') }}'">
+                <img id="mainImage" src="{{ $mainImgUrl }}" alt="{{ $product->name }}" onerror="this.src='{{ asset('assets/images/logo.png') }}'">
                 @if ($discount > 0)
                     <span class="badge badge--sale badge--lg">-{{ $discount }}%</span>
                 @endif

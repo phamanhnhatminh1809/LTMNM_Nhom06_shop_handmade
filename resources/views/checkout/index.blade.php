@@ -1,4 +1,4 @@
-@extends('layouts.app')
+﻿@extends('layouts.app')
 
 @section('title', 'Xem lại đơn hàng và Thanh toán')
 
@@ -105,12 +105,12 @@
                         @php
                             $imgSrc = $item->image_url
                                 ? (str_starts_with($item->image_url, 'http') ? $item->image_url : asset(ltrim($item->image_url, '/')))
-                                : asset('images/logo.png');
+                                : asset('assets/images/logo.png');
                         @endphp
                         <div class="checkout-item">
                             <img src="{{ $imgSrc }}" alt="{{ $item->name }}"
                                  class="checkout-item__img"
-                                 onerror="this.src='{{ asset('images/logo.png') }}'">
+                                 onerror="this.src='{{ asset('assets/images/logo.png') }}'">
                             <div class="checkout-item__info">
                                 <div class="checkout-item__name">{{ $item->name }}</div>
                                 <div class="checkout-item__qty">

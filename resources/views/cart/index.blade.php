@@ -1,4 +1,4 @@
-@extends('layouts.app')
+﻿@extends('layouts.app')
 
 @section('title', 'Giỏ hàng của bạn')
 
@@ -68,7 +68,7 @@
                                 @php
                                     $imgSrc = $item->image_url 
                                         ? (str_starts_with($item->image_url, 'http') ? $item->image_url : asset(ltrim($item->image_url, '/')))
-                                        : asset('images/logo.png');
+                                        : asset('assets/images/logo.png');
                                 @endphp
                                 <tr style="border-bottom: 1px solid var(--color-outline-variant, #f0eae1);">
                                     <!-- Cột thông tin sản phẩm -->
@@ -77,7 +77,7 @@
                                             <a href="{{ route('products.show', $item->product_id) }}" style="flex-shrink: 0;">
                                                 <img src="{{ $imgSrc }}" alt="{{ $item->name }}" 
                                                      style="width: 64px; height: 64px; object-fit: cover; border-radius: 8px; border: 1px solid #f0eae1;"
-                                                     onerror="this.src='{{ asset('images/logo.png') }}'">
+                                                     onerror="this.src='{{ asset('assets/images/logo.png') }}'">
                                             </a>
                                             <div>
                                                 <a href="{{ route('products.show', $item->product_id) }}" 

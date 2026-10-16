@@ -1,4 +1,4 @@
-@extends('layouts.admin')
+﻿@extends('layouts.admin')
 
 @section('title', 'Tổng quan hệ thống')
 
@@ -149,7 +149,7 @@
                         $itemImg = str_starts_with($item->image, 'http') ? $item->image : asset(ltrim($item->image, '/'));
                     @endphp
                     <div class="stock-item">
-                        <img src="{{ $itemImg }}" class="stock-thumb" alt="{{ $item->name }}" onerror="this.src='{{ asset('images/logo.png') }}'">
+                        <img src="{{ $itemImg }}" class="stock-thumb" alt="{{ $item->name }}" onerror="this.src='{{ asset('assets/images/logo.png') }}'">
                         <div class="stock-details">
                             <div class="stock-name">{{ $item->name }}</div>
                             <div class="stock-code">{{ $item->code }}</div>

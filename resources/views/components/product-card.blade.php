@@ -1,4 +1,4 @@
-@props(['product'])
+﻿@props(['product'])
 @php
     $discount = 0;
     if (!empty($product->old_price) && $product->old_price > $product->price) {
@@ -10,7 +10,7 @@
 @endphp
 <div class="product-card">
     <a href="{{ route('products.show', $product->id) }}" class="product-card__image">
-        <img src="{{ $imageUrl }}" alt="{{ $product->name }}" loading="lazy" onerror="this.src='{{ asset('images/logo.png') }}'">
+        <img src="{{ $imageUrl }}" alt="{{ $product->name }}" loading="lazy" onerror="this.src='{{ asset('assets/images/logo.png') }}'">
         @if ($discount > 0)
             <span class="badge badge--sale">-{{ $discount }}%</span>
         @endif

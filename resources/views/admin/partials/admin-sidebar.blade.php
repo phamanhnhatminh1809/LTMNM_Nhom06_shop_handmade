@@ -1,4 +1,4 @@
-@php
+﻿@php
 $currentMenu = $activeMenu ?? 'dashboard';
 @endphp
 <aside class="admin-sidebar" id="adminSidebar">
@@ -13,7 +13,7 @@ $currentMenu = $activeMenu ?? 'dashboard';
         <div class="sidebar-header">
             <div class="sidebar-brand-logo">
                 <a href="{{ route('admin.dashboard') }}" title="Handmade House">
-                    <img src="{{ asset('images/logo_admin.png') }}" alt="Handmade House Logo">
+                    <img src="{{ asset('assets/images/logo_admin.png') }}" alt="Handmade House Logo">
                 </a>
             </div>
         </div>
