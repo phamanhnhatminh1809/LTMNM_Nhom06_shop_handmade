@@ -1,23 +1,21 @@
 <div class="top-bar">
     <div class="container top-bar__inner">
         <div class="top-bar__left">
-            <a href="#">Seller Center</a>
-            <span class="top-bar__sep">|</span>
-            <a href="#" class="lang-link">Tiếng Việt</a>
+            <span>Handmade 100% - Made in Vietnam</span>
         </div>
         <div class="top-bar__right">
-            <a href="#">Blogs</a>
+            <a href="{{ route('about') }}">Giới thiệu</a>
+            <span class="top-bar__sep">|</span>
+            <a href="{{ route('contact') }}">Liên hệ</a>
             <span class="top-bar__sep">|</span>
             @auth
                 @if(Auth::user()->isAdmin())
                     <a href="{{ route('admin.dashboard') }}"><strong>Quản trị</strong></a>
                     <span class="top-bar__sep">|</span>
                 @endif
-                <a href="{{ route('orders.index') }}" style="color: inherit; text-decoration: none;">Đơn hàng của tôi</a>
+                <a href="{{ route('orders.index') }}">Đơn hàng</a>
                 <span class="top-bar__sep">|</span>
-                <a href="{{ route('profile.show') }}" style="color: inherit; text-decoration: none;">
-                    Chào, <strong>{{ Auth::user()->full_name }}</strong>
-                </a>
+                <a href="{{ route('profile.show') }}">{{ Auth::user()->full_name }}</a>
                 <span class="top-bar__sep">|</span>
                 <form action="{{ route('logout') }}" method="POST" style="display:inline;">
                     @csrf

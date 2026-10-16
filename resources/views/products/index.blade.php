@@ -159,7 +159,7 @@
                 </div>
                 
                 <div style="margin-top: 32px;">
-                    {{ $products->links() }}
+                    {{ $products->links('pagination::bootstrap-4') }}
                 </div>
             @endif
         </div>

@@ -10,11 +10,12 @@ class CategorySeeder extends Seeder
     public function run(): void
     {
         $categories = [
-            ['id' => 1, 'name' => 'Túi xách',  'slug' => 'tui-xach',  'icon' => '👜'],
-            ['id' => 2, 'name' => 'Móc khóa',  'slug' => 'moc-khoa',  'icon' => '🔑'],
-            ['id' => 3, 'name' => 'Trang sức', 'slug' => 'trang-suc', 'icon' => '💍'],
-            ['id' => 4, 'name' => 'Gấu bông',  'slug' => 'gau-bong',  'icon' => '🧸'],
-            ['id' => 5, 'name' => 'Khăn len',  'slug' => 'khan-len',  'icon' => '🧣'],
+            ['id' => 1, 'name' => 'Túi xách',     'slug' => 'tui-xach',     'icon' => '👜'],
+            ['id' => 2, 'name' => 'Móc khóa',     'slug' => 'moc-khoa',     'icon' => '🔑'],
+            ['id' => 3, 'name' => 'Trang sức',    'slug' => 'trang-suc',    'icon' => '💍'],
+            ['id' => 4, 'name' => 'Gấu bông',     'slug' => 'gau-bong',     'icon' => '🧸'],
+            ['id' => 5, 'name' => 'Khăn len + Nón', 'slug' => 'khan-len',  'icon' => '🧣'],
+            ['id' => 6, 'name' => 'Hoa handmade', 'slug' => 'hoa-handmade', 'icon' => '🌸'],
         ];
 
         foreach ($categories as $cat) {

@@ -7,8 +7,8 @@
     if (!empty($product->old_price) && $product->old_price > $product->price) {
         $discount = round((1 - $product->price / $product->old_price) * 100);
     }
-    $mainImgUrl = str_starts_with($product->image, 'http') 
-        ? $product->image 
+    $mainImgUrl = str_starts_with($product->image, 'http')
+        ? $product->image
         : asset(ltrim($product->image, '/'));
     $gallery = is_array($product->gallery) ? $product->gallery : [$product->image];
 @endphp
@@ -53,9 +53,12 @@
         <div class="product-info">
             <span class="product-info__cat">{{ $product->category->name ?? 'Handmade' }}</span>
             <h1>{{ $product->name }}</h1>
-            <div class="product-info__rating" style="font-size: 14px; color: var(--color-on-surface-variant); margin-bottom: 12px;">
-                Đánh giá: {{ $product->rating }} / 5 · Đã bán {{ $product->sold }} · Còn {{ $product->stock_quantity }} sản phẩm
+
+            <div class="product-info__rating" style="display: flex; align-items: center; gap: 6px; font-size: 14px; color: var(--color-on-surface-variant); margin-bottom: 12px;">
+                <x-star-rating :rating="$product->rating" size="16" />
+                <span>{{ $product->rating }}/5 · Đã bán {{ $product->sold }} · Còn {{ $product->stock_quantity }} sản phẩm</span>
             </div>
+
             <div class="product-info__price">
                 <span class="price price--lg">{{ number_format($product->price, 0, ',', '.') }}đ</span>
                 @if (!empty($product->old_price))
@@ -64,6 +67,7 @@
                 @endif
             </div>
             <p class="product-info__desc">{!! nl2br(e($product->description)) !!}</p>
+
             @if(!empty($product->instruction_preserve))
                 <div style="margin-bottom: 20px; padding: 12px; background: #fff1ec; border-radius: 8px; font-size: 14px;">
                     <strong>Hướng dẫn bảo quản:</strong> {{ $product->instruction_preserve }}
@@ -86,26 +90,30 @@
                 <form action="{{ route('cart.store') }}" method="POST" style="margin-bottom: 20px;">
                     @csrf
                     <input type="hidden" name="product_id" value="{{ $product->id }}">
-                    
+
                     <div style="display: flex; gap: 14px; align-items: center; margin-bottom: 16px; flex-wrap: wrap;">
                         <span style="font-size: 14px; font-weight: 600; color: var(--color-on-surface);">Số lượng:</span>
                         <div class="qty" style="display: inline-flex; border: 1px solid #d1d5db; border-radius: 6px; overflow: hidden;">
-                            <button type="button" onclick="const input = this.nextElementSibling; if(parseInt(input.value) > 1) input.value = parseInt(input.value) - 1;"
+                            <button type="button"
+                                    onclick="const input = this.nextElementSibling; if(parseInt(input.value) > 1) input.value = parseInt(input.value) - 1;"
                                     style="border: none; background: #f9fafb; padding: 8px 14px; cursor: pointer; font-weight: 700;">−</button>
                             <input type="number" name="quantity" value="1" min="1" max="{{ $product->stock_quantity }}"
                                    style="width: 50px; text-align: center; border: none; font-weight: 600; font-size: 14px;">
-                            <button type="button" onclick="const input = this.previousElementSibling; if(parseInt(input.value) < {{ $product->stock_quantity }}) input.value = parseInt(input.value) + 1;"
+                            <button type="button"
+                                    onclick="const input = this.previousElementSibling; if(parseInt(input.value) < {{ $product->stock_quantity }}) input.value = parseInt(input.value) + 1;"
                                     style="border: none; background: #f9fafb; padding: 8px 14px; cursor: pointer; font-weight: 700;">+</button>
                         </div>
                         <span style="font-size: 13px; color: var(--color-on-surface-variant);">(Còn {{ $product->stock_quantity }} sản phẩm)</span>
                     </div>
 
                     <div style="display: flex; gap: 12px; flex-wrap: wrap;">
-                        <button type="submit" class="btn btn--primary btn--lg" style="flex: 1; min-width: 180px; padding: 12px 20px; font-weight: 700;">
-                            Thêm vào giỏ
+                        <button type="submit" class="btn btn--primary btn--lg"
+                                style="flex: 1; min-width: 180px; padding: 12px 20px; font-weight: 700;">
+                            🛒 Thêm vào giỏ
                         </button>
-                        <button type="submit" name="buy_now" value="1" class="btn btn--outline btn--lg" style="flex: 1; min-width: 180px; padding: 12px 20px; font-weight: 700; border-color: var(--color-primary); color: var(--color-primary);">
-                            Mua ngay
+                        <button type="submit" name="buy_now" value="1" class="btn btn--outline btn--lg"
+                                style="flex: 1; min-width: 180px; padding: 12px 20px; font-weight: 700; border-color: var(--color-primary); color: var(--color-primary);">
+                            ⚡ Mua ngay
                         </button>
                     </div>
                 </form>
@@ -116,19 +124,19 @@
             @endif
 
             <ul class="product-info__meta" style="list-style: none; padding: 0; margin: 0; font-size: 13px; color: var(--color-on-surface-variant); display: flex; flex-direction: column; gap: 8px;">
-                <li>- Cam kết sản phẩm làm thủ công 100%</li>
-                <li>- Giao hàng toàn quốc, thanh toán khi nhận hàng (COD)</li>
-                <li>- Đổi trả trong 7 ngày nếu lỗi từ shop</li>
+                <li>✅ Cam kết sản phẩm làm thủ công 100%</li>
+                <li>🚚 Giao hàng toàn quốc, thanh toán khi nhận hàng (COD)</li>
+                <li>🔄 Đổi trả trong 7 ngày nếu lỗi từ shop</li>
             </ul>
         </div>
     </div>
 </section>
 
-<!-- Phần Đánh giá của khách hàng -->
+{{-- Phần Đánh giá của khách hàng --}}
 <section class="section" style="padding-top: 0;">
     <div class="container">
         <div style="background: var(--color-surface, #ffffff); border-radius: 16px; padding: 32px; border: 1px solid var(--color-outline-variant, #f0eae1); box-shadow: 0 4px 16px rgba(0,0,0,0.02);">
-            <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 24px; flex-wrap: wrap; gap: 12px; border-bottom: 1px solid var(--color-outline-variant, #f0eae1); padding-bottom: 16px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 12px; border-bottom: 1px solid var(--color-outline-variant, #f0eae1); padding-bottom: 16px;">
                 <div>
                     <h2 style="font-size: 20px; font-weight: 800; color: var(--color-on-surface); margin: 0 0 6px;">
                         Đánh giá từ khách hàng
@@ -138,12 +146,13 @@
                     </p>
                 </div>
 
-                <div style="display: flex; align-items: baseline; gap: 10px;">
-                    <span style="font-size: 28px; font-weight: 800; color: var(--color-primary, #e76f51);">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <x-star-rating :rating="$product->rating" size="22" />
+                    <span style="font-size: 20px; font-weight: 800; color: var(--color-primary, #e76f51);">
                         {{ $product->rating }}
                     </span>
                     <span style="font-size: 14px; color: var(--color-on-surface-variant);">
-                        / 5 sao ({{ $product->reviews->count() }} lượt đánh giá)
+                        / 5 ({{ $product->reviews->count() }} lượt đánh giá)
                     </span>
                 </div>
             </div>
@@ -171,8 +180,9 @@
                                     </div>
                                 </div>
 
-                                <span style="display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 12px; font-weight: 700; background: #fef3c7; color: #d97706;">
-                                    Đánh giá: {{ $rev->rating }}/5 sao
+                                <span style="display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; border-radius: 12px; font-size: 12px; font-weight: 700; background: #fef3c7; color: #d97706;">
+                                    <x-star-rating :rating="$rev->rating" size="12" />
+                                    {{ $rev->rating }}/5
                                 </span>
                             </div>
 

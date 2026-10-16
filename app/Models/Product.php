@@ -67,8 +67,8 @@ class Product extends Model
 
         return $query->where(function ($q) use ($keyword) {
             $q->where('name', 'like', "%{$keyword}%")
-              ->orWhere('code', 'like', "%{$keyword}%")
-              ->orWhere('description', 'like', "%{$keyword}%");
+                ->orWhere('code', 'like', "%{$keyword}%")
+                ->orWhere('description', 'like', "%{$keyword}%");
         });
     }
 
@@ -84,12 +84,21 @@ class Product extends Model
     }
 
     /**
-     * Tự động tính toán lại điểm đánh giá trung bình từ các đánh giá thực tế.
+     * Tính rating trung bình từ reviews thực tế.
+     */
+    public function getRatingAttribute()
+    {
+        $avg = $this->reviews()->avg('rating');
+        return $avg > 0 ? round($avg, 1) : ($this->attributes['rating'] ?? 5.0);
+    }
+
+    /**
+     * Cập nhật lại cột rating trong DB từ reviews.
      */
     public function recalculateRating(): void
     {
         $avg = (float) $this->reviews()->avg('rating');
-        $this->rating = $avg > 0 ? round($avg, 1) : 5.0;
+        $this->attributes['rating'] = $avg > 0 ? round($avg, 1) : 5.0;
         $this->save();
     }
 }

@@ -163,7 +163,7 @@
 
             <!-- Phân trang -->
             <div style="margin-top: 10px;">
-                {{ $orders->links() }}
+                {{ $orders->links('pagination::bootstrap-4') }}
             </div>
         </div>
     @endif
