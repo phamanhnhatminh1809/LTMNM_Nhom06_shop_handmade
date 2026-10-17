@@ -54,13 +54,31 @@ class ProductController extends Controller
             'description'          => 'nullable|string',
             'instruction_preserve' => 'nullable|string',
             'is_featured'          => 'nullable|boolean',
+            'image'                => 'nullable|image|mimes:jpeg,png,jpg,webp,gif|max:5120',
+            'gallery'              => 'nullable|array|max:5',
+            'gallery.*'            => 'nullable|image|mimes:jpeg,png,jpg,webp,gif|max:5120',
         ]);
 
         $validated['slug'] = Str::slug($validated['name']) . '-' . Str::random(5);
-        $validated['image'] = 'assets/images/products/tui-01.jpg'; // default placeholder
         $validated['rating'] = 5.0;
         $validated['sold'] = 0;
         $validated['is_featured'] = $request->boolean('is_featured');
+
+        // Xử lý upload ảnh đại diện chính
+        if ($request->hasFile('image')) {
+            $validated['image'] = $this->uploadProductImage($request->file('image'));
+        } else {
+            $validated['image'] = 'assets/images/products/tui-01.jpg'; // default placeholder
+        }
+
+        // Xử lý upload bộ sưu tập ảnh phụ (gallery)
+        if ($request->hasFile('gallery')) {
+            $galleryPaths = [];
+            foreach ($request->file('gallery') as $file) {
+                $galleryPaths[] = $this->uploadProductImage($file);
+            }
+            $validated['gallery'] = $galleryPaths;
+        }
 
         Product::create($validated);
 
@@ -101,6 +119,9 @@ class ProductController extends Controller
             'description'          => 'nullable|string',
             'instruction_preserve' => 'nullable|string',
             'is_featured'          => 'nullable|boolean',
+            'image'                => 'nullable|image|mimes:jpeg,png,jpg,webp,gif|max:5120',
+            'gallery'              => 'nullable|array|max:5',
+            'gallery.*'            => 'nullable|image|mimes:jpeg,png,jpg,webp,gif|max:5120',
         ]);
 
         // Tái sinh slug nếu tên thay đổi
@@ -109,6 +130,24 @@ class ProductController extends Controller
         }
 
         $validated['is_featured'] = $request->boolean('is_featured');
+
+        // Xử lý upload ảnh đại diện mới (nếu có chọn file mới)
+        if ($request->hasFile('image')) {
+            $validated['image'] = $this->uploadProductImage($request->file('image'));
+        } else {
+            unset($validated['image']);
+        }
+
+        // Xử lý upload bộ sưu tập ảnh mới (nếu có chọn file mới)
+        if ($request->hasFile('gallery')) {
+            $galleryPaths = [];
+            foreach ($request->file('gallery') as $file) {
+                $galleryPaths[] = $this->uploadProductImage($file);
+            }
+            $validated['gallery'] = $galleryPaths;
+        } else {
+            unset($validated['gallery']);
+        }
 
         $product->update($validated);
 
@@ -121,5 +160,21 @@ class ProductController extends Controller
         $product->delete();
         return redirect()->route('admin.products.index')
             ->with('success', 'Đã xóa sản phẩm thành công!');
+    }
+
+    /**
+     * Lưu file ảnh sản phẩm vào thư mục public/uploads/products.
+     */
+    private function uploadProductImage(\Illuminate\Http\UploadedFile $file): string
+    {
+        $uploadDir = public_path('uploads/products');
+        if (!is_dir($uploadDir)) {
+            mkdir($uploadDir, 0755, true);
+        }
+
+        $filename = time() . '_' . Str::random(6) . '.' . $file->getClientOriginalExtension();
+        $file->move($uploadDir, $filename);
+
+        return 'uploads/products/' . $filename;
     }
 }

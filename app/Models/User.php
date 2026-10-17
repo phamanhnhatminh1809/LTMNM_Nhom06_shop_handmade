@@ -57,9 +57,64 @@ class User extends Authenticatable
         return $this->hasMany(Cart::class);
     }
 
+    /**
+     * Kiểm tra tài khoản là Quản trị viên (toàn quyền).
+     */
     public function isAdmin(): bool
     {
-        return $this->role && $this->role->name === 'admin';
+        return $this->role && $this->role->name === Role::ADMIN;
+    }
+
+    /**
+     * Kiểm tra tài khoản là Nhân viên kho.
+     */
+    public function isWarehouseStaff(): bool
+    {
+        return $this->role && $this->role->name === Role::WAREHOUSE_STAFF;
+    }
+
+    /**
+     * Kiểm tra tài khoản là Nhân viên bán hàng.
+     */
+    public function isSalesStaff(): bool
+    {
+        return $this->role && $this->role->name === Role::SALES_STAFF;
+    }
+
+    /**
+     * Kiểm tra tài khoản có quyền vào trang Quản trị (Admin hoặc Nhân viên).
+     */
+    public function isStaffOrAdmin(): bool
+    {
+        return $this->role && in_array($this->role->name, [
+            Role::ADMIN,
+            Role::WAREHOUSE_STAFF,
+            Role::SALES_STAFF,
+        ], true);
+    }
+
+    /**
+     * Kiểm tra quyền quản lý Kho (Sản phẩm & Loại sản phẩm).
+     */
+    public function canManageWarehouse(): bool
+    {
+        return $this->isAdmin() || $this->isWarehouseStaff();
+    }
+
+    /**
+     * Kiểm tra quyền quản lý Bán hàng (Đơn hàng & Đánh giá).
+     */
+    public function canManageSales(): bool
+    {
+        return $this->isAdmin() || $this->isSalesStaff();
+    }
+
+    /**
+     * Kiểm tra tài khoản có một trong các role truyền vào hay không.
+     */
+    public function hasAnyRole(array $roles): bool
+    {
+        return $this->role && in_array($this->role->name, $roles, true);
     }
 
     /**
@@ -71,7 +126,17 @@ class User extends Authenticatable
     }
 
     /**
-     * Scope: tìm kiếm theo tên, email hoặc số điện thoại.
+     * Scope: chỉ lấy tài khoản nội bộ (Admin, Nhân viên kho, Nhân viên bán hàng).
+     */
+    public function scopeStaff(Builder $query): Builder
+    {
+        return $query->whereHas('role', function (Builder $q) {
+            $q->whereIn('name', [Role::ADMIN, Role::WAREHOUSE_STAFF, Role::SALES_STAFF]);
+        });
+    }
+
+    /**
+     * Scope: tìm kiếm theo tên, email, số điện thoại hoặc username.
      */
     public function scopeSearch(Builder $query, ?string $keyword): Builder
     {
