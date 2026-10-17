@@ -279,4 +279,65 @@ class CartAndCheckoutTest extends TestCase
         $response->assertSessionHasErrors(['shipping_phone']);
         $this->assertDatabaseCount('orders', 0);
     }
+
+    /**
+     * 11. Giá trị biên: Thêm hoặc cập nhật số lượng vượt quá tồn kho sẽ tự động giới hạn bằng tồn kho tối đa
+     */
+    public function test_cart_quantity_exceeding_stock_is_capped_at_stock_quantity(): void
+    {
+        // Tồn kho hiện tại của product là 15, thử thêm 99 sản phẩm
+        $this->actingAs($this->customer)->post('/cart', [
+            'product_id' => $this->product->id,
+            'quantity'   => 99,
+        ]);
+
+        $cartDetail = \App\Models\CartDetail::where('product_id', $this->product->id)->first();
+        $this->assertNotNull($cartDetail);
+        $this->assertEquals(15, $cartDetail->quantity);
+
+        // Thử cập nhật lên 50 -> tự điều chỉnh về 15
+        $this->actingAs($this->customer)->put("/cart/{$cartDetail->id}", [
+            'quantity' => 50,
+        ]);
+        $this->assertEquals(15, $cartDetail->fresh()->quantity);
+    }
+
+    /**
+     * 12. Bảo mật: Khách hàng không thể sửa/xóa mục giỏ hàng hoặc xem trang đặt hàng thành công của người khác (403 Forbidden)
+     */
+    public function test_user_cannot_modify_other_users_cart_or_view_other_users_checkout_success(): void
+    {
+        $otherCustomer = User::create([
+            'role_id'   => 2,
+            'username'  => 'other_cart_user',
+            'email'     => 'other_cart@example.com',
+            'password'  => bcrypt('password123'),
+            'full_name' => 'Khách Hàng Khác',
+            'is_active' => true,
+        ]);
+
+        // Tạo giỏ hàng của customer 1
+        $this->actingAs($this->customer)->post('/cart', [
+            'product_id' => $this->product->id,
+            'quantity'   => 2,
+        ]);
+        $cartDetail = \App\Models\CartDetail::where('product_id', $this->product->id)->first();
+
+        // otherCustomer cố tình sửa hoặc xóa cartDetail của customer 1 -> 403
+        $this->actingAs($otherCustomer)->put("/cart/{$cartDetail->id}", ['quantity' => 1])->assertStatus(403);
+        $this->actingAs($otherCustomer)->delete("/cart/{$cartDetail->id}")->assertStatus(403);
+
+        // Tạo đơn hàng của customer 1, otherCustomer cố tình xem trang checkout success -> 403
+        $order = Order::create([
+            'code'             => 'ORD-SEC-CART',
+            'user_id'          => $this->customer->id,
+            'shipping_name'    => 'Khách 1',
+            'shipping_phone'   => '0912345678',
+            'shipping_address' => 'Hà Nội',
+            'total_amount'     => 400000,
+            'status'           => 'pending',
+        ]);
+
+        $this->actingAs($otherCustomer)->get("/checkout/success/{$order->id}")->assertStatus(403);
+    }
 }

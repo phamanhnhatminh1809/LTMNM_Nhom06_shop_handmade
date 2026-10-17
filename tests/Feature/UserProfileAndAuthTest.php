@@ -309,4 +309,79 @@ class UserProfileAndAuthTest extends TestCase
         $loginResponse->assertRedirect(route('home'));
         $this->assertAuthenticated();
     }
+
+    /**
+     * 11. Đăng ký tài khoản mới thành công và đăng xuất
+     */
+    public function test_guest_can_register_and_logout(): void
+    {
+        $response = $this->post('/register', [
+            'full_name'             => 'Khách Hàng Đăng Ký Mới',
+            'username'              => 'new_customer_01',
+            'email'                 => 'new_customer_01@gmail.com',
+            'phone'                 => '0912345678',
+            'password'              => 'password123',
+            'password_confirmation' => 'password123',
+        ]);
+
+        $response->assertRedirect(route('home'));
+        $this->assertAuthenticated();
+        $this->assertDatabaseHas('users', [
+            'username' => 'new_customer_01',
+            'role_id'  => 2,
+        ]);
+
+        $logoutResponse = $this->post('/logout');
+        $logoutResponse->assertRedirect(route('home'));
+        $this->assertGuest();
+    }
+
+    /**
+     * 12. Giá trị biên: Quên mật khẩu từ chối OTP đã hết hạn và mật khẩu thiếu ký tự đặc biệt
+     */
+    public function test_forgot_password_rejects_expired_otp_and_password_without_special_char(): void
+    {
+        // OTP đã hết hạn 1 phút trước
+        PasswordResetOtp::create([
+            'email'      => 'test_user@gmail.com',
+            'otp'        => '112233',
+            'expires_at' => now()->subMinute(),
+        ]);
+
+        $expiredVerify = $this->postJson('/forgot-password/verify-otp', [
+            'email' => 'test_user@gmail.com',
+            'otp'   => '112233',
+        ]);
+        $expiredVerify->assertStatus(422)->assertJson(['success' => false]);
+
+        // OTP còn hạn nhưng mật khẩu mới không có ký tự đặc biệt
+        PasswordResetOtp::where('email', 'test_user@gmail.com')->delete();
+        PasswordResetOtp::create([
+            'email'      => 'test_user@gmail.com',
+            'otp'        => '445566',
+            'expires_at' => now()->addMinutes(10),
+        ]);
+
+        $noSpecialChar = $this->postJson('/forgot-password/reset', [
+            'email'                 => 'test_user@gmail.com',
+            'otp'                   => '445566',
+            'password'              => 'OnlyLettersAnd123',
+            'password_confirmation' => 'OnlyLettersAnd123',
+        ]);
+        $noSpecialChar->assertStatus(422)->assertJsonValidationErrors(['password']);
+    }
+
+    /**
+     * 13. Giá trị biên: Không cho phép đổi mật khẩu mới trùng với mật khẩu hiện tại
+     */
+    public function test_user_cannot_change_password_to_same_as_current_password(): void
+    {
+        $response = $this->actingAs($this->customer)->put('/profile/password', [
+            'current_password'      => 'old_password123',
+            'password'              => 'old_password123',
+            'password_confirmation' => 'old_password123',
+        ]);
+
+        $response->assertSessionHasErrors(['password']);
+    }
 }
