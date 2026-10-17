@@ -253,7 +253,7 @@
     </div>
 
     <div style="padding: 16px 24px;">
-        {{ $reviews->links() }}
+        {{ $reviews->links('admin.partials.pagination') }}
     </div>
 </div>
 @endsection

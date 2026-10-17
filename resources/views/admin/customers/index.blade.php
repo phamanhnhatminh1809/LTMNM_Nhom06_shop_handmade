@@ -240,7 +240,7 @@
     </div>
 
     <div style="padding: 16px 24px;">
-        {{ $customers->links() }}
+        {{ $customers->links('admin.partials.pagination') }}
     </div>
 </div>
 @endsection

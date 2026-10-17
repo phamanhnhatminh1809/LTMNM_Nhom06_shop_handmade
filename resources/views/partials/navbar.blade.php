@@ -3,7 +3,7 @@
     $currentRouteName = Route::currentRouteName();
     $cartCount = 0;
     try {
-        $activeCart = \App\Models\Cart::getActiveCart();
+        $activeCart = \App\Models\Cart::getActiveCart(false);
         $cartCount = $activeCart ? (int) $activeCart->total_quantity : 0;
     } catch (\Throwable $e) {
         $cartCount = 0;

@@ -304,7 +304,7 @@
     </div>
 
     <div style="padding: 16px 24px;">
-        {{ $users->links() }}
+        {{ $users->links('admin.partials.pagination') }}
     </div>
 </div>
 @endsection

@@ -2,7 +2,12 @@
 
 @section('title', 'Chi tiết sản phẩm — ' . $product->name)
 
-@php $activeMenu = 'products'; @endphp
+@php
+    $activeMenu = 'products';
+    $mainImg = !empty($product->image)
+        ? (str_starts_with($product->image, 'http') ? $product->image : asset(ltrim($product->image, '/')))
+        : asset('images/logo.png');
+@endphp
 
 @section('content')
 <!-- Top Bar -->
@@ -147,16 +152,17 @@
                         <span>Xem đánh giá của sản phẩm</span>
                     </a>
 
-                    <form action="{{ route('admin.products.destroy', $product) }}"
-                          method="POST"
-                          onsubmit="return confirm('Xác nhận xóa vĩnh viễn sản phẩm «{{ $product->name }}»?')">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" class="btn-inline-action danger" style="padding: 9px 16px;">
-                            <i class="bi bi-trash"></i>
-                            <span>Xóa sản phẩm này</span>
-                        </button>
-                    </form>
+                    <button type="button"
+                            class="btn-inline-action danger btn-trigger-delete-product"
+                            data-name="{{ $product->name }}"
+                            data-code="{{ $product->code }}"
+                            data-category="{{ $product->category->name ?? 'Chưa phân loại' }}"
+                            data-image="{{ $mainImg }}"
+                            data-url="{{ route('admin.products.destroy', $product) }}"
+                            style="padding: 9px 16px;">
+                        <i class="bi bi-trash"></i>
+                        <span>Xóa sản phẩm này</span>
+                    </button>
                 </div>
             </div>
         </div>
@@ -210,4 +216,11 @@
         </div>
     </div>
 </div>
+
+<!-- Modal Xác nhận Xóa -->
+@include('admin.partials.delete-product-modal')
 @endsection
+
+@push('scripts')
+<script src="{{ asset('js/admin/products.js') }}"></script>
+@endpush

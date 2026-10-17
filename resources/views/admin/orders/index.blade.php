@@ -269,7 +269,7 @@
     </div>
 
     <div style="padding: 16px 24px;">
-        {{ $orders->withQueryString()->links() }}
+        {{ $orders->withQueryString()->links('admin.partials.pagination') }}
     </div>
 </div>
 @endsection

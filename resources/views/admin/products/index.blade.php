@@ -1,4 +1,4 @@
-﻿@extends('layouts.admin')
+@extends('layouts.admin')
 
 @section('title', 'Quản lý sản phẩm')
 
@@ -156,7 +156,7 @@
                         </td>
                         <td>
                             <div class="customer-cell">
-                                <img src="{{ $prodImg }}" class="stock-thumb" alt="{{ $prod->name }}" onerror="this.src='{{ asset('assets/images/logo.png') }}'">
+                                <img src="{{ $prodImg }}" class="stock-thumb" alt="{{ $prod->name }}" onerror="this.onerror=null; this.src='{{ asset('assets/images/logo.png') }}'">
                                 <div class="customer-info-box">
                                     <a href="{{ route('admin.products.show', $prod) }}"
                                        class="c-name product-item-name"
@@ -211,16 +211,16 @@
                                 <a href="{{ route('admin.products.edit', $prod) }}" class="btn-action-view" title="Chỉnh sửa sản phẩm">
                                     <i class="bi bi-pencil"></i>
                                 </a>
-                                <form action="{{ route('admin.products.destroy', $prod) }}"
-                                      method="POST"
-                                      style="display: inline;"
-                                      onsubmit="return confirm('Xác nhận xóa sản phẩm «{{ $prod->name }}»?')">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn-action-view danger" title="Xóa sản phẩm">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
-                                </form>
+                                <button type="button"
+                                        class="btn-action-view danger btn-trigger-delete-product"
+                                        data-name="{{ $prod->name }}"
+                                        data-code="{{ $prod->code }}"
+                                        data-category="{{ $prod->category->name ?? 'Chưa phân loại' }}"
+                                        data-image="{{ $prodImg }}"
+                                        data-url="{{ route('admin.products.destroy', $prod) }}"
+                                        title="Xóa sản phẩm">
+                                    <i class="bi bi-trash"></i>
+                                </button>
                             </div>
                         </td>
                     </tr>
@@ -236,11 +236,12 @@
     </div>
 
     <div style="padding: 16px 24px;">
-        {{ $products->links() }}
+        {{ $products->links('admin.partials.pagination') }}
     </div>
 </div>
 
 <!-- Modals -->
+@include('admin.partials.delete-product-modal')
 @include('admin.partials.add-product-modal')
 @include('admin.partials.add-category-modal')
 @include('admin.partials.add-variant-modal')

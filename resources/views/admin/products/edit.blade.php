@@ -213,7 +213,7 @@
                                      src="{{ $currentMainImg }}"
                                      alt="{{ $product->name }}"
                                      style="width: 100%; max-height: 210px; object-fit: cover; border-radius: 10px; border: 1px solid #ebdcd7;"
-                                     onerror="this.src='{{ asset('images/logo.png') }}'">
+                                     onerror="this.onerror=null; this.src='{{ asset('assets/images/logo.png') }}'">
                             </div>
                         @endif
                         <input type="file"

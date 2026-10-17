@@ -377,7 +377,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // Phím tắt Esc để đóng Modal hoặc Drawer
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') {
-            if (addCategoryModalOverlay && addCategoryModalOverlay.classList.contains('show')) {
+            if (deleteProductModalOverlay && deleteProductModalOverlay.classList.contains('show')) {
+                closeDeleteProductModal();
+            } else if (addCategoryModalOverlay && addCategoryModalOverlay.classList.contains('show')) {
                 closeAddCategoryModal();
             } else if (addVariantModalOverlay && addVariantModalOverlay.classList.contains('show')) {
                 closeAddVariantModal();
@@ -875,6 +877,80 @@ document.addEventListener('DOMContentLoaded', () => {
                 alert('Vui lòng nhập tên danh mục!');
                 categoryNameInput?.focus();
             }
+        });
+    }
+
+    // ==========================================================================
+    // Xử lý Modal Xác nhận Xóa Sản Phẩm (Artisanal Delete Confirmation Modal)
+    // ==========================================================================
+    const deleteProductModalOverlay = document.getElementById('deleteProductModalOverlay');
+    const deleteProductModalCard = document.querySelector('.delete-modal-card');
+    const btnCloseDeleteProductModal = document.getElementById('btnCloseDeleteProductModal');
+    const btnCancelDeleteProductModal = document.getElementById('btnCancelDeleteProductModal');
+    const deleteProductName = document.getElementById('deleteProductName');
+    const deleteProductSku = document.getElementById('deleteProductSku');
+    const deleteProductCategory = document.getElementById('deleteProductCategory');
+    const deleteProductImg = document.getElementById('deleteProductImg');
+    const deleteProductForm = document.getElementById('deleteProductForm');
+
+    function openDeleteProductModal() {
+        if (!deleteProductModalOverlay) return;
+        deleteProductModalOverlay.classList.add('show');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeDeleteProductModal() {
+        if (!deleteProductModalOverlay) return;
+        deleteProductModalOverlay.classList.remove('show');
+        document.body.style.overflow = '';
+    }
+
+    // Gắn sự kiện click cho các nút trigger xóa sản phẩm
+    document.querySelectorAll('.btn-trigger-delete-product').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+
+            const name = btn.getAttribute('data-name') || '';
+            const code = btn.getAttribute('data-code') || '';
+            const category = btn.getAttribute('data-category') || 'Chưa phân loại';
+            const image = btn.getAttribute('data-image') || '';
+            const deleteUrl = btn.getAttribute('data-url') || '';
+
+            if (deleteProductName) deleteProductName.textContent = name;
+            if (deleteProductSku) deleteProductSku.textContent = code;
+            if (deleteProductCategory) deleteProductCategory.textContent = category;
+            if (deleteProductImg) {
+                deleteProductImg.src = image || '/images/logo.png';
+                deleteProductImg.alt = name;
+            }
+            if (deleteProductForm) {
+                deleteProductForm.action = deleteUrl;
+            }
+
+            openDeleteProductModal();
+        });
+    });
+
+    if (btnCloseDeleteProductModal) {
+        btnCloseDeleteProductModal.addEventListener('click', closeDeleteProductModal);
+    }
+
+    if (btnCancelDeleteProductModal) {
+        btnCancelDeleteProductModal.addEventListener('click', closeDeleteProductModal);
+    }
+
+    if (deleteProductModalOverlay) {
+        deleteProductModalOverlay.addEventListener('click', (e) => {
+            if (e.target === deleteProductModalOverlay) {
+                closeDeleteProductModal();
+            }
+        });
+    }
+
+    if (deleteProductModalCard) {
+        deleteProductModalCard.addEventListener('click', (e) => {
+            e.stopPropagation();
         });
     }
 });
