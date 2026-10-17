@@ -5,135 +5,217 @@
 @php $activeMenu = 'customers'; @endphp
 
 @section('content')
-{{--
-    ================================================================
-    [BACKEND ĐÃ CÓ] — Dành cho Frontend
-    ================================================================
-    Controller : App\Http\Controllers\Admin\CustomerController@show
-    Route      : GET /admin/customers/{customer}  (admin.customers.show)
+<!-- Top Bar -->
+<div class="admin-top-bar">
+    <div class="page-main-title">
+        <i class="bi bi-person-lines-fill"></i>
+        <span>HỒ SƠ KHÁCH HÀNG</span>
+    </div>
+    <div class="top-bar-right">
+        <a href="{{ route('admin.customers.index') }}" class="btn-secondary-outline">
+            <i class="bi bi-arrow-left"></i>
+            <span>Quay lại danh sách</span>
+        </a>
+    </div>
+</div>
 
-    Dữ liệu truyền vào view:
-      - $customer : User — khách hàng (role_id = 2, nếu không → 404)
-          Đã load:
-            - orders (10 đơn gần nhất, sắp xếp mới nhất trước)
-                mỗi Order có: id, code, total_amount, status, created_at
-                mỗi Order.items: quantity, unit_price, total_price
-                    + product: name, code
+<!-- Flash Notifications -->
+@if(session('success'))
+    <div class="admin-alert success">
+        <div class="admin-alert-content">
+            <i class="bi bi-check-circle-fill"></i>
+            <span>{{ session('success') }}</span>
+        </div>
+    </div>
+@endif
 
-          Fields: id, username, email, full_name, phone, is_active, created_at
+@if(session('error'))
+    <div class="admin-alert error">
+        <div class="admin-alert-content">
+            <i class="bi bi-exclamation-triangle-fill"></i>
+            <span>{{ session('error') }}</span>
+        </div>
+    </div>
+@endif
 
-    Các route thao tác:
-      - Khóa TK   : PATCH admin.customers.lock   /admin/customers/{customer}/lock
-      - Mở khóa   : PATCH admin.customers.unlock /admin/customers/{customer}/unlock
-      - Quay lại  : admin.customers.index
-
-    Trạng thái đăng nhập:
-      is_active = true  → Đang hoạt động (có thể đăng nhập)
-      is_active = false → Đã khóa (không thể đăng nhập,
-                          AuthController::login() từ chối vì is_active=false)
-    ================================================================
---}}
-
-{{-- ===== KHU VỰC BACKEND: CHI TIẾT KHÁCH HÀNG ===== --}}
-<div style="border: 2px dashed #3b82f6; padding: 16px; margin: 16px;">
-    <p><strong>[BACKEND DEMO]</strong> Trang chi tiết khách hàng — Frontend thay thế bằng UI hoàn chỉnh.</p>
-
-    {{-- Flash messages --}}
-    @if(session('success'))
-        <p style="color: green;">✅ {{ session('success') }}</p>
-    @endif
-    @if(session('error'))
-        <p style="color: red;">❌ {{ session('error') }}</p>
-    @endif
-
-    <a href="{{ route('admin.customers.index') }}">← Quay lại danh sách</a>
-
-    {{-- Thông tin tài khoản --}}
-    <h2>👤 {{ $customer->full_name }}</h2>
-
-    <table border="1" cellpadding="8">
-        <tr><th>ID</th><td>{{ $customer->id }}</td></tr>
-        <tr><th>Tên đăng nhập</th><td><code>{{ $customer->username }}</code></td></tr>
-        <tr><th>Email</th><td>{{ $customer->email }}</td></tr>
-        <tr><th>Số điện thoại</th><td>{{ $customer->phone ?? '—' }}</td></tr>
-        <tr>
-            <th>Trạng thái tài khoản</th>
-            <td>
+<div class="admin-detail-grid" style="grid-template-columns: 1fr 1.6fr;">
+    <!-- Cột trái: Thông tin hồ sơ & Khóa/Mở khóa -->
+    <div>
+        <div class="admin-card">
+            <div class="admin-card-header">
+                <h3 class="admin-card-title">
+                    <i class="bi bi-person-circle"></i>
+                    <span>Thông tin tài khoản</span>
+                </h3>
                 @if($customer->is_active)
-                    <span style="color: green; font-weight:bold;">🟢 Đang hoạt động</span>
+                    <span class="status-badge active-user">
+                        <i class="bi bi-check-circle"></i> Đang hoạt động
+                    </span>
                 @else
-                    <span style="color: red; font-weight:bold;">🔒 Đã khóa — Không thể đăng nhập</span>
+                    <span class="status-badge locked">
+                        <i class="bi bi-lock-fill"></i> Đã khóa
+                    </span>
                 @endif
-            </td>
-        </tr>
-        <tr><th>Ngày đăng ký</th><td>{{ $customer->created_at->format('d/m/Y H:i') }}</td></tr>
-        <tr><th>Tổng đơn hàng</th><td>{{ $customer->orders->count() }} đơn (hiển thị 10 gần nhất)</td></tr>
-    </table>
+            </div>
 
-    {{-- Nút khóa / mở khóa --}}
-    <div style="margin: 12px 0;">
-        @if($customer->is_active)
-            <form action="{{ route('admin.customers.lock', $customer) }}" method="POST" style="display:inline;">
-                @csrf
-                @method('PATCH')
-                <button type="submit"
-                        onclick="return confirm('Xác nhận khóa tài khoản của {{ $customer->full_name }}?\nHọ sẽ không thể đăng nhập ngay sau đó.')">
-                    🔒 Khóa tài khoản này
-                </button>
-            </form>
-        @else
-            <form action="{{ route('admin.customers.unlock', $customer) }}" method="POST" style="display:inline;">
-                @csrf
-                @method('PATCH')
-                <button type="submit"
-                        onclick="return confirm('Mở khóa tài khoản của {{ $customer->full_name }}?')">
-                    🔓 Mở khóa tài khoản này
-                </button>
-            </form>
-        @endif
+            <div class="admin-card-body">
+                <div style="display: flex; align-items: center; gap: 16px; padding-bottom: 18px; margin-bottom: 16px; border-bottom: 1px solid #f4eae6;">
+                    <div class="customer-avatar-abbr" style="width: 56px; height: 56px; font-size: 20px; border-radius: 14px;">
+                        {{ mb_strtoupper(mb_substr($customer->full_name, 0, 2)) }}
+                    </div>
+                    <div>
+                        <div style="font-size: 18px; font-weight: 800; color: var(--color-on-surface);">
+                            {{ $customer->full_name }}
+                        </div>
+                        <div style="margin-top: 4px;">
+                            <span class="mono-code">@{{ $customer->username }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-kv-list">
+                    <div class="info-kv-row">
+                        <span class="info-kv-label">Mã khách hàng</span>
+                        <span class="info-kv-value"><span class="mono-code">#{{ $customer->id }}</span></span>
+                    </div>
+                    <div class="info-kv-row">
+                        <span class="info-kv-label">Địa chỉ Email</span>
+                        <span class="info-kv-value">{{ $customer->email }}</span>
+                    </div>
+                    <div class="info-kv-row">
+                        <span class="info-kv-label">Số điện thoại</span>
+                        <span class="info-kv-value">
+                            <span class="mono-code">{{ $customer->phone ?? 'Chưa cập nhật' }}</span>
+                        </span>
+                    </div>
+                    @if(!empty($customer->address))
+                        <div class="info-kv-row">
+                            <span class="info-kv-label">Địa chỉ mặc định</span>
+                            <span class="info-kv-value">{{ $customer->address }}</span>
+                        </div>
+                    @endif
+                    <div class="info-kv-row">
+                        <span class="info-kv-label">Ngày đăng ký</span>
+                        <span class="info-kv-value">{{ $customer->created_at ? $customer->created_at->format('d/m/Y H:i') : '—' }}</span>
+                    </div>
+                    <div class="info-kv-row">
+                        <span class="info-kv-label">Quyền đăng nhập</span>
+                        <span class="info-kv-value">
+                            @if($customer->is_active)
+                                <span style="color: var(--color-success);">Được phép đăng nhập</span>
+                            @else
+                                <span style="color: var(--color-danger);">Đã chặn đăng nhập</span>
+                            @endif
+                        </span>
+                    </div>
+                </div>
+
+                <div style="margin-top: 20px; padding-top: 18px; border-top: 1px solid #f4eae6;">
+                    @if($customer->is_active)
+                        <form action="{{ route('admin.customers.lock', $customer) }}"
+                              method="POST"
+                              onsubmit="return confirm('Xác nhận khóa tài khoản của «{{ $customer->full_name }}»? Khách hàng sẽ không thể đăng nhập ngay sau khi khóa.')">
+                            @csrf
+                            @method('PATCH')
+                            <button type="submit" class="btn-inline-action danger" style="width: 100%; justify-content: center; padding: 11px 16px; font-size: 13.5px;">
+                                <i class="bi bi-lock-fill"></i>
+                                <span>Khóa tài khoản khách hàng này</span>
+                            </button>
+                        </form>
+                    @else
+                        <form action="{{ route('admin.customers.unlock', $customer) }}"
+                              method="POST"
+                              onsubmit="return confirm('Xác nhận mở khóa tài khoản cho «{{ $customer->full_name }}»?')">
+                            @csrf
+                            @method('PATCH')
+                            <button type="submit" class="btn-inline-action success" style="width: 100%; justify-content: center; padding: 11px 16px; font-size: 13.5px;">
+                                <i class="bi bi-unlock-fill"></i>
+                                <span>Mở khóa tài khoản khách hàng này</span>
+                            </button>
+                        </form>
+                    @endif
+                </div>
+            </div>
+        </div>
     </div>
 
-    {{-- Lịch sử đơn hàng --}}
-    <h3>🛒 Lịch sử đơn hàng gần nhất</h3>
-    @if($customer->orders->isEmpty())
-        <p><em>Khách hàng này chưa có đơn hàng nào.</em></p>
-    @else
-        <table border="1" cellpadding="8" style="width:100%;">
-            <thead>
-                <tr>
-                    <th>Mã ĐH</th>
-                    <th>Số sản phẩm</th>
-                    <th>Tổng tiền</th>
-                    <th>Trạng thái</th>
-                    <th>Ngày đặt</th>
-                    <th>Thao tác</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach($customer->orders as $order)
-                    @php
-                        $statusLabels = [
-                            'pending'   => '⏳ Chờ xác nhận',
-                            'shipping'  => '🚚 Đang giao',
-                            'completed' => '✅ Hoàn thành',
-                            'cancelled' => '❌ Đã hủy',
-                        ];
-                    @endphp
-                    <tr>
-                        <td><strong>#{{ $order->code }}</strong></td>
-                        <td>{{ $order->items->count() }} sản phẩm</td>
-                        <td>{{ number_format($order->total_amount, 0, ',', '.') }}đ</td>
-                        <td>{{ $statusLabels[$order->status] ?? $order->status }}</td>
-                        <td>{{ $order->created_at->format('d/m/Y H:i') }}</td>
-                        <td>
-                            <a href="{{ route('admin.orders.show', $order) }}">Xem đơn</a>
-                        </td>
-                    </tr>
-                @endforeach
-            </tbody>
-        </table>
-    @endif
-</div>
-{{-- ===== KẾT THÚC KHU VỰC BACKEND ===== --}}
+    <!-- Cột phải: Lịch sử 10 đơn hàng gần nhất -->
+    <div class="table-card" style="margin-bottom: 0;">
+        <div class="table-header-flex">
+            <div>
+                <h3 style="font-size: 15px; font-weight: 800; color: var(--color-on-surface); margin-bottom: 3px;">
+                    Lịch sử đơn hàng gần nhất ({{ $customer->orders->count() }})
+                </h3>
+                <p style="font-size: 12px; color: var(--color-outline);">Hiển thị tối đa 10 đơn hàng mới nhất của khách hàng này</p>
+            </div>
+        </div>
 
+        <div class="admin-table-wrapper">
+            <table class="admin-data-table">
+                <thead>
+                    <tr>
+                        <th>Mã ĐH</th>
+                        <th>Sản phẩm</th>
+                        <th>Tổng tiền</th>
+                        <th>Trạng thái</th>
+                        <th>Ngày đặt</th>
+                        <th style="text-align: center;">Chi tiết</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($customer->orders as $order)
+                        <tr>
+                            <td>
+                                <a href="{{ route('admin.orders.show', $order) }}" style="text-decoration: none;">
+                                    <span class="mono-code">#{{ $order->code }}</span>
+                                </a>
+                            </td>
+                            <td>
+                                <span style="font-weight: 700;">{{ $order->items->count() }} sản phẩm</span>
+                            </td>
+                            <td>
+                                <span class="total-amount-text">{{ number_format($order->total_amount, 0, ',', '.') }}đ</span>
+                            </td>
+                            <td>
+                                @if($order->status === 'completed')
+                                    <span class="status-badge completed">
+                                        <i class="bi bi-check-circle"></i> Hoàn thành
+                                    </span>
+                                @elseif($order->status === 'shipping')
+                                    <span class="status-badge shipping">
+                                        <i class="bi bi-truck"></i> Đang giao
+                                    </span>
+                                @elseif($order->status === 'cancelled')
+                                    <span class="status-badge cancelled">
+                                        <i class="bi bi-x-circle"></i> Đã hủy
+                                    </span>
+                                @else
+                                    <span class="status-badge pending">
+                                        <i class="bi bi-clock"></i> Chờ xác nhận
+                                    </span>
+                                @endif
+                            </td>
+                            <td>
+                                <span style="font-size: 13px; color: var(--color-on-surface-variant);">
+                                    {{ $order->created_at->format('d/m/Y H:i') }}
+                                </span>
+                            </td>
+                            <td style="text-align: center;">
+                                <a href="{{ route('admin.orders.show', $order) }}" class="btn-action-view" title="Xem đơn hàng">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="6" style="text-align: center; padding: 32px; color: var(--color-outline);">
+                                Khách hàng này chưa có đơn hàng nào.
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
 @endsection

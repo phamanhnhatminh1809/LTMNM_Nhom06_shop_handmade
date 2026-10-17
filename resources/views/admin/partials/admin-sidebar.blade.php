@@ -1,8 +1,15 @@
-﻿@php
-$currentMenu = $activeMenu ?? 'dashboard';
+@php
+    $currentMenu = $activeMenu ?? 'dashboard';
+    $authUser = Auth::user();
+    $roleShortLabel = match ($authUser?->role?->name) {
+        'admin'           => 'Quản trị viên',
+        'warehouse_staff' => 'Nhân viên kho',
+        'sales_staff'     => 'Nhân viên bán hàng',
+        default           => 'Quản trị viên',
+    };
 @endphp
 <aside class="admin-sidebar" id="adminSidebar">
-    <!-- Nút bấm thu gọn / trượt ra 
+    <!-- Nút bấm thu gọn / trượt ra -->
     <button type="button" class="btn-sidebar-toggle" id="btnSidebarToggle" title="Thu gọn / Mở rộng sidebar">
         <i class="bi bi-chevron-left" id="sidebarToggleIcon"></i>
     </button>
@@ -28,81 +35,83 @@ $currentMenu = $activeMenu ?? 'dashboard';
                 </a>
             </div>
 
-            <!-- Nhóm HỆ THỐNG -->
+            <!-- Nhóm HỆ THỐNG: Chỉ Quản trị viên (admin) -->
+            @if(!$authUser || $authUser->isAdmin())
             <div class="nav-group">
                 <div class="nav-group-title">HỆ THỐNG</div>
                 <ul class="nav-list">
                     <li>
-                        <a href="#" class="nav-link {{ $currentMenu === 'staff' ? 'active' : '' }}" title="Nhân viên">
+                        <a href="{{ route('admin.staff.index') }}" class="nav-link {{ $currentMenu === 'staff' ? 'active' : '' }}" title="Nhân viên">
                             <i class="bi bi-person-vcard"></i>
                             <span class="nav-text">Nhân viên</span>
                         </a>
                     </li>
                     <li>
-                        <a href="#" class="nav-link {{ $currentMenu === 'permissions' ? 'active' : '' }}" title="Phân quyền">
+                        <a href="{{ route('admin.staff.index', ['role' => 'all']) }}" class="nav-link {{ $currentMenu === 'permissions' ? 'active' : '' }}" title="Phân quyền">
                             <i class="bi bi-shield-lock"></i>
                             <span class="nav-text">Phân quyền</span>
                         </a>
                     </li>
                 </ul>
             </div>
+            @endif
 
-            <!-- Nhóm QUẢN LÝ KHO -->
+            <!-- Nhóm QUẢN LÝ KHO: Admin & Nhân viên kho -->
+            @if(!$authUser || $authUser->canManageWarehouse())
             <div class="nav-group">
                 <div class="nav-group-title">QUẢN LÝ KHO</div>
                 <ul class="nav-list">
+                    <li>
+                        <a href="{{ route('admin.categories.index') }}" class="nav-link {{ $currentMenu === 'categories' ? 'active' : '' }}" title="Loại sản phẩm">
+                            <i class="bi bi-tags"></i>
+                            <span class="nav-text">Loại sản phẩm</span>
+                        </a>
+                    </li>
                     <li>
                         <a href="{{ route('admin.products.index') }}" class="nav-link {{ $currentMenu === 'products' ? 'active' : '' }}" title="Sản phẩm">
                             <i class="bi bi-bag"></i>
                             <span class="nav-text">Sản phẩm</span>
                         </a>
                     </li>
+                </ul>
+            </div>
+            @endif
+
+            <!-- Nhóm BÁN HÀNG: Admin & Nhân viên bán hàng -->
+            @if(!$authUser || $authUser->canManageSales())
+            <div class="nav-group">
+                <div class="nav-group-title">KINH DOANH</div>
+                <ul class="nav-list">
                     <li>
-                        <a href="#" class="nav-link {{ $currentMenu === 'warehouse' ? 'active' : '' }}" title="Kho hàng">
-                            <i class="bi bi-box-seam"></i>
-                            <span class="nav-text">Kho hàng</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#" class="nav-link {{ $currentMenu === 'orders' ? 'active' : '' }}" title="Đơn hàng">
+                        <a href="{{ route('admin.orders.index') }}" class="nav-link {{ $currentMenu === 'orders' ? 'active' : '' }}" title="Đơn hàng">
                             <i class="bi bi-receipt-cutoff"></i>
                             <span class="nav-text">Đơn hàng</span>
                         </a>
                     </li>
-                </ul>
-            </div>
-
-            <!-- Nhóm TRẢI NGHIỆM -->
-            <div class="nav-group">
-                <div class="nav-group-title">TRẢI NGHIỆM</div>
-                <ul class="nav-list">
                     <li>
-                        <a href="#" class="nav-link {{ $currentMenu === 'workshop' ? 'active' : '' }}" title="Workshop">
-                            <i class="bi bi-calendar-event"></i>
-                            <span class="nav-text">Workshop</span>
+                        <a href="{{ route('admin.reviews.index') }}" class="nav-link {{ $currentMenu === 'reviews' ? 'active' : '' }}" title="Đánh giá">
+                            <i class="bi bi-star"></i>
+                            <span class="nav-text">Đánh giá</span>
                         </a>
                     </li>
+                </ul>
+            </div>
+            @endif
+
+            <!-- Nhóm KHÁCH HÀNG: Chỉ Quản trị viên (admin) -->
+            @if(!$authUser || $authUser->isAdmin())
+            <div class="nav-group">
+                <div class="nav-group-title">KHÁCH HÀNG</div>
+                <ul class="nav-list">
                     <li>
-                        <a href="#" class="nav-link {{ $currentMenu === 'customers' ? 'active' : '' }}" title="Khách hàng">
+                        <a href="{{ route('admin.customers.index') }}" class="nav-link {{ $currentMenu === 'customers' ? 'active' : '' }}" title="Khách hàng">
                             <i class="bi bi-people"></i>
                             <span class="nav-text">Khách hàng</span>
                         </a>
                     </li>
                 </ul>
             </div>
-
-            <!-- Nhóm BÁO CÁO THỐNG KÊ -->
-            <div class="nav-group">
-                <div class="nav-group-title">BÁO CÁO THỐNG KÊ</div>
-                <ul class="nav-list">
-                    <li>
-                        <a href="#" class="nav-link {{ $currentMenu === 'reports' ? 'active' : '' }}" title="Báo cáo">
-                            <i class="bi bi-bar-chart-line"></i>
-                            <span class="nav-text">Báo cáo</span>
-                        </a>
-                    </li>
-                </ul>
-            </div>
+            @endif
         </nav>
 
         <!-- Footer Sidebar -->
@@ -112,8 +121,8 @@ $currentMenu = $activeMenu ?? 'dashboard';
                     <i class="bi bi-person"></i>
                 </div>
                 <div class="profile-info">
-                    <div class="profile-name">{{ Auth::user()->full_name ?? 'Quản trị viên' }}</div>
-                    <div class="profile-role">Quản trị viên</div>
+                    <div class="profile-name">{{ $authUser->full_name ?? 'Quản trị viên' }}</div>
+                    <div class="profile-role">{{ $roleShortLabel }}</div>
                 </div>
             </div>
 

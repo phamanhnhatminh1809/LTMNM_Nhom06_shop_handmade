@@ -5,6 +5,8 @@ use App\Http\Controllers\Admin\CustomerController as AdminCustomerController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Admin\ProductController as AdminProductController;
+use App\Http\Controllers\Admin\ReviewController as AdminReviewController;
+use App\Http\Controllers\Admin\StaffController as AdminStaffController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CheckoutController;
@@ -69,35 +71,53 @@ Route::middleware('auth')->group(function () {
 });
 
 // ==========================================
-// 3. ADMIN MANAGEMENT ROUTES
+// 4. ADMIN MANAGEMENT ROUTES (CÓ PHÂN QUYỀN ROLE)
 // ==========================================
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(function () {
-    // Dashboard
+    // Dashboard (Admin, Nhân viên kho, Nhân viên bán hàng đều vào được khu vực quản trị)
     Route::get('/', [AdminDashboardController::class, 'index'])->name('dashboard');
     Route::get('/dashboard', [AdminDashboardController::class, 'index']);
 
-    // Quản lý loại sản phẩm (Category) — CRUD đầy đủ
-    Route::resource('categories', AdminCategoryController::class);
+    // --- PHÂN HỆ KHO: Chỉ Admin & Nhân viên kho (warehouse_staff) ---
+    Route::middleware('admin:admin,warehouse_staff')->group(function () {
+        // Quản lý loại sản phẩm (Category) — CRUD đầy đủ
+        Route::resource('categories', AdminCategoryController::class);
 
-    // Quản lý sản phẩm — CRUD đầy đủ (có show + edit + update)
-    Route::resource('products', AdminProductController::class);
+        // Quản lý sản phẩm — CRUD đầy đủ + Upload ảnh
+        Route::resource('products', AdminProductController::class);
+    });
 
-    // Quản lý đơn hàng — xem danh sách, xem chi tiết, cập nhật trạng thái
-    Route::resource('orders', AdminOrderController::class)->only(['index', 'show']);
-    Route::patch('orders/{order}/status', [AdminOrderController::class, 'updateStatus'])
-        ->name('orders.updateStatus');
+    // --- PHÂN HỆ BÁN HÀNG: Chỉ Admin & Nhân viên bán hàng (sales_staff) ---
+    Route::middleware('admin:admin,sales_staff')->group(function () {
+        // Quản lý đơn hàng — xem danh sách, xem chi tiết, cập nhật trạng thái
+        Route::resource('orders', AdminOrderController::class)->only(['index', 'show']);
+        Route::patch('orders/{order}/status', [AdminOrderController::class, 'updateStatus'])
+            ->name('orders.updateStatus');
 
-    // Quản lý khách hàng — xem danh sách, xem chi tiết, khóa/mở khóa
-    Route::resource('customers', AdminCustomerController::class)->only(['index', 'show']);
-    Route::patch('customers/{customer}/lock', [AdminCustomerController::class, 'lock'])
-        ->name('customers.lock');
-    Route::patch('customers/{customer}/unlock', [AdminCustomerController::class, 'unlock'])
-        ->name('customers.unlock');
+        // Quản lý đánh giá sản phẩm — xem danh sách, lọc theo sản phẩm/số sao, xóa đánh giá
+        Route::resource('reviews', AdminReviewController::class)->only(['index', 'destroy']);
+    });
+
+    // --- PHÂN HỆ TOÀN QUYỀN: Chỉ Admin (admin) ---
+    Route::middleware('admin:admin')->group(function () {
+        // Quản lý khách hàng — xem danh sách, xem chi tiết, khóa/mở khóa
+        Route::resource('customers', AdminCustomerController::class)->only(['index', 'show']);
+        Route::patch('customers/{customer}/lock', [AdminCustomerController::class, 'lock'])
+            ->name('customers.lock');
+        Route::patch('customers/{customer}/unlock', [AdminCustomerController::class, 'unlock'])
+            ->name('customers.unlock');
+
+        // Quản lý nhân viên & Phân quyền (Admin, Nhân viên kho, Nhân viên bán hàng)
+        Route::resource('staff', AdminStaffController::class)->only(['index', 'create', 'store']);
+        Route::patch('staff/{user}/role', [AdminStaffController::class, 'updateRole'])
+            ->name('staff.updateRole');
+        Route::patch('staff/{user}/status', [AdminStaffController::class, 'toggleStatus'])
+            ->name('staff.toggleStatus');
+    });
 });
 
-
 // ==========================================
-// 4. BACKWARD COMPATIBILITY (?route=...)
+// 5. BACKWARD COMPATIBILITY (?route=...)
 // ==========================================
 Route::get('/index.php', function () {
     $route = request('route', 'home');

@@ -408,6 +408,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    const modalCategoryIdInput = document.getElementById('modalCategoryIdInput');
     modalCategoryItems.forEach(item => {
         item.addEventListener('click', function (e) {
             e.stopPropagation();
@@ -416,6 +417,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (selectedModalCategoryText) {
                 selectedModalCategoryText.textContent = this.textContent.trim();
+            }
+            if (modalCategoryIdInput && this.getAttribute('data-cat-id')) {
+                modalCategoryIdInput.value = this.getAttribute('data-cat-id');
             }
             if (modalCategoryDropdown) {
                 modalCategoryDropdown.classList.remove('show');
@@ -467,7 +471,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const thumbBox = document.createElement('div');
             thumbBox.className = 'image-thumb-box';
 
-            let mainBadgeHtml = (idx === 0) ? '<span class="badge-main-image">Ảnh chính</span>' : '';
+            let mainBadgeHtml = (idx === 0) ? '<span class="badge-main-image">Ảnh 1</span>' : '';
 
             thumbBox.innerHTML = `
                 <img src="${src}" alt="Ảnh sản phẩm ${idx + 1}">
@@ -504,7 +508,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const remainingSlots = 5 - uploadedImagesList.length;
             if (remainingSlots <= 0) {
                 alert('Bạn chỉ có thể thêm tối đa 5 ảnh cho mỗi sản phẩm!');
-                this.value = '';
                 return;
             }
 
@@ -522,30 +525,33 @@ document.addEventListener('DOMContentLoaded', () => {
                 };
                 reader.readAsDataURL(file);
             });
-
-            this.value = '';
         });
     }
-    const btnSaveProduct = document.getElementById('btnSaveProduct');
-    if (btnSaveProduct) {
-        btnSaveProduct.addEventListener('click', () => {
+
+    const addProductModalForm = document.getElementById('addProductModalForm');
+    const productDescriptionHidden = document.getElementById('productDescriptionHidden');
+    if (addProductModalForm) {
+        addProductModalForm.addEventListener('submit', (e) => {
             const productName = document.getElementById('productNameInput')?.value.trim();
             const productSku = document.getElementById('productSkuInput')?.value.trim();
 
             if (!productName) {
+                e.preventDefault();
                 alert('Vui lòng nhập tên sản phẩm!');
                 document.getElementById('productNameInput')?.focus();
                 return;
             }
 
             if (!productSku) {
+                e.preventDefault();
                 alert('Vui lòng nhập mã SKU!');
                 document.getElementById('productSkuInput')?.focus();
                 return;
             }
 
-            alert(`Sản phẩm "${productName}" (${productSku}) đã được lưu thành công!`);
-            closeAddProductModal();
+            if (editorContent && productDescriptionHidden) {
+                productDescriptionHidden.value = editorContent.innerText.trim();
+            }
         });
     }
     // Xử lý modal thêm biến thể
@@ -860,54 +866,15 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Xử lý tạo danh mục mới & chọn ngay
+    // Xử lý tạo danh mục mới & lưu trực tiếp vào CSDL
     if (btnSubmitCategory) {
         btnSubmitCategory.addEventListener('click', (e) => {
-            e.preventDefault();
-
             const catName = categoryNameInput?.value.trim();
             if (!catName) {
+                e.preventDefault();
                 alert('Vui lòng nhập tên danh mục!');
                 categoryNameInput?.focus();
-                return;
             }
-
-            // Thêm danh mục mới vào Custom Dropdown của Modal Thêm sản phẩm
-            const menu = modalCategoryDropdown?.querySelector('.modal-select-menu');
-            const divider = menu?.querySelector('.modal-select-divider');
-
-            if (menu && divider) {
-                // Bỏ active cũ
-                const allItems = menu.querySelectorAll('.modal-select-item');
-                allItems.forEach(it => it.classList.remove('active'));
-
-                // Tạo item mới
-                const newItem = document.createElement('div');
-                newItem.className = 'modal-select-item active';
-                newItem.setAttribute('data-cat', catName);
-                newItem.textContent = catName;
-
-                newItem.addEventListener('click', function (ev) {
-                    ev.stopPropagation();
-                    menu.querySelectorAll('.modal-select-item').forEach(i => i.classList.remove('active'));
-                    this.classList.add('active');
-                    if (selectedModalCategoryText) {
-                        selectedModalCategoryText.textContent = this.textContent.trim();
-                    }
-                    if (modalCategoryDropdown) {
-                        modalCategoryDropdown.classList.remove('show');
-                    }
-                });
-
-                menu.insertBefore(newItem, divider);
-
-                // Tự chọn luôn danh mục vừa tạo
-                if (selectedModalCategoryText) {
-                    selectedModalCategoryText.textContent = catName;
-                }
-            }
-
-            closeAddCategoryModal();
         });
     }
 });

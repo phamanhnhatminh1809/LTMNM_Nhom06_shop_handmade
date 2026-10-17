@@ -3847,3 +3847,602 @@ body {
     transform: translateY(-1.5px);
     box-shadow: 0 6px 16px rgba(121, 42, 22, 0.28);
 }
+
+/* ==========================================================================
+   ARTISANAL DASHBOARD — EXTENDED COMPONENTS (FOR_AGENT_FE.md)
+   ========================================================================== */
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+:root {
+    --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+.mono-code {
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--color-primary);
+    background-color: #fff1ec;
+    border: 1px solid #f2dcd4;
+    padding: 3px 8px;
+    border-radius: 6px;
+    display: inline-block;
+    letter-spacing: 0.01em;
+}
+
+/* Flash Alerts & Validation Notifications */
+.admin-alert {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 13px 18px;
+    border-radius: 12px;
+    margin-bottom: 18px;
+    font-size: 13.5px;
+    font-weight: 600;
+    line-height: 1.5;
+    box-shadow: 0 4px 12px rgba(121, 42, 22, 0.04);
+}
+
+.admin-alert-content {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+}
+
+.admin-alert-content i {
+    font-size: 17px;
+    margin-top: 1px;
+    flex-shrink: 0;
+}
+
+.admin-alert.success {
+    background-color: #eef5ef;
+    border: 1px solid #c5dcc8;
+    color: #263d2b;
+}
+
+.admin-alert.success i {
+    color: var(--color-success);
+}
+
+.admin-alert.error {
+    background-color: #ffdad6;
+    border: 1px solid #f5b5ae;
+    color: #690005;
+}
+
+.admin-alert.error i {
+    color: var(--color-danger);
+}
+
+.admin-alert.info {
+    background-color: #fff1ec;
+    border: 1px solid #dcc1ba;
+    color: var(--color-on-surface);
+}
+
+.admin-alert.info i {
+    color: var(--color-primary);
+}
+
+.admin-alert ul {
+    margin: 4px 0 0 18px;
+    padding: 0;
+}
+
+/* Status Filter Tabs / Pills Bar */
+.status-tabs-bar {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.status-tab-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 15px;
+    border-radius: 9999px;
+    background-color: #ffffff;
+    border: 1px solid #dcc1ba;
+    color: var(--color-on-surface-variant);
+    font-size: 13px;
+    font-weight: 700;
+    text-decoration: none;
+    transition: all 0.18s ease;
+    box-shadow: 0 2px 6px rgba(121, 42, 22, 0.03);
+}
+
+.status-tab-pill:hover {
+    background-color: #fff1ec;
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+}
+
+.status-tab-pill.active {
+    background-color: var(--color-primary);
+    border-color: var(--color-primary);
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(121, 42, 22, 0.2);
+}
+
+.tab-count-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 22px;
+    height: 20px;
+    padding: 0 6px;
+    border-radius: 9999px;
+    font-size: 11px;
+    font-weight: 800;
+    background-color: #f5ded5;
+    color: var(--color-primary);
+}
+
+.status-tab-pill.active .tab-count-badge {
+    background-color: rgba(255, 255, 255, 0.22);
+    color: #ffffff;
+}
+
+/* Extended Status & Role Badges */
+.status-badge.cancelled,
+.status-badge.locked {
+    background-color: #ffdad6;
+    color: #93000a;
+}
+
+.status-badge.active-user {
+    background-color: #dcece0;
+    color: #233b28;
+}
+
+.role-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 11px;
+    border-radius: 9999px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.role-badge.admin {
+    background-color: #ffdad2;
+    color: #792a16;
+    border: 1px solid #f2b8aa;
+}
+
+.role-badge.warehouse_staff {
+    background-color: #fddbce;
+    color: #584238;
+    border: 1px solid #e0c0b3;
+}
+
+.role-badge.sales_staff {
+    background-color: #cdead0;
+    color: #1f3725;
+    border: 1px solid #b2ceb5;
+}
+
+.role-badge.customer {
+    background-color: #f1f1f1;
+    color: #55423e;
+    border: 1px solid #dcc1ba;
+}
+
+/* Action Buttons in Tables & Headers */
+.btn-action-view {
+    text-decoration: none;
+}
+
+.btn-action-view.danger:hover {
+    background-color: #ffdad6;
+    color: var(--color-danger);
+    border-color: #f5b5ae;
+}
+
+.btn-inline-action {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 11px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 700;
+    font-family: var(--font-main);
+    border: 1px solid transparent;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.18s ease;
+    white-space: nowrap;
+}
+
+.btn-inline-action.primary {
+    background-color: var(--color-primary);
+    color: #ffffff;
+}
+
+.btn-inline-action.primary:hover {
+    background-color: var(--color-primary-container);
+    transform: translateY(-1px);
+}
+
+.btn-inline-action.success {
+    background-color: var(--color-success);
+    color: #ffffff;
+}
+
+.btn-inline-action.success:hover {
+    background-color: #324a37;
+    transform: translateY(-1px);
+}
+
+.btn-inline-action.warning {
+    background-color: #fdf3dc;
+    color: #8a6214;
+    border-color: #e8cf96;
+}
+
+.btn-inline-action.warning:hover {
+    background-color: #fae6b9;
+}
+
+.btn-inline-action.danger {
+    background-color: #fff5f4;
+    color: var(--color-danger);
+    border-color: #f5b5ae;
+}
+
+.btn-inline-action.danger:hover {
+    background-color: #ffdad6;
+}
+
+.btn-secondary-outline {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 9px 16px;
+    border-radius: 8px;
+    border: 1.5px solid #72594f;
+    background-color: #ffffff;
+    color: #55423e;
+    font-size: 13px;
+    font-weight: 700;
+    font-family: var(--font-main);
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.18s ease;
+}
+
+.btn-secondary-outline:hover {
+    background-color: #fff1ec;
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+}
+
+/* Form Pages & Detail Cards */
+.admin-form-grid {
+    display: grid;
+    grid-template-columns: 1.65fr 1fr;
+    gap: 20px;
+    align-items: start;
+}
+
+.admin-detail-grid {
+    display: grid;
+    grid-template-columns: 1.35fr 1fr;
+    gap: 20px;
+    align-items: start;
+}
+
+.admin-card {
+    background-color: #ffffff;
+    border-radius: 14px;
+    border: 1px solid #ebdcd7;
+    box-shadow: 0 4px 16px rgba(152, 65, 43, 0.05);
+    overflow: hidden;
+    margin-bottom: 20px;
+}
+
+.admin-card-header {
+    padding: 16px 22px;
+    border-bottom: 1px solid #f3e6e1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    background-color: #fffcfa;
+}
+
+.admin-card-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 15px;
+    font-weight: 800;
+    color: var(--color-on-surface);
+    margin: 0;
+}
+
+.admin-card-title i {
+    color: var(--color-primary);
+    font-size: 17px;
+}
+
+.admin-card-body {
+    padding: 22px;
+}
+
+.admin-form-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 12px;
+    padding-top: 18px;
+    margin-top: 18px;
+    border-top: 1px solid #f3e6e1;
+}
+
+.form-help-text {
+    font-size: 12px;
+    color: var(--color-outline);
+    margin-top: 5px;
+    line-height: 1.4;
+}
+
+.form-error-text {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--color-danger);
+    margin-top: 4px;
+}
+
+/* Key-Value Information Lists */
+.info-kv-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.info-kv-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 12px 0;
+    border-bottom: 1px solid #f4eae6;
+    font-size: 13.5px;
+}
+
+.info-kv-row:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.info-kv-row:first-child {
+    padding-top: 0;
+}
+
+.info-kv-label {
+    color: var(--color-outline);
+    font-weight: 600;
+    flex-shrink: 0;
+}
+
+.info-kv-value {
+    color: var(--color-on-surface);
+    font-weight: 700;
+    text-align: right;
+    word-break: break-word;
+}
+
+/* Order Progress Stepper */
+.order-stepper-card {
+    background-color: #ffffff;
+    border: 1px solid #ebdcd7;
+    border-radius: 14px;
+    padding: 20px 24px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 16px rgba(152, 65, 43, 0.05);
+}
+
+.order-stepper {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+    max-width: 760px;
+    margin: 0 auto;
+}
+
+.step-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    position: relative;
+    z-index: 2;
+    flex: 1;
+}
+
+.step-circle {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #fff1ec;
+    border: 2px solid #dcc1ba;
+    color: var(--color-outline);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 17px;
+    font-weight: 800;
+    transition: all 0.2s ease;
+}
+
+.step-item.active .step-circle {
+    background-color: var(--color-primary);
+    border-color: var(--color-primary);
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(121, 42, 22, 0.25);
+}
+
+.step-item.done .step-circle {
+    background-color: var(--color-success);
+    border-color: var(--color-success);
+    color: #ffffff;
+}
+
+.step-item.cancelled .step-circle {
+    background-color: var(--color-danger);
+    border-color: var(--color-danger);
+    color: #ffffff;
+}
+
+.step-label {
+    font-size: 12.5px;
+    font-weight: 700;
+    color: var(--color-outline);
+}
+
+.step-item.active .step-label,
+.step-item.done .step-label {
+    color: var(--color-on-surface);
+}
+
+.step-connector {
+    flex: 1;
+    height: 3px;
+    background-color: #ebdcd7;
+    margin: 0 -12px 24px;
+    z-index: 1;
+}
+
+.step-connector.done {
+    background-color: var(--color-success);
+}
+
+/* Star Rating & Rank Badges */
+.star-rating-group {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    color: #d99b26;
+    font-size: 13px;
+}
+
+.star-rating-group .star-empty {
+    color: #e2d5cf;
+}
+
+.rank-badge {
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    font-weight: 800;
+    background-color: #fff1ec;
+    color: var(--color-on-surface-variant);
+    border: 1px solid #ebdcd7;
+}
+
+.rank-badge.rank-1 {
+    background-color: #792a16;
+    color: #ffffff;
+    border-color: #792a16;
+}
+
+.rank-badge.rank-2 {
+    background-color: #c49b4d;
+    color: #ffffff;
+    border-color: #c49b4d;
+}
+
+.rank-badge.rank-3 {
+    background-color: #49624e;
+    color: #ffffff;
+    border-color: #49624e;
+}
+
+/* Icon Quick Picker Chips */
+.icon-chip-picker {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.icon-chip-btn {
+    padding: 6px 11px;
+    border-radius: 8px;
+    background-color: #fff8f6;
+    border: 1px solid #dcc1ba;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--color-on-surface);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.15s ease;
+}
+
+.icon-chip-btn:hover,
+.icon-chip-btn.active {
+    background-color: #fff1ec;
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+}
+
+/* Role Summary Grid */
+.role-summary-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+    margin-bottom: 18px;
+}
+
+.role-summary-card {
+    background-color: #ffffff;
+    border: 1px solid #ebdcd7;
+    border-radius: 12px;
+    padding: 15px 18px;
+    box-shadow: 0 2px 10px rgba(121, 42, 22, 0.04);
+}
+
+.role-summary-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+
+.role-summary-count {
+    font-family: var(--font-mono);
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--color-on-surface);
+}
+
+.role-summary-desc {
+    font-size: 12px;
+    color: var(--color-outline);
+    line-height: 1.45;
+}
+
+/* Responsive adjustments for Form & Detail Grids */
+@media (max-width: 1024px) {
+    .admin-form-grid,
+    .admin-detail-grid,
+    .role-summary-grid {
+        grid-template-columns: 1fr;
+    }
+}
