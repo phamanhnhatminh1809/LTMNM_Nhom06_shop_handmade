@@ -61,5 +61,31 @@ class UserSeeder extends Seeder
                 'is_active' => true,
             ]
         );
+
+        // Tài khoản Nhân viên kho mẫu
+        User::firstOrCreate(
+            ['email' => 'warehouse@shophandmade.com'],
+            [
+                'role_id' => 3,
+                'username' => 'staff_warehouse',
+                'password' => Hash::make('password123'),
+                'full_name' => 'Phạm Hoàng Kho',
+                'phone' => '0945678901',
+                'is_active' => true,
+            ]
+        );
+
+        // Tài khoản Nhân viên bán hàng mẫu
+        User::firstOrCreate(
+            ['email' => 'sales@shophandmade.com'],
+            [
+                'role_id' => 4,
+                'username' => 'staff_sales',
+                'password' => Hash::make('password123'),
+                'full_name' => 'Đỗ Thu Bán Hàng',
+                'phone' => '0956789012',
+                'is_active' => true,
+            ]
+        );
     }
 }
