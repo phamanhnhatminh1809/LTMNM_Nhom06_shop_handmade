@@ -58,8 +58,8 @@ class ProductController extends Controller
                 break;
         }
 
-        $total = (clone $query)->count();
         $products = $query->paginate(12)->withQueryString();
+        $total = $products->total();
         $categories = Category::all();
         $currentCategory = $categorySlug !== '' ? Category::where('slug', $categorySlug)->first() : null;
 

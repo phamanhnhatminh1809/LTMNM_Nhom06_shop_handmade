@@ -17,4 +17,10 @@ class Category extends Model
     {
         return $this->hasMany(Product::class);
     }
+
+    protected static function booted(): void
+    {
+        static::saved(fn () => \Illuminate\Support\Facades\Cache::forget('global_categories'));
+        static::deleted(fn () => \Illuminate\Support\Facades\Cache::forget('global_categories'));
+    }
 }

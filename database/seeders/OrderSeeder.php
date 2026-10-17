@@ -4,7 +4,9 @@ namespace Database\Seeders;
 
 use App\Models\Order;
 use App\Models\OrderItem;
+use App\Models\Product;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Schema;
 
 class OrderSeeder extends Seeder
 {
@@ -197,21 +199,54 @@ class OrderSeeder extends Seeder
             ],
         ];
 
+        $existingProductIds = Product::pluck('id')->toArray();
+        if (empty($existingProductIds)) {
+            return;
+        }
+
+        Schema::disableForeignKeyConstraints();
+        OrderItem::truncate();
+        Order::truncate();
+        Schema::enableForeignKeyConstraints();
+
         foreach ($orders as $orderData) {
             $items = $orderData['items'];
             unset($orderData['items']);
 
             $order = Order::updateOrCreate(['id' => $orderData['id']], $orderData);
 
+            $orderTotal = 0;
+            $usedInOrder = [];
+
             foreach ($items as $item) {
-                OrderItem::firstOrCreate(
-                    [
-                        'order_id' => $order->id,
-                        'product_id' => $item['product_id'],
-                    ],
-                    $item
-                );
+                // Đảm bảo product_id luôn hợp lệ và không trùng lặp trong cùng một đơn
+                $targetProductId = in_array($item['product_id'], $existingProductIds, true)
+                    ? $item['product_id']
+                    : $existingProductIds[array_rand($existingProductIds)];
+
+                if (in_array($targetProductId, $usedInOrder, true)) {
+                    $available = array_diff($existingProductIds, $usedInOrder);
+                    if (!empty($available)) {
+                        $targetProductId = $available[array_rand($available)];
+                    }
+                }
+                $usedInOrder[] = $targetProductId;
+
+                $product = Product::find($targetProductId);
+                $unitPrice = $product ? (float) $product->price : (float) $item['unit_price'];
+                $totalPrice = $unitPrice * $item['quantity'];
+                $orderTotal += $totalPrice;
+
+                OrderItem::create([
+                    'order_id'    => $order->id,
+                    'product_id'  => $targetProductId,
+                    'quantity'    => $item['quantity'],
+                    'unit_price'  => $unitPrice,
+                    'total_price' => $totalPrice,
+                ]);
             }
+
+            $order->update(['total_amount' => $orderTotal]);
         }
     }
 }

@@ -59,7 +59,7 @@ class Cart extends Model
     /**
      * Lấy hoặc tạo mới giỏ hàng hoạt động (active) cho người dùng hiện tại hoặc phiên làm việc.
      */
-    public static function getActiveCart(): self
+    public static function getActiveCart(bool $createIfNotExist = true): ?self
     {
         $sessionId = Session::getId();
 
@@ -101,7 +101,7 @@ class Cart extends Model
                 }
             }
 
-            if (!$cart) {
+            if (!$cart && $createIfNotExist) {
                 $cart = self::create([
                     'user_id' => $userId,
                     'session_id' => $sessionId,
@@ -118,7 +118,7 @@ class Cart extends Model
             ->where('status', 'active')
             ->first();
 
-        if (!$cart) {
+        if (!$cart && $createIfNotExist) {
             $cart = self::create([
                 'session_id' => $sessionId,
                 'status' => 'active',
