@@ -18,6 +18,7 @@ services:
       DB_DATABASE: ltmnm_shop_handmade
       DB_USERNAME: root
       DB_PASSWORD: root
+      PHP_CLI_SERVER_WORKERS: 4
     command: php artisan serve --host=0.0.0.0 --port=8000
     depends_on:
       - db
@@ -44,10 +45,6 @@ services:
       DB_DATABASE: ltmnm_shop_handmade
       DB_USERNAME: root
       DB_PASSWORD: root
-    command: >
-      bash -c "sed -ri -e 's!/var/www/html!/var/www/html/public!g' /etc/apache2/sites-available/*.conf &&
-               sed -ri -e 's!/var/www/!/var/www/html/public!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf &&
-               apache2-foreground"
     depends_on:
       - db
     networks:

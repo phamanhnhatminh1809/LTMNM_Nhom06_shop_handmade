@@ -24,7 +24,7 @@ Dự án website thương mại điện tử đồ thủ công **Shop Handmade**
    # Cài đặt dependencies (nếu chưa có vendor)
    composer install
 
-   # Chạy Migration và nạp 50 sản phẩm mẫu từ Seeder
+   # Chạy Migration và nạp dữ liệu mẫu (sản phẩm ngẫu nhiên 6-13 SP/danh mục, tài khoản, đơn hàng, đánh giá)
    php artisan migrate:fresh --seed
 
    # Khởi chạy server phát triển
@@ -44,9 +44,10 @@ Dự án website thương mại điện tử đồ thủ công **Shop Handmade**
    ```bash
    docker compose exec app php artisan migrate:fresh --seed
    ```
+   docker compose exec app php artisan serve
 4. Truy cập website:
+   - **Web Apache Server (Khuyến nghị - Siêu mượt, không giật lag)**: [http://localhost:8080](http://localhost:8080)
    - **Laravel App (Artisan)**: [http://localhost:8000](http://localhost:8000)
-   - **Web Apache Server**: [http://localhost:8080](http://localhost:8080)
    
 5. Để thực hiện các lệnh php/composer trực tiếp trong docker
    docker compose exec -it app bash
@@ -63,21 +64,36 @@ Dự án website thương mại điện tử đồ thủ công **Shop Handmade**
 | **Đăng ký** | `/register` | Đăng ký tài khoản thành viên mới |
 | **Giới thiệu** | `/about` | Giới thiệu cửa hàng đồ handmade |
 | **Liên hệ** | `/contact` | Thông tin liên hệ, hotline, địa chỉ |
-| **Tổng quan Admin** | `/admin/dashboard` | 5 thẻ chỉ số, biểu đồ Chart.js doanh thu & danh mục, đơn gần đây |
-| **Quản lý SP Admin** | `/admin/products` | Bảng quản lý sản phẩm, tồn kho, modal thêm sản phẩm |
+| **Giỏ hàng** | `/cart` | Quản lý giỏ hàng, cập nhật số lượng, xóa món |
+| **Thanh toán COD** | `/checkout` | Đặt hàng thanh toán khi nhận hàng, kiểm tra giỏ hàng |
+| **Đơn hàng của tôi** | `/orders` | Lịch sử mua hàng, chi tiết đơn, đánh giá sản phẩm |
+| **Hồ sơ cá nhân** | `/profile` | Quản lý thông tin tài khoản, đổi mật khẩu |
+| **Tổng quan Admin** | `/admin/dashboard` | 5 thẻ chỉ số, thống kê bán chạy, biểu đồ Chart.js doanh thu & danh mục |
+| **Quản lý Sản phẩm** | `/admin/products` | Danh sách, lọc danh mục, thêm/sửa/xóa sản phẩm, cập nhật tồn kho |
+| **Quản lý Loại sản phẩm** | `/admin/categories` | Thêm, sửa, xóa loại sản phẩm handmade, chống xóa khi có sản phẩm |
+| **Quản lý Đơn hàng** | `/admin/orders` | Danh sách đơn, lọc trạng thái, duyệt đơn (Chờ xác nhận ➔ Đang giao ➔ Hoàn thành) |
+| **Quản lý Đánh giá** | `/admin/reviews` | Lọc đánh giá theo sản phẩm/số sao, tìm kiếm, kiểm duyệt xóa vi phạm |
+| **Quản lý Khách hàng** | `/admin/customers` | Danh sách tài khoản khách, xem lịch sử đơn, khóa/mở khóa tài khoản |
+| **Nhân viên & Phân quyền** | `/admin/staff` | Quản lý tài khoản nội bộ, cấp quyền Admin / Nhân viên kho / Nhân viên bán hàng |
 
 ---
 
 ## 🔑 Tài khoản thử nghiệm
 
-| Vai trò | Email / Username | Mật khẩu | Quyền hạn |
-| :--- | :--- | :--- | :--- |
-| **Quản trị viên (Admin)** | `admin@shophandmade.com` / `shop_admin` | `password123` | Quản trị toàn bộ hệ thống, kho hàng, đơn hàng |
-| **Khách hàng mẫu** | `test_customer@gmail.com` / `test_customer` | `password123` | Mua sắm, theo dõi đơn hàng |
+Tất cả tài khoản mẫu đều dùng chung mật khẩu: `password123`
+
+| Vai trò | Họ tên | Email / Tên đăng nhập | SĐT | Quyền hạn chi tiết |
+| :--- | :--- | :--- | :--- | :--- |
+| 👑 **Quản trị viên (Admin)** | Quản trị viên | `admin@shophandmade.com`<br>`shop_admin` | `0901234567` | **Toàn quyền hệ thống**: Quản lý kho hàng, đơn hàng, khách hàng, nhân viên, phân quyền RBAC và thống kê doanh thu. |
+| 📦 **Nhân viên kho** | Phạm Hoàng Kho | `warehouse@shophandmade.com`<br>`staff_warehouse` | `0945678901` | **Quản lý kho**: Toàn quyền thêm, sửa, xóa sản phẩm, cập nhật số lượng tồn kho và quản lý loại sản phẩm. Không xem được đơn hàng/doanh thu. |
+| 💼 **Nhân viên bán hàng** | Đỗ Thu Bán Hàng | `sales@shophandmade.com`<br>`staff_sales` | `0956789012` | **Quản lý bán hàng**: Xem và duyệt đơn hàng, cập nhật trạng thái đơn (chuyển hàng, hoàn tất), xem và kiểm duyệt đánh giá khách hàng. |
+| 👤 **Khách hàng 1** | Nguyễn Văn An | `test_customer@gmail.com`<br>`test_customer` | `0912345678` | Đặt hàng COD, xem lịch sử đơn, quản lý giỏ hàng, viết đánh giá sản phẩm đã mua, cập nhật thông tin cá nhân. |
+| 👤 **Khách hàng 2** | Trần Thị Bình | `tranbinh@mail.com`<br>`tranbinh` | `0923456789` | Tài khoản khách hàng mẫu (đã có đơn hàng mẫu đang giao và đã hoàn thành). |
+| 👤 **Khách hàng 3** | Lê Văn Minh | `levanminh@gmail.com`<br>`levanminh` | `0934567890` | Tài khoản khách hàng mẫu (đã có đơn hàng mẫu giá trị cao đã hoàn thành). |
 
 ---
 
-## 🗄️ Kết nối cơ sở dữ liệu mysql
+## Kết nối cơ sở dữ liệu mysql
 
 - **Chạy Local (Laragon)**: Port `3306` | User `root` | Password: ` ` (trống)
 - **Chạy Docker**: Port `3307` (Host) -> `3306` (Container) | User `root` | Password `root`
