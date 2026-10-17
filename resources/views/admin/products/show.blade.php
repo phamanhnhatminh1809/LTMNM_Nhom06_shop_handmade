@@ -1,63 +1,213 @@
 @extends('layouts.admin')
 
-@section('title', 'Chi tiết sản phẩm')
+@section('title', 'Chi tiết sản phẩm — ' . $product->name)
 
 @php $activeMenu = 'products'; @endphp
 
 @section('content')
-{{--
-    ================================================================
-    [BACKEND ĐÃ CÓ] — Dành cho Frontend
-    ================================================================
-    Controller : App\Http\Controllers\Admin\ProductController@show
-    Route      : GET /admin/products/{product}  (admin.products.show)
-
-    Dữ liệu truyền vào view:
-      - $product : Product — object sản phẩm (đã load quan hệ 'category')
-          Có: id, code, name, slug, description, instruction_preserve,
-              image, gallery (array), price, old_price, stock_quantity,
-              rating, sold, is_featured, category (Category object)
-
-    Từ đây có thể điều hướng sang:
-      - Sửa  : route('admin.products.edit', $product)
-      - Xóa  : form DELETE route('admin.products.destroy', $product)
-      - Back  : route('admin.products.index')
-    ================================================================
---}}
-
-{{-- ===== KHU VỰC BACKEND: CHI TIẾT SẢN PHẨM ===== --}}
-<div style="border: 2px dashed #3b82f6; padding: 16px; margin: 16px;">
-    <p><strong>[BACKEND DEMO]</strong> Trang chi tiết sản phẩm — Frontend thay thế bằng UI hoàn chỉnh.</p>
-
-    <h2>Chi tiết sản phẩm: {{ $product->name }}</h2>
-    <a href="{{ route('admin.products.index') }}">← Quay lại danh sách</a>
-    |
-    <a href="{{ route('admin.products.edit', $product) }}">✏️ Sửa sản phẩm này</a>
-
-    <table border="1" cellpadding="8" style="margin-top: 12px;">
-        <tr><th>Mã SKU</th><td>{{ $product->code }}</td></tr>
-        <tr><th>Tên sản phẩm</th><td>{{ $product->name }}</td></tr>
-        <tr><th>Slug</th><td><code>{{ $product->slug }}</code></td></tr>
-        <tr><th>Danh mục</th><td>{{ $product->category->name ?? '—' }}</td></tr>
-        <tr><th>Giá bán</th><td>{{ number_format($product->price, 0, ',', '.') }}đ</td></tr>
-        <tr><th>Giá cũ</th><td>{{ $product->old_price ? number_format($product->old_price, 0, ',', '.') . 'đ' : '—' }}</td></tr>
-        <tr><th>Tồn kho</th><td>{{ $product->stock_quantity }}</td></tr>
-        <tr><th>Đã bán</th><td>{{ $product->sold }}</td></tr>
-        <tr><th>Đánh giá</th><td>⭐ {{ $product->rating }}</td></tr>
-        <tr><th>Nổi bật</th><td>{{ $product->is_featured ? '✅ Có' : '❌ Không' }}</td></tr>
-        <tr><th>Mô tả</th><td>{{ $product->description ?? '—' }}</td></tr>
-        <tr><th>Hướng dẫn bảo quản</th><td>{{ $product->instruction_preserve ?? '—' }}</td></tr>
-        <tr><th>Hình ảnh chính</th><td>
-            @if($product->image)
-                <img src="{{ asset(ltrim($product->image, '/')) }}" alt="{{ $product->name }}" style="max-width:150px;" onerror="this.style.display='none'">
-            @else
-                (Chưa có ảnh)
-            @endif
-        </td></tr>
-        <tr><th>Ngày tạo</th><td>{{ $product->created_at->format('d/m/Y H:i') }}</td></tr>
-        <tr><th>Cập nhật lần cuối</th><td>{{ $product->updated_at->format('d/m/Y H:i') }}</td></tr>
-    </table>
+<!-- Top Bar -->
+<div class="admin-top-bar">
+    <div class="page-main-title">
+        <i class="bi bi-box-seam"></i>
+        <span>CHI TIẾT SẢN PHẨM</span>
+    </div>
+    <div class="top-bar-right" style="display: flex; align-items: center; gap: 10px;">
+        <a href="{{ route('products.show', $product->id) }}" target="_blank" class="btn-secondary-outline">
+            <i class="bi bi-box-arrow-up-right"></i>
+            <span>Xem ngoài cửa hàng</span>
+        </a>
+        <a href="{{ route('admin.products.edit', $product) }}" class="btn-add-product" style="padding: 9px 16px;">
+            <i class="bi bi-pencil"></i>
+            <span>Chỉnh sửa</span>
+        </a>
+        <a href="{{ route('admin.products.index') }}" class="btn-secondary-outline">
+            <i class="bi bi-arrow-left"></i>
+            <span>Quay lại</span>
+        </a>
+    </div>
 </div>
-{{-- ===== KẾT THÚC KHU VỰC BACKEND ===== --}}
 
+<!-- Hàng Thẻ Chỉ Số Sản Phẩm -->
+<div class="metrics-row" style="grid-template-columns: repeat(4, 1fr);">
+    <div class="metric-card">
+        <div class="metric-icon-box">
+            <i class="bi bi-tag"></i>
+        </div>
+        <div class="metric-label">Giá bán niêm yết</div>
+        <div class="metric-value">
+            {{ number_format($product->price, 0, ',', '.') }}đ
+            @if(!empty($product->old_price))
+                <span style="font-size: 13px; color: var(--color-outline); text-decoration: line-through; font-weight: 600; margin-left: 6px;">
+                    {{ number_format($product->old_price, 0, ',', '.') }}đ
+                </span>
+            @endif
+        </div>
+    </div>
+
+    <div class="metric-card">
+        <div class="metric-icon-box">
+            <i class="bi bi-boxes"></i>
+        </div>
+        <div class="metric-label">Số lượng tồn kho</div>
+        <div class="metric-value">
+            {{ $product->stock_quantity }}
+            @if($product->stock_quantity <= 2)
+                <span class="stock-tag danger" style="font-size: 11px; vertical-align: middle; margin-left: 6px;">SẮP HẾT</span>
+            @elseif($product->stock_quantity <= 5)
+                <span class="stock-tag warning" style="font-size: 11px; vertical-align: middle; margin-left: 6px;">THẤP</span>
+            @endif
+        </div>
+    </div>
+
+    <div class="metric-card">
+        <div class="metric-icon-box">
+            <i class="bi bi-bag-heart"></i>
+        </div>
+        <div class="metric-label">Tổng số lượng đã bán</div>
+        <div class="metric-value">{{ $product->sold }}</div>
+    </div>
+
+    <div class="metric-card">
+        <div class="metric-icon-box">
+            <i class="bi bi-star"></i>
+        </div>
+        <div class="metric-label">Điểm đánh giá trung bình</div>
+        <div class="metric-value">⭐ {{ $product->rating }} / 5.0</div>
+    </div>
+</div>
+
+<div class="admin-detail-grid">
+    <!-- Cột trái: Mô tả, Bảo quản & Thông số -->
+    <div>
+        <div class="admin-card">
+            <div class="admin-card-header">
+                <h3 class="admin-card-title">
+                    <i class="bi bi-card-text"></i>
+                    <span>{{ $product->name }}</span>
+                </h3>
+                @if($product->is_featured)
+                    <span class="status-badge completed">⭐ Sản phẩm nổi bật</span>
+                @endif
+            </div>
+            <div class="admin-card-body">
+                <div style="margin-bottom: 20px;">
+                    <h4 style="font-size: 13px; font-weight: 800; color: var(--color-outline); text-transform: uppercase; margin-bottom: 8px;">
+                        Mô tả chi tiết sản phẩm
+                    </h4>
+                    <div style="font-size: 14px; line-height: 1.7; color: var(--color-on-surface); white-space: pre-line; background: #fff8f6; padding: 14px 16px; border-radius: 10px; border: 1px solid #f2e2dc;">
+                        {{ $product->description ?: 'Chưa có mô tả chi tiết cho sản phẩm này.' }}
+                    </div>
+                </div>
+
+                <div>
+                    <h4 style="font-size: 13px; font-weight: 800; color: var(--color-outline); text-transform: uppercase; margin-bottom: 8px;">
+                        Hướng dẫn sử dụng & Bảo quản
+                    </h4>
+                    <div style="font-size: 14px; line-height: 1.7; color: var(--color-on-surface-variant); white-space: pre-line; background: #fff8f6; padding: 14px 16px; border-radius: 10px; border: 1px solid #f2e2dc;">
+                        {{ $product->instruction_preserve ?: 'Chưa có hướng dẫn bảo quản riêng.' }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="admin-card">
+            <div class="admin-card-header">
+                <h3 class="admin-card-title">
+                    <i class="bi bi-sliders"></i>
+                    <span>Thông số định danh & Quản trị</span>
+                </h3>
+            </div>
+            <div class="admin-card-body">
+                <div class="info-kv-list">
+                    <div class="info-kv-row">
+                        <span class="info-kv-label">Mã SKU</span>
+                        <span class="info-kv-value"><span class="mono-code">{{ $product->code }}</span></span>
+                    </div>
+                    <div class="info-kv-row">
+                        <span class="info-kv-label">Đường dẫn tĩnh (Slug)</span>
+                        <span class="info-kv-value"><span class="mono-code">{{ $product->slug }}</span></span>
+                    </div>
+                    <div class="info-kv-row">
+                        <span class="info-kv-label">Danh mục</span>
+                        <span class="info-kv-value">{{ $product->category->name ?? 'Chưa phân loại' }}</span>
+                    </div>
+                    <div class="info-kv-row">
+                        <span class="info-kv-label">Ngày khởi tạo</span>
+                        <span class="info-kv-value">{{ $product->created_at ? $product->created_at->format('d/m/Y H:i') : '—' }}</span>
+                    </div>
+                    <div class="info-kv-row">
+                        <span class="info-kv-label">Cập nhật lần cuối</span>
+                        <span class="info-kv-value">{{ $product->updated_at ? $product->updated_at->format('d/m/Y H:i') : '—' }}</span>
+                    </div>
+                </div>
+
+                <div class="admin-form-actions" style="justify-content: space-between;">
+                    <a href="{{ route('admin.reviews.index', ['product_id' => $product->id]) }}" class="btn-secondary-outline">
+                        <i class="bi bi-star"></i>
+                        <span>Xem đánh giá của sản phẩm</span>
+                    </a>
+
+                    <form action="{{ route('admin.products.destroy', $product) }}"
+                          method="POST"
+                          onsubmit="return confirm('Xác nhận xóa vĩnh viễn sản phẩm «{{ $product->name }}»?')">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="btn-inline-action danger" style="padding: 9px 16px;">
+                            <i class="bi bi-trash"></i>
+                            <span>Xóa sản phẩm này</span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cột phải: Hình ảnh đại diện & Bộ sưu tập -->
+    <div>
+        <div class="admin-card">
+            <div class="admin-card-header">
+                <h3 class="admin-card-title">
+                    <i class="bi bi-image"></i>
+                    <span>Hình ảnh sản phẩm</span>
+                </h3>
+            </div>
+            <div class="admin-card-body">
+                @php
+                    $mainImg = !empty($product->image)
+                        ? (str_starts_with($product->image, 'http') ? $product->image : asset(ltrim($product->image, '/')))
+                        : asset('images/logo.png');
+                @endphp
+                <div style="margin-bottom: 14px;">
+                    <img id="detailMainImage"
+                         src="{{ $mainImg }}"
+                         alt="{{ $product->name }}"
+                         style="width: 100%; height: 320px; object-fit: cover; border-radius: 12px; border: 1px solid #ebdcd7;"
+                         onerror="this.src='{{ asset('images/logo.png') }}'">
+                </div>
+
+                @if(!empty($product->gallery) && is_array($product->gallery) && count($product->gallery) > 0)
+                    <div class="form-help-text" style="margin-bottom: 8px; font-weight: 700;">
+                        Bộ sưu tập ảnh phụ ({{ count($product->gallery) }} ảnh):
+                    </div>
+                    <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+                        <img src="{{ $mainImg }}"
+                             alt="Main"
+                             onclick="document.getElementById('detailMainImage').src = this.src"
+                             style="width: 68px; height: 68px; object-fit: cover; border-radius: 8px; border: 2px solid var(--color-primary); cursor: pointer;">
+                        @foreach($product->gallery as $galImg)
+                            @php
+                                $galUrl = str_starts_with($galImg, 'http') ? $galImg : asset(ltrim($galImg, '/'));
+                            @endphp
+                            <img src="{{ $galUrl }}"
+                                 alt="Gallery"
+                                 onclick="document.getElementById('detailMainImage').src = this.src"
+                                 style="width: 68px; height: 68px; object-fit: cover; border-radius: 8px; border: 1px solid #ebdcd7; cursor: pointer;"
+                                 onerror="this.style.display='none'">
+                        @endforeach
+                    </div>
+                @endif
+            </div>
+        </div>
+    </div>
+</div>
 @endsection

@@ -1,17 +1,22 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // Dữ liệu mẫu biểu đồ Doanh thu
+    const chartData = window.dashboardChartData || {};
     const revenueCtx = document.getElementById('revenueChart');
+    const revenueSubLabel = document.getElementById('revenueChartSubLabel');
     let revenueChartInstance = null;
 
-    const dataWeek = {
-        labels: ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'],
-        data: [2.5, 3.8, 2.1, 4.3, 3.6, 5.8, 4.9]
-    };
+    const dataWeek = (chartData.revenueWeek && Array.isArray(chartData.revenueWeek.labels) && chartData.revenueWeek.labels.length > 0)
+        ? chartData.revenueWeek
+        : {
+            labels: ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'],
+            data: [2.5, 3.8, 2.1, 4.3, 3.6, 5.8, 4.9]
+        };
 
-    const dataMonth = {
-        labels: ['Tuần 1', 'Tuần 2', 'Tuần 3', 'Tuần 4'],
-        data: [18.2, 22.5, 20.1, 26.8]
-    };
+    const dataMonth = (chartData.revenueMonth && Array.isArray(chartData.revenueMonth.labels) && chartData.revenueMonth.labels.length > 0)
+        ? chartData.revenueMonth
+        : {
+            labels: ['Tuần 1', 'Tuần 2', 'Tuần 3', 'Tuần 4'],
+            data: [18.2, 22.5, 20.1, 26.8]
+        };
 
     if (revenueCtx) {
         revenueChartInstance = new Chart(revenueCtx, {
@@ -35,7 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     pointBorderColor: '#792a16',
                     pointBorderWidth: 2,
                     pointRadius: 4,
-                    pointHoverRadius: 4,
+                    pointHoverRadius: 5,
                     pointHitRadius: 15
                 }]
             },
@@ -84,30 +89,41 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (period === 'month') {
                     revenueChartInstance.data.labels = dataMonth.labels;
                     revenueChartInstance.data.datasets[0].data = dataMonth.data;
+                    if (revenueSubLabel) revenueSubLabel.textContent = '4 tuần gần nhất (Đơn vị: triệu VNĐ)';
                 } else {
                     revenueChartInstance.data.labels = dataWeek.labels;
                     revenueChartInstance.data.datasets[0].data = dataWeek.data;
+                    if (revenueSubLabel) revenueSubLabel.textContent = '7 ngày gần nhất (Đơn vị: triệu VNĐ)';
                 }
                 revenueChartInstance.update();
             }
         });
     });
 
-    // Biểu đồ tròn Doanh thu theo danh mục
+    // Biểu đồ tròn Tỷ trọng theo danh mục
     const categoryCtx = document.getElementById('categoryDonutChart');
     let categoryChartInstance = null;
     if (categoryCtx) {
+        const palette = ['#792a16', '#c49b4d', '#49624e', '#98412b', '#72594f', '#89726d'];
+        const hasDynamicCat = chartData.categoryShare
+            && Array.isArray(chartData.categoryShare.labels)
+            && chartData.categoryShare.labels.length > 0;
+
+        const donutLabels = hasDynamicCat
+            ? chartData.categoryShare.labels
+            : ['Gấu bông len', 'Móc khóa len', 'Bó hoa len'];
+        const donutPercentages = hasDynamicCat
+            ? chartData.categoryShare.percentages
+            : [45, 30, 25];
+        const donutColors = donutLabels.map((_, idx) => palette[idx % palette.length]);
+
         categoryChartInstance = new Chart(categoryCtx, {
             type: 'doughnut',
             data: {
-                labels: ['Gấu bông len', 'Móc khóa len', 'Bó hoa len'],
+                labels: donutLabels,
                 datasets: [{
-                    data: [45, 30, 25],
-                    backgroundColor: [
-                        '#792a16',
-                        '#c49b4d',
-                        '#49624e'
-                    ],
+                    data: donutPercentages,
+                    backgroundColor: donutColors,
                     borderWidth: 0,
                     hoverOffset: 0
                 }]
@@ -117,7 +133,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 maintainAspectRatio: false,
                 cutout: '72%',
                 onHover: (event, chartElement) => {
-                    event.native.target.style.cursor = chartElement[0] ? 'pointer' : 'default';
+                    if (event.native && event.native.target) {
+                        event.native.target.style.cursor = chartElement[0] ? 'pointer' : 'default';
+                    }
                 },
                 plugins: {
                     legend: { display: false },
@@ -132,7 +150,11 @@ document.addEventListener('DOMContentLoaded', () => {
                         yAlign: 'bottom',
                         callbacks: {
                             label: function (context) {
-                                return ` ${context.label}: ${context.parsed}%`;
+                                const soldCounts = hasDynamicCat && Array.isArray(chartData.categoryShare.sold_counts)
+                                    ? chartData.categoryShare.sold_counts[context.dataIndex]
+                                    : null;
+                                const suffix = soldCounts !== null ? ` (${soldCounts} đã bán)` : '';
+                                return ` ${context.label}: ${context.parsed}%${suffix}`;
                             }
                         }
                     }
@@ -144,7 +166,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const legendItems = document.querySelectorAll('.legend-item');
         legendItems.forEach((item, index) => {
             item.addEventListener('mouseenter', () => {
-                if (categoryChartInstance) {
+                if (categoryChartInstance && index < donutLabels.length) {
                     categoryChartInstance.setActiveElements([{ datasetIndex: 0, index: index }]);
                     categoryChartInstance.tooltip.setActiveElements([{ datasetIndex: 0, index: index }]);
                     categoryChartInstance.update();
@@ -160,8 +182,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-
-
     // Xử lý Dropdown / Popover chọn khoảng thời gian
     const dateFilterContainer = document.querySelector('.date-filter-container');
     const btnDateFilter = document.getElementById('btnDateFilter');
@@ -174,13 +194,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const endDateInput = document.getElementById('endDateInput');
 
     if (btnDateFilter && dateFilterContainer) {
-        // Toggle mở / đóng popover
         btnDateFilter.addEventListener('click', (e) => {
             e.stopPropagation();
             dateFilterContainer.classList.toggle('show');
         });
 
-        // Đóng popover khi bấm dấu X hoặc nút Hủy bỏ
         if (btnCloseDatePopover) {
             btnCloseDatePopover.addEventListener('click', () => {
                 dateFilterContainer.classList.remove('show');
@@ -192,7 +210,6 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
 
-        // Chặn đóng khi click bên trong popover
         const popoverEl = document.getElementById('dateRangePopover');
         if (popoverEl) {
             popoverEl.addEventListener('click', (e) => {
@@ -200,12 +217,10 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
 
-        // Đóng popover khi click ra ngoài màn hình
         document.addEventListener('click', () => {
             dateFilterContainer.classList.remove('show');
         });
 
-        // Chọn các nút có sẵn
         presetButtons.forEach(btn => {
             btn.addEventListener('click', function () {
                 presetButtons.forEach(b => b.classList.remove('active'));
@@ -236,7 +251,6 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
 
-        // Bấm nút Áp dụng
         if (btnApplyDateFilter) {
             btnApplyDateFilter.addEventListener('click', () => {
                 const activePreset = document.querySelector('.preset-btn.active');
