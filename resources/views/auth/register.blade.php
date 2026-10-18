@@ -278,6 +278,22 @@
                         </div>
                     </div>
 
+                    <!-- Ô nhập OTP Đăng ký -->
+                    <div class="form-group" style="margin-bottom: 20px; padding: 15px; background: #f9fafb; border-radius: 8px; border: 1px dashed var(--color-primary);">
+                        <label class="form-label" style="color: var(--color-primary); margin-bottom: 8px;">
+                            XÁC THỰC EMAIL (OTP) <span class="required">*</span>
+                        </label>
+                        <div style="display: flex; gap: 10px;">
+                            <input type="text" id="register-otp" name="otp" class="form-control" placeholder="Nhập 6 số OTP" maxlength="6" required style="flex: 1; letter-spacing: 2px; text-align: center; font-weight: bold;">
+                            <button type="button" id="btn-send-reg-otp" class="btn-outline-custom" style="white-space: nowrap; height: 44px;">
+                                Gửi mã OTP
+                            </button>
+                        </div>
+                        @error('otp')
+                            <span style="color: #ef4444; font-size: 12px; margin-top: 4px; display: block;">{{ $message }}</span>
+                        @enderror
+                    </div>
+
                     <!-- Điều khoản -->
                     <div class="form-options">
                         <label class="checkbox-label" for="accept-terms">

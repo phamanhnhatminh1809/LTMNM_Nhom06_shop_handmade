@@ -142,7 +142,6 @@
 
                 <form action="{{ route('login.submit') }}" method="POST" class="auth-form" id="login-form" novalidate>
                     @csrf
-                    <!-- Tài khoản / Email -->
                     <div class="form-group">
                         <label for="login-account" class="form-label">
                             EMAIL HOẶC TÊN TÀI KHOẢN <span class="required">*</span>
@@ -156,7 +155,6 @@
                         <span class="client-feedback-error" id="error-login-account" style="display: none;"></span>
                     </div>
 
-                    <!-- Mật khẩu -->
                     <div class="form-group">
                         <label for="login-password" class="form-label">
                             MẬT KHẨU <span class="required">*</span>
@@ -173,7 +171,6 @@
                         <span class="client-feedback-error" id="error-login-password" style="display: none;"></span>
                     </div>
 
-                    <!-- Ghi nhớ & Quên mật khẩu -->
                     <div class="form-options">
                         <label class="checkbox-label" for="remember-me">
                             <input type="checkbox" name="remember" id="remember-me">
@@ -182,12 +179,10 @@
                         <a href="javascript:void(0)" class="link-forgot" id="btn-open-forgot">Quên mật khẩu?</a>
                     </div>
 
-                    <!-- Nút Đăng nhập -->
                     <button type="submit" class="btn-submit" id="btn-submit-login">
                         <span>Đăng nhập</span>
                     </button>
 
-                    <!-- Chuyển sang đăng ký -->
                     <p class="switch-auth-link">
                         Chưa có tài khoản? <a href="javascript:void(0)" class="link-switch-to-register">Đăng ký ngay</a>
                     </p>
@@ -276,6 +271,22 @@
                             </div>
                             <span class="client-feedback-error" id="error-reg-confirm-password" style="display: none;"></span>
                         </div>
+                    </div>
+
+                    <!-- Ô nhập OTP Đăng ký -->
+                    <div class="form-group" style="margin-bottom: 20px; padding: 15px; background: #f9fafb; border-radius: 8px; border: 1px dashed var(--color-primary);">
+                        <label class="form-label" style="color: var(--color-primary); margin-bottom: 8px;">
+                            XÁC THỰC EMAIL (OTP) <span class="required">*</span>
+                        </label>
+                        <div style="display: flex; gap: 10px;">
+                            <input type="text" id="register-otp" name="otp" class="form-control" placeholder="Nhập 6 số OTP" maxlength="6" required style="flex: 1; letter-spacing: 2px; text-align: center; font-weight: bold;">
+                            <button type="button" id="btn-send-reg-otp" class="btn-outline-custom" style="white-space: nowrap; height: 44px;">
+                                Gửi mã OTP
+                            </button>
+                        </div>
+                        @error('otp')
+                            <span style="color: #ef4444; font-size: 12px; margin-top: 4px; display: block;">{{ $message }}</span>
+                        @enderror
                     </div>
 
                     <!-- Điều khoản -->

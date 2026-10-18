@@ -270,14 +270,14 @@ body {
     justify-content: flex-start;
     background-color: var(--color-surface-container-lowest);
     position: relative;
-    overflow: hidden;
+    overflow-y: auto;
 }
 
-/* KHUNG CHỨA SLIDER 2 FORM (Instant 0ms Slide) */
+/* KHUNG CHỨA SLIDER 2 FORM (Đã sửa lỗi cắt xén) */
 .auth-forms-slider-track {
     position: relative;
     width: 100%;
-    min-height: 480px;
+    min-height: auto; /* SỬA: Để form tự giãn theo nội dung */
 }
 
 .auth-form-slide {

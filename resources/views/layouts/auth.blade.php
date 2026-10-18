@@ -18,8 +18,8 @@
     </main>
 
     @include('partials.auth-footer')
-
     <script src="{{ asset('js/auth.js') }}?v={{ filemtime(public_path('js/auth.js')) }}"></script>
+    
     @stack('scripts')
 </body>
 </html>

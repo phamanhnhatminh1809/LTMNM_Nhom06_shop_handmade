@@ -15,12 +15,40 @@
     <link rel="stylesheet" href="{{ asset('css/base.css') }}">
     <link rel="stylesheet" href="{{ asset('css/layout.css') }}">
     <link rel="stylesheet" href="{{ asset('css/components.css') }}">
+
+    <style>
+        html, body { margin: 0; padding: 0; overflow-x: hidden; }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 15px;
+            box-sizing: border-box;
+        }
+
+        /* Lưới sản phẩm dùng chung (trang chủ, danh sách, liên quan) */
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 20px;
+        }
+        .product-grid > :empty { display: none; }
+        .shop-layout {
+            display: grid;
+            grid-template-columns: 260px minmax(0, 1fr);
+            gap: 24px;
+            align-items: start;
+        }
+        @media (max-width: 900px) {
+            .shop-layout { grid-template-columns: 1fr; }
+        }
+    </style>
+
     @stack('styles')
 </head>
 <body>
-
     @include('partials.header')
-    @include('partials.navbar')
 
     <main class="main-content">
         @yield('content')

@@ -777,3 +777,68 @@ body.no-scroll { overflow: hidden; }
     .features { grid-template-columns: 1fr; }
     .top-bar__right a:nth-child(1) { display: none; }
 }
+/* ============================================
+   FIX DỨT ĐIỂM LAYOUT SẢN PHẨM
+   ============================================ */
+.product-layout {
+    display: grid !important;
+    grid-template-columns: 240px minmax(0, 1fr) !important;
+    gap: 28px !important;
+    align-items: start !important;
+    width: 100% !important;
+}
+
+.product-layout .sidebar {
+    width: 240px !important;
+    max-width: 240px !important;
+    min-width: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    float: none !important;
+    position: sticky !important;
+    top: 90px !important;
+}
+
+.product-layout .product-main {
+    min-width: 0 !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    float: none !important;
+}
+
+.product-grid.product-grid--3 {
+    display: grid !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 24px !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.product-grid.product-grid--3 > .product-card {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    float: none !important;
+}
+
+@media (max-width: 992px) {
+    .product-layout {
+        grid-template-columns: 1fr !important;
+    }
+    .product-layout .sidebar {
+        position: static !important;
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+    .product-grid.product-grid--3 {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    }
+}
+
+@media (max-width: 600px) {
+    .product-grid.product-grid--3 {
+        grid-template-columns: 1fr !important;
+    }
+}

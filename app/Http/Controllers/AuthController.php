@@ -3,10 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\PasswordResetOtp;
+use App\Mail\ResetPasswordOtpMail;
+use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
 
 class AuthController extends Controller
@@ -58,6 +63,46 @@ class AuthController extends Controller
         return view('auth.register');
     }
 
+    /**
+     * Gửi OTP xác thực email đăng ký
+     */
+    public function sendRegisterOtp(Request $request)
+    {
+        $request->validate(['email' => 'required|email']);
+        
+        $email = $request->email;
+        if (User::where('email', $email)->exists()) {
+            return response()->json(['success' => false, 'message' => 'Email này đã được sử dụng!'], 422);
+        }
+
+        // Tạo mã OTP 6 số
+        $otp = str_pad((string) random_int(100000, 999999), 6, '0', STR_PAD_LEFT);
+
+        // Lưu tạm vào bảng password_reset_otps
+        PasswordResetOtp::where('email', $email)->delete();
+        PasswordResetOtp::create([
+            'email' => $email,
+            'otp' => $otp,
+            'expires_at' => Carbon::now()->addMinutes(10),
+        ]);
+
+        // Gửi mail
+        try {
+            Mail::to($email)->send(new ResetPasswordOtpMail($otp, 'Khách hàng mới'));
+        } catch (\Exception $e) {
+            Log::error('Lỗi gửi mail OTP đăng ký: ' . $e->getMessage());
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Mã OTP đã được gửi.',
+            'dev_otp' => app()->environment('local') ? $otp : null,
+        ]);
+    }
+
+    /**
+     * Xử lý đăng ký (có kèm kiểm tra OTP)
+     */
     public function register(Request $request): RedirectResponse
     {
         $request->validate([
@@ -66,13 +111,26 @@ class AuthController extends Controller
             'email' => 'required|string|email|max:100|unique:users,email',
             'phone' => 'nullable|string|max:20',
             'password' => 'required|string|min:8|confirmed',
+            'otp' => 'required|string|size:6',
         ], [
             'username.unique' => 'Tên tài khoản này đã được sử dụng.',
             'email.unique' => 'Địa chỉ email này đã được sử dụng.',
             'password.confirmed' => 'Xác nhận mật khẩu không khớp.',
             'password.min' => 'Mật khẩu phải chứa ít nhất 8 ký tự.',
+            'otp.required' => 'Vui lòng nhập mã OTP.',
+            'otp.size' => 'Mã OTP phải là 6 chữ số.',
         ]);
 
+        // Kiểm tra OTP có khớp không
+        $record = PasswordResetOtp::where('email', $request->email)
+            ->where('otp', $request->otp)
+            ->first();
+
+        if (!$record || $record->isExpired()) {
+            return back()->withErrors(['otp' => 'Mã OTP không chính xác hoặc đã hết hạn.'])->withInput();
+        }
+
+        // Tạo user mới
         $user = User::create([
             'role_id' => 2, // Customer
             'full_name' => $request->input('full_name'),
@@ -82,6 +140,9 @@ class AuthController extends Controller
             'password' => Hash::make($request->input('password')),
             'is_active' => true,
         ]);
+
+        // Xóa OTP sau khi dùng
+        PasswordResetOtp::where('email', $request->email)->delete();
 
         Auth::login($user);
         $request->session()->regenerate();
@@ -98,9 +159,6 @@ class AuthController extends Controller
         return redirect()->route('home');
     }
 
-    /**
-     * Điều hướng người dùng về trang mặc định theo quyền.
-     */
     private function redirectByUserRole(User $user): RedirectResponse
     {
         if ($user->isStaffOrAdmin()) {
@@ -110,9 +168,6 @@ class AuthController extends Controller
         return redirect()->route('home');
     }
 
-    /**
-     * Lấy URL trang quản trị mặc định phù hợp với quyền của nhân viên/admin.
-     */
     private function getDefaultAdminRouteForUser(User $user): string
     {
         if ($user->isWarehouseStaff()) {

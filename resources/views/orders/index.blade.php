@@ -1,4 +1,4 @@
-﻿@extends('layouts.app')
+@extends('layouts.app')
 
 @section('title', 'Đơn hàng của tôi')
 
@@ -142,7 +142,7 @@
                         <div style="display: flex; gap: 10px; align-items: center;">
                             @if($order->status === 'pending')
                                 <form action="{{ route('orders.cancel', $order->id) }}" method="POST" 
-                                      onsubmit="return confirm('Bạn có chắc chắn muốn hủy đơn hàng #{{ $order->code }}?');">
+                                      onsubmit="return openCancelModal(this, '{{ $order->code }}');">
                                     @csrf
                                     <button type="submit" 
                                             style="padding: 8px 16px; border: 1px solid #ef4444; background: #fff; color: #ef4444; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; transition: background 0.2s;"
@@ -169,4 +169,32 @@
     @endif
 
 </div>
+
+<!-- Modal Hủy Đơn Hàng -->
+<div id="cancelModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:9999; align-items:center; justify-content:center;">
+    <div style="background:#fff; padding:30px; border-radius:12px; width:400px; text-align:center; box-shadow: 0 10px 25px rgba(0,0,0,0.1); position: relative;">
+        <div style="font-size: 40px; color: #ef4444; margin-bottom: 10px;">⚠️</div>
+        <h3 style="margin-bottom:15px; color:#ef4444; font-weight: 800; font-size: 20px;">Xác nhận hủy đơn</h3>
+        <p id="cancelOrderCode" style="margin-bottom:20px; font-weight:bold; color: #555;"></p>
+        <div style="display:flex; gap:10px; justify-content:center;">
+            <button onclick="document.getElementById('cancelModal').style.display='none'" class="btn btn--outline" style="padding: 10px 20px; flex: 1;">Đóng</button>
+            <button id="confirmCancelBtn" class="btn btn--primary" style="background:#ef4444; border-color:#ef4444; padding: 10px 20px; flex: 1;">Đồng ý hủy</button>
+        </div>
+    </div>
+</div>
+
+@push('scripts')
+<script>
+    let formToSubmit = null;
+    function openCancelModal(form, code) {
+        formToSubmit = form;
+        document.getElementById('cancelOrderCode').innerText = 'Bạn có chắc muốn hủy đơn ' + code + '?';
+        document.getElementById('cancelModal').style.display = 'flex';
+        return false;
+    }
+    document.getElementById('confirmCancelBtn').addEventListener('click', function() {
+        if(formToSubmit) formToSubmit.submit();
+    });
+</script>
+@endpush
 @endsection
