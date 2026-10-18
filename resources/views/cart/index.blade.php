@@ -2,6 +2,49 @@
 
 @section('title', 'Giỏ hàng của bạn')
 
+@push('styles')
+<style>
+    /* CSS cho Modal Xác nhận */
+    .modal-overlay {
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0, 0, 0, 0.5); z-index: 9999;
+        display: flex; align-items: center; justify-content: center;
+        opacity: 0; visibility: hidden; transition: all 0.3s ease;
+    }
+    .modal-overlay.active {
+        opacity: 1; visibility: visible;
+    }
+    .modal-box {
+        background: #fff; width: 100%; max-width: 400px;
+        border-radius: 12px; padding: 24px; text-align: center;
+        transform: translateY(-20px); transition: all 0.3s ease;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    }
+    .modal-overlay.active .modal-box {
+        transform: translateY(0);
+    }
+    .modal-icon {
+        width: 60px; height: 60px; margin: 0 auto 16px;
+        background: #fef2f2; color: #ef4444; border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 28px;
+    }
+    .modal-title { font-size: 18px; font-weight: 700; margin-bottom: 8px; color: #333; }
+    .modal-desc { font-size: 14px; color: #666; margin-bottom: 24px; }
+    .modal-actions { display: flex; gap: 12px; justify-content: center; }
+    .btn-cancel {
+        padding: 10px 20px; border-radius: 8px; border: 1px solid #d1d5db;
+        background: #fff; color: #4b5563; font-weight: 600; cursor: pointer; flex: 1;
+    }
+    .btn-confirm {
+        padding: 10px 20px; border-radius: 8px; border: none;
+        background: #ef4444; color: #fff; font-weight: 600; cursor: pointer; flex: 1;
+    }
+    .btn-cancel:hover { background: #f3f4f6; }
+    .btn-confirm:hover { background: #dc2626; }
+</style>
+@endpush
+
 @section('content')
 <div class="container" style="padding-top: 28px; padding-bottom: 50px;">
     <!-- Breadcrumb -->
@@ -127,16 +170,19 @@
                                         {{ number_format($item->subtotal, 0, ',', '.') }}đ
                                     </td>
 
-                                    <!-- Cột thao tác xóa -->
+                                    <!-- Cột thao tác xóa (Dùng Modal thay vì confirm) -->
                                     <td style="padding: 16px 10px; text-align: center;">
-                                        <form action="{{ route('cart.destroy', $item->id) }}" method="POST" onsubmit="return confirm('Bạn có chắc chắn muốn xóa sản phẩm này khỏi giỏ hàng?');">
+                                        <!-- Form thực hiện xóa (ẩn) -->
+                                        <form id="delete-form-{{ $item->id }}" action="{{ route('cart.destroy', $item->id) }}" method="POST" style="display: none;">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" style="background: none; border: none; color: #9ca3af; cursor: pointer; font-size: 13px; padding: 4px 8px; border-radius: 4px; transition: color 0.2s;"
-                                                    onmouseover="this.style.color='#ef4444'" onmouseout="this.style.color='#9ca3af'">
-                                                Xóa
-                                            </button>
                                         </form>
+                                        <!-- Nút kích hoạt Modal -->
+                                        <button type="button" onclick="showDeleteModal({{ $item->id }})" 
+                                                style="background: none; border: none; color: #9ca3af; cursor: pointer; font-size: 13px; padding: 4px 8px; border-radius: 4px; transition: color 0.2s;"
+                                                onmouseover="this.style.color='#ef4444'" onmouseout="this.style.color='#9ca3af'">
+                                            Xóa
+                                        </button>
                                     </td>
                                 </tr>
                             @endforeach
@@ -148,12 +194,13 @@
                     <a href="{{ route('products.index') }}" style="color: var(--color-primary); font-size: 14px; font-weight: 600; text-decoration: none;">
                         &larr; Tiếp tục xem sản phẩm khác
                     </a>
-                    <form action="{{ route('cart.clear') }}" method="POST" onsubmit="return confirm('Bạn có chắc muốn xóa toàn bộ giỏ hàng?');">
+                    <!-- Nút xóa toàn bộ giỏ (Cũng dùng Modal) -->
+                    <form id="clear-cart-form" action="{{ route('cart.clear') }}" method="POST" style="display: none;">
                         @csrf
-                        <button type="submit" style="background: none; border: 1px solid #d1d5db; padding: 8px 16px; border-radius: 6px; font-size: 13px; color: #4b5563; cursor: pointer;">
-                            Xóa toàn bộ giỏ
-                        </button>
                     </form>
+                    <button type="button" onclick="showClearCartModal()" style="background: none; border: 1px solid #d1d5db; padding: 8px 16px; border-radius: 6px; font-size: 13px; color: #4b5563; cursor: pointer;">
+                        Xóa toàn bộ giỏ
+                    </button>
                 </div>
             </div>
 
@@ -203,4 +250,52 @@
         </div>
     @endif
 </div>
+
+<!-- MODAL XÁC NHẬN XÓA -->
+<div class="modal-overlay" id="deleteModal">
+    <div class="modal-box">
+        <div class="modal-icon">🗑️</div>
+        <h3 class="modal-title" id="modalTitle">Xóa sản phẩm?</h3>
+        <p class="modal-desc" id="modalDesc">Bạn có chắc chắn muốn xóa sản phẩm này khỏi giỏ hàng không?</p>
+        <div class="modal-actions">
+            <button class="btn-cancel" onclick="closeModal()">Hủy bỏ</button>
+            <button class="btn-confirm" id="btnConfirmDelete" onclick="submitDelete()">Đồng ý xóa</button>
+        </div>
+    </div>
+</div>
+
+@push('scripts')
+<script>
+    let formToSubmitId = null;
+
+    // Hàm hiển thị modal khi xóa 1 sản phẩm
+    function showDeleteModal(id) {
+        formToSubmitId = 'delete-form-' + id;
+        document.getElementById('modalTitle').innerText = 'Xóa sản phẩm?';
+        document.getElementById('modalDesc').innerText = 'Bạn có chắc chắn muốn xóa sản phẩm này khỏi giỏ hàng không?';
+        document.getElementById('deleteModal').classList.add('active');
+    }
+
+    // Hàm hiển thị modal khi xóa toàn bộ giỏ
+    function showClearCartModal() {
+        formToSubmitId = 'clear-cart-form';
+        document.getElementById('modalTitle').innerText = 'Xóa toàn bộ giỏ hàng?';
+        document.getElementById('modalDesc').innerText = 'Hành động này sẽ xóa tất cả sản phẩm trong giỏ hàng của bạn. Bạn có chắc chắn muốn tiếp tục?';
+        document.getElementById('deleteModal').classList.add('active');
+    }
+
+    // Hàm đóng modal
+    function closeModal() {
+        document.getElementById('deleteModal').classList.remove('active');
+        formToSubmitId = null;
+    }
+
+    // Hàm thực thi Form xóa khi bấm Đồng ý
+    function submitDelete() {
+        if (formToSubmitId) {
+            document.getElementById(formToSubmitId).submit();
+        }
+    }
+</script>
+@endpush
 @endsection

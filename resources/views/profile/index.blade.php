@@ -2,6 +2,23 @@
 
 @section('title', 'Quản lý tài khoản cá nhân')
 
+@push('styles')
+<style>
+    .address-select {
+        width: 100%;
+        padding: 10px 14px;
+        border: 1px solid var(--color-outline, #d1d5db);
+        border-radius: 8px;
+        font-size: 14px;
+        background: #fff;
+        outline: none;
+        cursor: pointer;
+        box-sizing: border-box;
+    }
+    .address-select:focus { border-color: var(--color-primary, #e76f51); }
+</style>
+@endpush
+
 @section('content')
 <div class="container" style="padding-top: 28px; padding-bottom: 50px;">
     <!-- Breadcrumb -->
@@ -49,6 +66,16 @@
                     <span>{{ session('password_success') }}</span>
                 </div>
             @endif
+            
+            @if($errors->any())
+                <div style="background: #fef2f2; border-left: 4px solid #ef4444; color: #991b1b; padding: 14px 18px; border-radius: 8px; font-size: 14px;">
+                    <ul style="margin: 0; padding-left: 20px;">
+                        @foreach($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
 
             <!-- Card 1: Quản lý thông tin cá nhân -->
             <section style="background: var(--color-surface, #ffffff); border-radius: 16px; padding: 28px; border: 1px solid var(--color-outline-variant, #f0eae1); box-shadow: 0 4px 16px rgba(0,0,0,0.03);">
@@ -68,9 +95,6 @@
                             </label>
                             <input type="text" name="full_name" value="{{ old('full_name', $user->full_name) }}" required
                                    style="width: 100%; padding: 10px 14px; border: 1px solid var(--color-outline, #d1d5db); border-radius: 8px; font-size: 14px; box-sizing: border-box;">
-                            @error('full_name')
-                                <span style="color: #ef4444; font-size: 12px; margin-top: 4px; display: block;">{{ $message }}</span>
-                            @enderror
                         </div>
 
                         <div>
@@ -79,9 +103,6 @@
                             </label>
                             <input type="text" name="phone" value="{{ old('phone', $user->phone) }}" placeholder="Ví dụ: 0912345678"
                                    style="width: 100%; padding: 10px 14px; border: 1px solid var(--color-outline, #d1d5db); border-radius: 8px; font-size: 14px; box-sizing: border-box;">
-                            @error('phone')
-                                <span style="color: #ef4444; font-size: 12px; margin-top: 4px; display: block;">{{ $message }}</span>
-                            @enderror
                         </div>
                     </div>
 
@@ -100,21 +121,38 @@
                             </label>
                             <input type="email" name="email" value="{{ old('email', $user->email) }}" required
                                    style="width: 100%; padding: 10px 14px; border: 1px solid var(--color-outline, #d1d5db); border-radius: 8px; font-size: 14px; box-sizing: border-box;">
-                            @error('email')
-                                <span style="color: #ef4444; font-size: 12px; margin-top: 4px; display: block;">{{ $message }}</span>
-                            @enderror
                         </div>
                     </div>
 
-                    <div style="margin-bottom: 22px;">
+                    <!-- CHỌN ĐỊA CHỈ 2 CẤP MỚI -->
+                    <div style="margin-bottom: 18px;">
                         <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: var(--color-on-surface);">
                             Địa chỉ nhận hàng mặc định
                         </label>
-                        <textarea name="address" rows="3" placeholder="Số nhà, tên đường, phường/xã, quận/huyện, tỉnh/thành phố..."
-                                  style="width: 100%; padding: 10px 14px; border: 1px solid var(--color-outline, #d1d5db); border-radius: 8px; font-size: 14px; box-sizing: border-box; font-family: inherit;">{{ old('address', $user->address) }}</textarea>
-                        @error('address')
-                            <span style="color: #ef4444; font-size: 12px; margin-top: 4px; display: block;">{{ $message }}</span>
-                        @enderror
+                        @if($user->address)
+                            <div style="margin-bottom: 10px; padding: 10px; background: #fdfaf7; border: 1px dashed #d1d5db; border-radius: 8px; font-size: 13px; color: #666;">
+                                <strong>Địa chỉ hiện tại:</strong> {{ $user->address }}
+                            </div>
+                        @endif
+
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 12px;">
+                            <div>
+                                <select id="province" class="address-select">
+                                    <option value="">-- Chọn Tỉnh/Thành phố --</option>
+                                </select>
+                            </div>
+                            <div>
+                                <select id="ward" class="address-select" disabled>
+                                    <option value="">-- Chọn Phường/Xã --</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <input type="text" id="street" placeholder="Số nhà, tên đường (Ví dụ: 123 Nguyễn Trãi)" 
+                               style="width: 100%; padding: 10px 14px; border: 1px solid var(--color-outline, #d1d5db); border-radius: 8px; font-size: 14px; box-sizing: border-box;">
+                        
+                        <!-- Input ẩn gửi lên server -->
+                        <input type="hidden" name="address" id="full_address" value="{{ old('address', $user->address) }}">
                     </div>
 
                     <div style="text-align: right;">
@@ -142,9 +180,6 @@
                         </label>
                         <input type="password" name="current_password" required placeholder="Nhập mật khẩu hiện tại"
                                style="width: 100%; padding: 10px 14px; border: 1px solid var(--color-outline, #d1d5db); border-radius: 8px; font-size: 14px; box-sizing: border-box;">
-                        @error('current_password')
-                            <span style="color: #ef4444; font-size: 12px; margin-top: 4px; display: block;">{{ $message }}</span>
-                        @enderror
                     </div>
 
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 22px;">
@@ -154,9 +189,6 @@
                             </label>
                             <input type="password" name="password" required placeholder="Tối thiểu 8 ký tự" minlength="8"
                                    style="width: 100%; padding: 10px 14px; border: 1px solid var(--color-outline, #d1d5db); border-radius: 8px; font-size: 14px; box-sizing: border-box;">
-                            @error('password')
-                                <span style="color: #ef4444; font-size: 12px; margin-top: 4px; display: block;">{{ $message }}</span>
-                            @enderror
                         </div>
 
                         <div>
@@ -240,4 +272,61 @@
         </div>
     </div>
 </div>
+
+@push('scripts')
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.2/axios.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const provinceSelect = document.getElementById('province');
+        const wardSelect = document.getElementById('ward');
+        const streetInput = document.getElementById('street');
+        const fullAddressInput = document.getElementById('full_address');
+
+        // API V2 - DỮ LIỆU SAU SÁT NHẬP
+        const API_URL = 'https://provinces.open-api.vn/api/v2';
+
+        // 1. Tải Tỉnh/Thành
+        axios.get(`${API_URL}/p/`).then(res => {
+            res.data.forEach(province => {
+                provinceSelect.innerHTML += `<option value="${province.code}" data-name="${province.name}">${province.name}</option>`;
+            });
+        });
+
+        // 2. Khi chọn Tỉnh -> Tải Phường/Xã
+        provinceSelect.addEventListener('change', function() {
+            const provinceCode = this.value;
+            wardSelect.innerHTML = '<option value="">-- Chọn Phường/Xã --</option>';
+            wardSelect.disabled = true;
+            updateFullAddress();
+
+            if (provinceCode) {
+                wardSelect.disabled = false;
+                axios.get(`${API_URL}/p/${provinceCode}?depth=2`).then(res => {
+                    let wards = res.data.wards || [];
+                    wards.forEach(ward => {
+                        wardSelect.innerHTML += `<option value="${ward.code}" data-name="${ward.name}">${ward.name}</option>`;
+                    });
+                });
+            }
+        });
+
+        wardSelect.addEventListener('change', updateFullAddress);
+        streetInput.addEventListener('input', updateFullAddress);
+
+        // Hàm nối chuỗi địa chỉ
+        function updateFullAddress() {
+            const street = streetInput.value.trim();
+            const wardName = wardSelect.options[wardSelect.selectedIndex]?.getAttribute('data-name') || '';
+            const provinceName = provinceSelect.options[provinceSelect.selectedIndex]?.getAttribute('data-name') || '';
+
+            let parts = [];
+            if (street) parts.push(street);
+            if (wardName) parts.push(wardName);
+            if (provinceName) parts.push(provinceName);
+
+            fullAddressInput.value = parts.join(', ');
+        }
+    });
+</script>
+@endpush
 @endsection

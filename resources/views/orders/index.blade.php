@@ -152,6 +152,18 @@
                                 </form>
                             @endif
 
+                            <!-- NÚT MUA LẠI (Chỉ hiện khi đơn đã giao hoặc đã hủy) -->
+                            @if(in_array($order->status, ['completed', 'cancelled']))
+                                <form action="{{ route('orders.reorder', $order->id) }}" method="POST" style="margin: 0;">
+                                    @csrf
+                                    <button type="submit" 
+                                            style="padding: 8px 16px; background: #fff; color: #10b981; border: 1px solid #10b981; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; transition: background 0.2s;"
+                                            onmouseover="this.style.background='#ecfdf5'" onmouseout="this.style.background='#fff'">
+                                        Mua lại
+                                    </button>
+                                </form>
+                            @endif
+
                             <a href="{{ route('orders.show', $order->id) }}" 
                                style="padding: 8px 18px; background: #374151; color: #fff; border-radius: 6px; font-size: 13px; font-weight: 600; text-decoration: none;">
                                 Chi tiết đơn hàng

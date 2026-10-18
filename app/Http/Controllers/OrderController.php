@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Cart;
 use App\Models\Order;
 use App\Models\Product;
 use Illuminate\Http\RedirectResponse;
@@ -88,5 +89,71 @@ class OrderController extends Controller
         });
 
         return back()->with('success', 'Đơn hàng #' . $order->code . ' đã được hủy thành công.');
+    }
+
+    /**
+     * Mua lại đơn hàng cũ (Thêm các sản phẩm vào giỏ hiện tại).
+     */
+    public function reorder(Order $order): RedirectResponse
+    {
+        // Kiểm tra quyền sở hữu đơn hàng
+        if ($order->user_id !== Auth::id()) {
+            abort(403, 'Bạn không có quyền thực hiện thao tác trên đơn hàng này.');
+        }
+
+        // Lấy giỏ hàng đang hoạt động (hoặc tạo mới nếu chưa có)
+        // Giả sử Model Cart của bạn có hàm getActiveCart()
+        $cart = Cart::getActiveCart();
+        
+        $addedCount = 0;
+        $errorMessages = [];
+
+        foreach ($order->items as $item) {
+            $product = $item->product;
+            
+            // Bỏ qua nếu sản phẩm đã bị xóa khỏi shop
+            if (!$product) {
+                continue;
+            }
+
+            // Kiểm tra tồn kho
+            if ($product->stock_quantity < $item->quantity) {
+                $errorMessages[] = "Sản phẩm \"{$product->name}\" chỉ còn {$product->stock_quantity} cái.";
+                continue;
+            }
+
+            // Kiểm tra xem sản phẩm đã có trong giỏ hàng chưa
+            $existingDetail = $cart->details()->where('product_id', $product->id)->first();
+
+            if ($existingDetail) {
+                // Nếu có rồi, cộng dồn số lượng (không vượt quá tồn kho)
+                $newQty = $existingDetail->quantity + $item->quantity;
+                if ($newQty > $product->stock_quantity) {
+                    $newQty = $product->stock_quantity;
+                    $errorMessages[] = "Sản phẩm \"{$product->name}\" đã được thêm tối đa (chỉ còn {$product->stock_quantity} cái).";
+                }
+                $existingDetail->update(['quantity' => $newQty]);
+            } else {
+                // Nếu chưa có, thêm mới vào giỏ
+                $cart->details()->create([
+                    'product_id' => $product->id,
+                    'product_code' => $product->code,
+                    'name'         => $product->name,
+                    'quantity'   => $item->quantity,
+                    'unit_price' => $product->price, // Lấy giá hiện tại, không lấy giá cũ
+                ]);
+            }
+            $addedCount++;
+        }
+
+        if ($addedCount > 0) {
+            $msg = "Đã thêm {$addedCount} sản phẩm vào giỏ hàng.";
+            if (!empty($errorMessages)) {
+                $msg .= " Lưu ý: " . implode(' ', $errorMessages);
+            }
+            return redirect()->route('cart.index')->with('success', $msg);
+        }
+
+        return redirect()->back()->with('error', 'Không thể mua lại. Sản phẩm có thể đã hết hàng hoặc ngừng kinh doanh.');
     }
 }

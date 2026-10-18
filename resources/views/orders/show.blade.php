@@ -2,6 +2,49 @@
 
 @section('title', 'Chi tiết đơn hàng #' . $order->code)
 
+@push('styles')
+<style>
+    /* CSS cho Modal Xác nhận Hủy đơn */
+    .modal-overlay {
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0, 0, 0, 0.5); z-index: 9999;
+        display: flex; align-items: center; justify-content: center;
+        opacity: 0; visibility: hidden; transition: all 0.3s ease;
+    }
+    .modal-overlay.active {
+        opacity: 1; visibility: visible;
+    }
+    .modal-box {
+        background: #fff; width: 100%; max-width: 400px;
+        border-radius: 12px; padding: 24px; text-align: center;
+        transform: translateY(-20px); transition: all 0.3s ease;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    }
+    .modal-overlay.active .modal-box {
+        transform: translateY(0);
+    }
+    .modal-icon {
+        width: 60px; height: 60px; margin: 0 auto 16px;
+        background: #fef2f2; color: #ef4444; border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 28px;
+    }
+    .modal-title { font-size: 18px; font-weight: 700; margin-bottom: 8px; color: #333; }
+    .modal-desc { font-size: 14px; color: #666; margin-bottom: 24px; }
+    .modal-actions { display: flex; gap: 12px; justify-content: center; }
+    .btn-cancel-modal {
+        padding: 10px 20px; border-radius: 8px; border: 1px solid #d1d5db;
+        background: #fff; color: #4b5563; font-weight: 600; cursor: pointer; flex: 1;
+    }
+    .btn-confirm-modal {
+        padding: 10px 20px; border-radius: 8px; border: none;
+        background: #ef4444; color: #fff; font-weight: 600; cursor: pointer; flex: 1;
+    }
+    .btn-cancel-modal:hover { background: #f3f4f6; }
+    .btn-confirm-modal:hover { background: #dc2626; }
+</style>
+@endpush
+
 @section('content')
 <div class="container" style="padding-top: 28px; padding-bottom: 50px;">
     <!-- Breadcrumb -->
@@ -40,13 +83,15 @@
             </span>
 
             @if($order->status === 'pending')
-                <form action="{{ route('orders.cancel', $order->id) }}" method="POST" 
-                      onsubmit="return confirm('Bạn có chắc chắn muốn hủy đơn hàng này? Thao tác này không thể hoàn tác.');">
+                <!-- Nút kích hoạt Modal Hủy đơn -->
+                <button type="button" onclick="showCancelOrderModal()" 
+                        style="padding: 6px 16px; border: 1px solid #ef4444; background: #fff; color: #ef4444; border-radius: 20px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s;">
+                    Hủy đơn hàng
+                </button>
+                
+                <!-- Form ẩn để thực hiện hủy -->
+                <form id="cancel-order-form" action="{{ route('orders.cancel', $order->id) }}" method="POST" style="display: none;">
                     @csrf
-                    <button type="submit" 
-                            style="padding: 6px 16px; border: 1px solid #ef4444; background: #fff; color: #ef4444; border-radius: 20px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s;">
-                        Hủy đơn hàng
-                    </button>
                 </form>
             @endif
         </div>
@@ -215,28 +260,43 @@
                     <div><strong>Địa chỉ:</strong> {{ $order->shipping_address }}</div>
                     <div style="margin-top: 8px; padding-top: 8px; border-top: 1px dashed var(--color-outline-variant, #f0eae1);">
                         <strong>Phương thức thanh toán:</strong><br>
-                        <span>Thanh toán khi nhận hàng (COD)</span>
+                        <span>
+                            @if($order->payment_method === 'qr')
+                                Chuyển khoản qua mã QR (VietQR)
+                            @else
+                                Thanh toán khi nhận hàng (COD)
+                            @endif
+                        </span>
                     </div>
                 </div>
             </div>
 
-            <!-- Thẻ 2: Tóm tắt thanh toán -->
+            <!-- Thẻ 2: Tóm tắt thanh toán (ĐÃ SỬA LOGIC) -->
             <div style="background: var(--color-surface, #ffffff); border-radius: 16px; padding: 22px; border: 1px solid var(--color-outline-variant, #f0eae1); box-shadow: 0 4px 16px rgba(0,0,0,0.03);">
                 <h3 style="font-size: 16px; font-weight: 700; color: var(--color-on-surface); margin: 0 0 14px; border-bottom: 1px solid var(--color-outline-variant, #f0eae1); padding-bottom: 8px;">
                     Tổng kết thanh toán
                 </h3>
                 <div style="font-size: 13px; display: flex; flex-direction: column; gap: 10px;">
+                    <!-- Tạm tính = Tổng tiền - Phí ship -->
                     <div style="display: flex; justify-content: space-between; color: var(--color-on-surface-variant);">
                         <span>Tạm tính tiền hàng:</span>
-                        <strong style="color: var(--color-on-surface);">{{ number_format($order->total_amount, 0, ',', '.') }}đ</strong>
+                        <strong style="color: var(--color-on-surface);">
+                            {{ number_format($order->total_amount - $order->shipping_fee, 0, ',', '.') }}đ
+                        </strong>
                     </div>
+                    <!-- Phí ship -->
                     <div style="display: flex; justify-content: space-between; color: var(--color-on-surface-variant);">
                         <span>Phí giao hàng:</span>
-                        <span style="color: #10b981; font-weight: 600;">Miễn phí</span>
+                        @if($order->shipping_fee > 0)
+                            <strong style="color: var(--color-on-surface);">{{ number_format($order->shipping_fee, 0, ',', '.') }}đ</strong>
+                        @else
+                            <span style="color: #10b981; font-weight: 600;">Miễn phí</span>
+                        @endif
                     </div>
 
                     <hr style="border: none; border-top: 1px solid var(--color-outline-variant, #f0eae1); margin: 4px 0;">
 
+                    <!-- Tổng thanh toán = Tạm tính + Phí ship -->
                     <div style="display: flex; justify-content: space-between; align-items: baseline;">
                         <span style="font-weight: 700; font-size: 15px; color: var(--color-on-surface);">Tổng thanh toán:</span>
                         <strong style="font-size: 18px; font-weight: 800; color: var(--color-primary, #e76f51);">
@@ -250,4 +310,33 @@
 
     </div>
 </div>
+
+<!-- MODAL XÁC NHẬN HỦY ĐƠN HÀNG -->
+<div class="modal-overlay" id="cancelOrderModal">
+    <div class="modal-box">
+        <div class="modal-icon">⚠️</div>
+        <h3 class="modal-title">Hủy đơn hàng?</h3>
+        <p class="modal-desc">Bạn có chắc chắn muốn hủy đơn hàng này không? Hành động này không thể hoàn tác.</p>
+        <div class="modal-actions">
+            <button class="btn-cancel-modal" onclick="closeCancelModal()">Suy nghĩ lại</button>
+            <button class="btn-confirm-modal" onclick="submitCancelOrder()">Đồng ý hủy</button>
+        </div>
+    </div>
+</div>
+
+@push('scripts')
+<script>
+    function showCancelOrderModal() {
+        document.getElementById('cancelOrderModal').classList.add('active');
+    }
+
+    function closeCancelModal() {
+        document.getElementById('cancelOrderModal').classList.remove('active');
+    }
+
+    function submitCancelOrder() {
+        document.getElementById('cancel-order-form').submit();
+    }
+</script>
+@endpush
 @endsection
