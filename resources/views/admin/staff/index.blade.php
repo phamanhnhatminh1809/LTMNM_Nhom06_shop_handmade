@@ -1,17 +1,17 @@
 @extends('layouts.admin')
 
-@section('title', 'Quản lý nhân viên & Phân quyền')
+@section('title', 'Quản lý nhân viên')
 
 @php
-    $activeMenu = ($roleFilter ?? 'staff_only') === 'all' ? 'permissions' : 'staff';
+    $activeMenu = 'staff';
 @endphp
 
 @section('content')
 <!-- Top Bar -->
 <div class="admin-top-bar">
     <div class="page-main-title">
-        <i class="bi bi-shield-lock"></i>
-        <span>QUẢN LÝ NHÂN VIÊN & PHÂN QUYỀN</span>
+        <i class="bi bi-people"></i>
+        <span>QUẢN LÝ NHÂN VIÊN</span>
     </div>
     <div class="top-bar-right">
         <button class="btn-icon-bell" title="Thông báo hệ thống">
@@ -42,63 +42,49 @@
 
 <!-- Welcome Card -->
 <div class="product-welcome-card">
-    <h2 class="product-welcome-title">
-        Quản lý đội ngũ vận hành và phân quyền truy cập<br>theo từng bộ phận chuyên trách
-    </h2>
+    <div>
+        <h2 class="product-welcome-title" style="margin-bottom: 4px;">
+            Quản lý nhân viên
+        </h2>
+    </div>
     <a href="{{ route('admin.staff.create') }}" class="btn-add-product">
         <i class="bi bi-person-plus"></i>
         <span>Tạo tài khoản nhân viên</span>
     </a>
 </div>
 
-<!-- 4 Thẻ Tóm tắt Quy tắc Phân quyền -->
-<div class="role-summary-grid">
-    <div class="role-summary-card">
-        <div class="role-summary-header">
-            <span class="role-badge admin">
-                <i class="bi bi-shield-fill-check"></i> Quản trị viên
-            </span>
-            <span class="role-summary-count">{{ $roleCounts['admin'] ?? 0 }}</span>
+<!-- 4 Thẻ KPI Chỉ số Nhân sự (Gọn gàng, không có mô tả rườm rà) -->
+<div class="metrics-row" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
+    <div class="metric-card">
+        <div class="metric-icon-box" style="background: #ffdad2; color: #792a16;">
+            <i class="bi bi-shield-fill-check"></i>
         </div>
-        <div class="role-summary-desc">
-            Toàn quyền quản trị hệ thống: Kho hàng, Đơn hàng, Đánh giá, Khách hàng và Phân quyền nhân sự.
-        </div>
+        <div class="metric-label">Quản trị viên</div>
+        <div class="metric-value">{{ $roleCounts['admin'] ?? 0 }}</div>
     </div>
 
-    <div class="role-summary-card">
-        <div class="role-summary-header">
-            <span class="role-badge warehouse_staff">
-                <i class="bi bi-box-seam"></i> Nhân viên kho
-            </span>
-            <span class="role-summary-count">{{ $roleCounts['warehouse_staff'] ?? 0 }}</span>
+    <div class="metric-card">
+        <div class="metric-icon-box" style="background: #fff1ec; color: #98412b;">
+            <i class="bi bi-box-seam"></i>
         </div>
-        <div class="role-summary-desc">
-            Chuyên trách phân hệ Kho: Quản lý <strong>Loại sản phẩm</strong> và <strong>Sản phẩm</strong> (Thêm, sửa, xóa, tồn kho).
-        </div>
+        <div class="metric-label">Nhân viên kho</div>
+        <div class="metric-value">{{ $roleCounts['warehouse_staff'] ?? 0 }}</div>
     </div>
 
-    <div class="role-summary-card">
-        <div class="role-summary-header">
-            <span class="role-badge sales_staff">
-                <i class="bi bi-receipt-cutoff"></i> NV Bán hàng
-            </span>
-            <span class="role-summary-count">{{ $roleCounts['sales_staff'] ?? 0 }}</span>
+    <div class="metric-card">
+        <div class="metric-icon-box" style="background: #e8f5e9; color: #2e7d32;">
+            <i class="bi bi-receipt-cutoff"></i>
         </div>
-        <div class="role-summary-desc">
-            Chuyên trách Kinh doanh: Duyệt & cập nhật trạng thái <strong>Đơn hàng</strong>, quản lý <strong>Đánh giá sản phẩm</strong>.
-        </div>
+        <div class="metric-label">NV Bán hàng</div>
+        <div class="metric-value">{{ $roleCounts['sales_staff'] ?? 0 }}</div>
     </div>
 
-    <div class="role-summary-card">
-        <div class="role-summary-header">
-            <span class="role-badge customer">
-                <i class="bi bi-person"></i> Khách hàng
-            </span>
-            <span class="role-summary-count">{{ $roleCounts['customer'] ?? 0 }}</span>
+    <div class="metric-card">
+        <div class="metric-icon-box" style="background: #eef2ff; color: #4338ca;">
+            <i class="bi bi-people"></i>
         </div>
-        <div class="role-summary-desc">
-            Tài khoản mua sắm ngoài cửa hàng, không có quyền truy cập khu vực quản trị <code>/admin</code>.
-        </div>
+        <div class="metric-label">Khách hàng</div>
+        <div class="metric-value">{{ $roleCounts['customer'] ?? 0 }}</div>
     </div>
 </div>
 
@@ -156,15 +142,15 @@
     </form>
 </div>
 
-<!-- Bảng Danh sách Nhân viên & Cấp/Đổi quyền trực tiếp -->
+<!-- Bảng Danh sách Nhân viên (Cấu trúc cột tinh gọn, rõ ràng) -->
 <div class="table-card">
     <div class="table-header-flex">
         <div>
             <h3 style="font-size: 15px; font-weight: 800; color: var(--color-on-surface); margin-bottom: 3px;">
-                Danh sách tài khoản & Phân quyền ({{ $users->total() }})
+                Danh sách nhân sự ({{ $users->total() }})
             </h3>
             <p style="font-size: 12px; color: var(--color-outline);">
-                Chọn vai trò mới trong cột <strong>Cấp / Đổi quyền</strong> và nhấn <strong>Lưu quyền</strong> để áp dụng ngay lập tức.
+                Bấm nút <strong>Sửa</strong> để cập nhật thông tin, thay đổi vai trò hoặc khóa/mở khóa tài khoản.
             </p>
         </div>
     </div>
@@ -174,13 +160,11 @@
             <thead>
                 <tr>
                     <th style="width: 60px;">ID</th>
-                    <th>Họ tên nhân sự</th>
-                    <th>Username</th>
+                    <th>Nhân sự</th>
                     <th>Email & SĐT</th>
-                    <th>Quyền hiện tại</th>
-                    <th>Cấp / Đổi quyền</th>
+                    <th>Vai trò</th>
                     <th>Trạng thái</th>
-                    <th style="text-align: center;">Thao tác</th>
+                    <th style="text-align: center; width: 120px;">Thao tác</th>
                 </tr>
             </thead>
             <tbody>
@@ -200,16 +184,18 @@
                                 </div>
                                 <div class="customer-info-box">
                                     <div class="c-name" style="display: flex; align-items: center; gap: 6px;">
-                                        <span>{{ $u->full_name }}</span>
+                                        <a href="{{ route('admin.staff.edit', $u) }}" style="text-decoration: none; color: inherit; font-weight: 700;">
+                                            {{ $u->full_name }}
+                                        </a>
                                         @if($isCurrentUser)
                                             <span class="stock-tag" style="background:#ffdad2;color:#792a16;font-size:10px;padding:1px 6px;border-radius:4px;">BẠN</span>
                                         @endif
                                     </div>
+                                    <div class="mono-code" style="font-size: 12px; color: var(--color-outline);">
+                                        {{ '@' . $u->username }}
+                                    </div>
                                 </div>
                             </div>
-                        </td>
-                        <td>
-                            <span class="mono-code">{{ $u->username }}</span>
                         </td>
                         <td>
                             <div style="font-size: 13px; font-weight: 600; color: var(--color-on-surface);">
@@ -233,30 +219,6 @@
                             </span>
                         </td>
                         <td>
-                            <form action="{{ route('admin.staff.updateRole', $u) }}"
-                                  method="POST"
-                                  style="display: inline-flex; align-items: center; gap: 6px;">
-                                @csrf
-                                @method('PATCH')
-                                <select name="role_id"
-                                        class="modal-input"
-                                        style="padding: 6px 10px; font-size: 12.5px; width: auto; min-width: 190px;"
-                                        {{ $isCurrentUser ? 'disabled title=Không_thể_tự_hạ_quyền_chính_mình' : '' }}>
-                                    @foreach($roles as $r)
-                                        <option value="{{ $r->id }}" {{ $u->role_id === $r->id ? 'selected' : '' }}>
-                                            {{ $r->label }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                                @if(!$isCurrentUser)
-                                    <button type="submit" class="btn-inline-action primary" title="Lưu vai trò mới">
-                                        <i class="bi bi-check2"></i>
-                                        <span>Lưu quyền</span>
-                                    </button>
-                                @endif
-                            </form>
-                        </td>
-                        <td>
                             @if($u->is_active)
                                 <span class="status-badge active-user">
                                     <i class="bi bi-check-circle"></i> Hoạt động
@@ -268,33 +230,29 @@
                             @endif
                         </td>
                         <td style="text-align: center;">
-                            @if(!$isCurrentUser)
-                                <form action="{{ route('admin.staff.toggleStatus', $u) }}"
-                                      method="POST"
-                                      style="display: inline;"
-                                      onsubmit="return confirm('Xác nhận đổi trạng thái khóa/mở khóa tài khoản «{{ $u->full_name }}»?')">
-                                    @csrf
-                                    @method('PATCH')
-                                    @if($u->is_active)
-                                        <button type="submit" class="btn-inline-action danger" title="Khóa tài khoản">
-                                            <i class="bi bi-lock"></i>
-                                            <span>Khóa</span>
-                                        </button>
-                                    @else
-                                        <button type="submit" class="btn-inline-action success" title="Mở khóa tài khoản">
-                                            <i class="bi bi-unlock"></i>
-                                            <span>Mở khóa</span>
-                                        </button>
-                                    @endif
-                                </form>
-                            @else
-                                <span style="font-size: 12px; color: var(--color-outline);">—</span>
-                            @endif
+                            <div style="display: inline-flex; align-items: center; gap: 6px;">
+                                <a href="{{ route('admin.staff.edit', $u) }}"
+                                   class="btn-action-view"
+                                   title="Chỉnh sửa chi tiết & phân quyền">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+
+                                @if(!$isCurrentUser)
+                                    <button type="button"
+                                            class="btn-action-view danger"
+                                            title="Xóa tài khoản nhân viên"
+                                            onclick="openDeleteStaffModal({{ $u->id }}, '{{ addslashes($u->full_name) }}', '{{ route('admin.staff.destroy', $u) }}')">
+                                        <i class="bi bi-trash3"></i>
+                                    </button>
+                                @else
+                                    <span style="font-size: 12px; color: var(--color-outline); width: 28px; text-align: center;">—</span>
+                                @endif
+                            </div>
                         </td>
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="8" style="text-align: center; padding: 32px; color: var(--color-outline);">
+                        <td colspan="6" style="text-align: center; padding: 32px; color: var(--color-outline);">
                             Không tìm thấy tài khoản nào phù hợp với bộ lọc.
                         </td>
                     </tr>
@@ -307,4 +265,58 @@
         {{ $users->links('admin.partials.pagination') }}
     </div>
 </div>
+
+<!-- Modal Xác nhận Xóa Nhân viên -->
+<div class="modal-overlay" id="deleteStaffModal">
+    <div class="modal-box" style="max-width: 420px; text-align: center; padding: 28px 24px;">
+        <div style="width: 56px; height: 56px; border-radius: 50%; background: #fee2e2; color: #ba1a1a; display: flex; align-items: center; justify-content: center; font-size: 26px; margin: 0 auto 16px;">
+            <i class="bi bi-trash3-fill"></i>
+        </div>
+        <h3 style="font-size: 18px; font-weight: 800; color: var(--color-on-surface); margin: 0 0 8px;">
+            Xóa tài khoản nhân viên?
+        </h3>
+        <p style="font-size: 13.5px; color: var(--color-on-surface-variant); margin: 0 0 20px; line-height: 1.5;" id="deleteStaffMessage">
+            Bạn có chắc chắn muốn xóa tài khoản này khỏi hệ thống? Hành động này không thể hoàn tác.
+        </p>
+
+        <form id="deleteStaffForm" method="POST" action="">
+            @csrf
+            @method('DELETE')
+            <div style="display: flex; gap: 12px; justify-content: center;">
+                <button type="button" class="btn-cancel-modal" onclick="closeDeleteStaffModal()" style="padding: 10px 20px; border-radius: 8px; border: 1px solid #d1d5db; background: #fff; cursor: pointer; font-weight: 600; flex: 1;">
+                    Hủy bỏ
+                </button>
+                <button type="submit" style="padding: 10px 20px; border-radius: 8px; border: none; background: #ba1a1a; color: #fff; cursor: pointer; font-weight: 700; flex: 1;">
+                    Đồng ý xóa
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@push('scripts')
+<script>
+    function openDeleteStaffModal(id, name, deleteUrl) {
+        const modal = document.getElementById('deleteStaffModal');
+        const form = document.getElementById('deleteStaffForm');
+        const msg = document.getElementById('deleteStaffMessage');
+
+        form.action = deleteUrl;
+        msg.innerHTML = 'Bạn có chắc chắn muốn xóa tài khoản <strong>«' + name + '»</strong>? Hành động này không thể hoàn tác.';
+        modal.classList.add('active');
+    }
+
+    function closeDeleteStaffModal() {
+        const modal = document.getElementById('deleteStaffModal');
+        modal.classList.remove('active');
+    }
+
+    // Đóng khi click ngoài modal box
+    document.getElementById('deleteStaffModal')?.addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeDeleteStaffModal();
+        }
+    });
+</script>
+@endpush
 @endsection

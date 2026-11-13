@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,opsz,wght@0,6..12,300;0,6..12,400;0,6..12,600;0,6..12,700;0,6..12,800;1,6..12,400&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap');
+/* Google Fonts được nạp song song qua <link> trong layout để chống giật lag / render-blocking */
 
 :root {
     --color-surface: #fff8f6;
@@ -20,6 +20,17 @@
 
     --sidebar-collapsed-width: 72px;
     --sidebar-expanded-width: 250px;
+}
+
+/* Áp dụng ngay chiều rộng 72px khi tải trang nếu localStorage là collapsed (chống giật layout) */
+html.sidebar-is-collapsed .admin-sidebar {
+    width: var(--sidebar-collapsed-width) !important;
+    transition: none !important;
+}
+html.sidebar-is-collapsed .admin-sidebar .nav-text,
+html.sidebar-is-collapsed .admin-sidebar .nav-group-title,
+html.sidebar-is-collapsed .admin-sidebar .sidebar-brand-logo {
+    display: none !important;
 }
 
 * {

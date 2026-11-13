@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 800" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bannerBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F8F3EF" />
+      <stop offset="50%" stop-color="#F1E7E0" />
+      <stop offset="100%" stop-color="#E5D6CD" />
+    </linearGradient>
+    <filter id="bannerCardShadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="8" stdDeviation="16" flood-color="#792A16" flood-opacity="0.08"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1600" height="800" fill="url(#bannerBg)" />
+
+  <!-- Subtle Artisanal Background Stitching / Curved Waves -->
+  <path d="M-50,650 Q400,500 800,680 T1650,600" fill="none" stroke="#DCC7BC" stroke-width="2.5" stroke-dasharray="12 12" opacity="0.6" />
+  <path d="M-50,700 Q450,550 850,730 T1650,650" fill="none" stroke="#E3D2C8" stroke-width="2" stroke-dasharray="8 8" opacity="0.4" />
+  <path d="M-50,200 Q500,100 1000,220 T1650,150" fill="none" stroke="#E3D2C8" stroke-width="1.5" stroke-dasharray="10 10" opacity="0.35" />
+
+  <!-- Center Content Badge -->
+  <g transform="translate(800, 400)">
+    <!-- White Card Pill / Rounded Rectangle -->
+    <rect x="-320" y="-190" width="640" height="380" rx="28" fill="#FFFFFF" fill-opacity="0.9" filter="url(#bannerCardShadow)" stroke="#ECE0D8" stroke-width="1.5" />
+    
+    <!-- Inner Decorative Border -->
+    <rect x="-304" y="-174" width="608" height="348" rx="20" fill="none" stroke="#F1E4DC" stroke-width="1.5" stroke-dasharray="8 6" />
+
+    <!-- Center Icon Circle -->
+    <circle cx="0" cy="-60" r="54" fill="#FAF5F2" stroke="#E8D7CD" stroke-width="2" />
+    
+    <!-- Artisanal Knitting / Craft Motif -->
+    <g transform="translate(-24, -84)" fill="none" stroke="#792A16" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round">
+      <!-- Gift / Craft Box with Ribbon -->
+      <rect x="0" y="14" width="48" height="34" rx="6" fill="#FFFFFF" />
+      <line x1="24" y1="14" x2="24" y2="48" stroke="#792A16" />
+      <line x1="0" y1="28" x2="48" y2="28" stroke="#792A16" />
+      <!-- Bow -->
+      <path d="M24 14 C16 4, 6 8, 14 14 C18 16, 24 14, 24 14 Z" fill="#792A16" fill-opacity="0.15" />
+      <path d="M24 14 C32 4, 42 8, 34 14 C30 16, 24 14, 24 14 Z" fill="#792A16" fill-opacity="0.15" />
+    </g>
+
+    <!-- Sparkles -->
+    <path d="M50 -95 L53 -102 L60 -99 L53 -96 L50 -89 L47 -96 L40 -99 L47 -102 Z" fill="#D97706" />
+    <path d="M-55 -40 L-53 -45 L-48 -43 L-53 -41 L-55 -36 L-57 -41 L-62 -43 L-57 -45 Z" fill="#D97706" />
+
+    <!-- Text Header -->
+    <text x="0" y="35" text-anchor="middle" font-family="'Nunito Sans', system-ui, -apple-system, sans-serif" font-size="28" font-weight="800" fill="#792A16" letter-spacing="3">SHOP HANDMADE</text>
+    
+    <!-- Subtitle -->
+    <text x="0" y="70" text-anchor="middle" font-family="'Nunito Sans', system-ui, -apple-system, sans-serif" font-size="16" font-weight="600" fill="#72594F">Đồ Thủ Công &amp; Quà Tặng Đan Len Tinh Xảo</text>
+
+    <!-- Tagline Badge -->
+    <rect x="-140" y="98" width="280" height="34" rx="17" fill="#F7EDE8" stroke="#E6D3C8" stroke-width="1" />
+    <text x="0" y="120" text-anchor="middle" font-family="'Nunito Sans', system-ui, -apple-system, sans-serif" font-size="13" font-weight="700" fill="#792A16">Hình ảnh đang được chuẩn bị</text>
+  </g>
+</svg>

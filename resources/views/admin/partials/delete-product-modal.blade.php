@@ -18,7 +18,7 @@
         <!-- Body: Chi tiết sản phẩm sẽ bị xóa -->
         <div class="delete-modal-body">
             <div class="delete-product-preview-card">
-                <img id="deleteProductImg" src="{{ asset('images/logo.png') }}" alt="Product" class="delete-product-thumb" onerror="this.src='{{ asset('images/logo.png') }}'">
+                <img id="deleteProductImg" src="{{ asset('assets/images/placeholder.svg') }}" alt="Product" class="delete-product-thumb" onerror="this.onerror=null; this.src='{{ asset('assets/images/placeholder.svg') }}';">
                 <div class="delete-product-info">
                     <div class="delete-product-name" id="deleteProductName">Tên sản phẩm</div>
                     <div class="delete-product-meta">

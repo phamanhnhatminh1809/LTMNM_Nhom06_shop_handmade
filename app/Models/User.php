@@ -82,6 +82,17 @@ class User extends Authenticatable
     }
 
     /**
+     * Kiểm tra tài khoản là Nhân viên (kho hoặc bán hàng).
+     */
+    public function isStaff(): bool
+    {
+        return $this->role && in_array($this->role->name, [
+            Role::WAREHOUSE_STAFF,
+            Role::SALES_STAFF,
+        ], true);
+    }
+
+    /**
      * Kiểm tra tài khoản có quyền vào trang Quản trị (Admin hoặc Nhân viên).
      */
     public function isStaffOrAdmin(): bool

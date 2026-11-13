@@ -25,17 +25,17 @@
     --color-tertiary-container: #49624e;
     --color-on-tertiary-container: #c0dcc3;
 
-    /* Surfaces - Ivory */
-    --color-surface: #fff8f6;
-    --color-surface-dim: #ecd5cd;
-    --color-surface-bright: #fff8f6;
+    /* Surfaces - Clean White Canvas with Warm Artisanal Accents */
+    --color-surface: #ffffff;
+    --color-surface-dim: #f3ece8;
+    --color-surface-bright: #ffffff;
     --color-surface-container-lowest: #ffffff;
-    --color-surface-container-low: #fff1ec;
-    --color-surface-container: #ffe9e2;
-    --color-surface-container-high: #fbe3db;
-    --color-surface-container-highest: #f5ded5;
-    --color-surface-variant: #f5ded5;
-    --color-surface-ivory: #fff8f6;
+    --color-surface-container-low: #faf7f5;
+    --color-surface-container: #f5ede8;
+    --color-surface-container-high: #efe4de;
+    --color-surface-container-highest: #e8ded9;
+    --color-surface-variant: #f5ede8;
+    --color-surface-ivory: #faf7f5;
 
     /* Text on surfaces */
     --color-on-surface: #251914;

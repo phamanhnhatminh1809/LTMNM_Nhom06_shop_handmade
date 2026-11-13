@@ -193,7 +193,7 @@
                             </span>
                         </div>
                         <div style="font-size: 12.5px; color: var(--color-on-surface-variant); line-height: 1.5;">
-                            • Quản lý danh mục loại sản phẩm (Thêm, sửa, xóa).<br>
+                            • Quản lý danh mục sản phẩm (Thêm, sửa, xóa).<br>
                             • Quản lý sản phẩm, hình ảnh và số lượng tồn kho.<br>
                             • Không truy cập được Đơn hàng, Khách hàng hay Phân quyền.
                         </div>

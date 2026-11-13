@@ -41,15 +41,9 @@
                 <div class="nav-group-title">HỆ THỐNG</div>
                 <ul class="nav-list">
                     <li>
-                        <a href="{{ route('admin.staff.index') }}" class="nav-link {{ $currentMenu === 'staff' ? 'active' : '' }}" title="Nhân viên">
+                        <a href="{{ route('admin.staff.index') }}" class="nav-link {{ in_array($currentMenu, ['staff', 'permissions']) ? 'active' : '' }}" title="Nhân viên">
                             <i class="bi bi-person-vcard"></i>
                             <span class="nav-text">Nhân viên</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{{ route('admin.staff.index', ['role' => 'all']) }}" class="nav-link {{ $currentMenu === 'permissions' ? 'active' : '' }}" title="Phân quyền">
-                            <i class="bi bi-shield-lock"></i>
-                            <span class="nav-text">Phân quyền</span>
                         </a>
                     </li>
                 </ul>
@@ -62,9 +56,9 @@
                 <div class="nav-group-title">QUẢN LÝ KHO</div>
                 <ul class="nav-list">
                     <li>
-                        <a href="{{ route('admin.categories.index') }}" class="nav-link {{ $currentMenu === 'categories' ? 'active' : '' }}" title="Loại sản phẩm">
+                        <a href="{{ route('admin.categories.index') }}" class="nav-link {{ $currentMenu === 'categories' ? 'active' : '' }}" title="Danh mục sản phẩm">
                             <i class="bi bi-tags"></i>
-                            <span class="nav-text">Loại sản phẩm</span>
+                            <span class="nav-text">Danh mục sản phẩm</span>
                         </a>
                     </li>
                     <li>

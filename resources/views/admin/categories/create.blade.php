@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'Thêm loại sản phẩm')
+@section('title', 'Thêm danh mục sản phẩm')
 
 @php $activeMenu = 'categories'; @endphp
 
@@ -9,7 +9,7 @@
 <div class="admin-top-bar">
     <div class="page-main-title">
         <i class="bi bi-tags"></i>
-        <span>THÊM LOẠI SẢN PHẨM MỚI</span>
+        <span>THÊM DANH MỤC MỚI</span>
     </div>
     <div class="top-bar-right">
         <a href="{{ route('admin.categories.index') }}" class="btn-secondary-outline">
@@ -41,7 +41,7 @@
         <div class="admin-card-header">
             <h3 class="admin-card-title">
                 <i class="bi bi-plus-circle"></i>
-                <span>Thông tin loại sản phẩm</span>
+                <span>Thông tin danh mục sản phẩm</span>
             </h3>
         </div>
         <div class="admin-card-body">
@@ -82,33 +82,70 @@
 
                 <div class="modal-form-group" style="margin-bottom: 18px;">
                     <label class="modal-label" for="icon">
-                        Biểu tượng (Emoji hoặc mã Bootstrap Icon)
+                        Biểu tượng danh mục (Mã Bootstrap Icon)
                     </label>
                     <input type="text"
                            id="icon"
                            name="icon"
                            class="modal-input"
-                           value="{{ old('icon') }}"
-                           placeholder="VD: 🏺, 🧶, 🕯️ hoặc bi-bag, bi-flower1">
+                           value="{{ old('icon', 'bi-tag') }}"
+                           placeholder="VD: bi-bag-heart, bi-gem, bi-flower1">
                     @error('icon')
                         <div class="form-error-text">{{ $message }}</div>
                     @enderror
 
-                    <div class="form-help-text" style="margin-top: 8px;">Chọn nhanh biểu tượng gợi ý:</div>
-                    <div class="icon-chip-picker">
+                    <div class="form-help-text" style="margin-top: 10px; font-weight: 700; color: var(--color-on-surface);">
+                        Chọn nhanh biểu tượng chuẩn hóa theo ngành hàng:
+                    </div>
+                    <div class="icon-chip-picker" style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px;">
                         @foreach([
-                            ['val' => '🏺', 'label' => '🏺 Gốm sứ'],
-                            ['val' => '🧶', 'label' => '🧶 Đồ len'],
-                            ['val' => '🕯️', 'label' => '🕯️ Nến thơm'],
-                            ['val' => '👜', 'label' => '👜 Túi & Phụ kiện'],
-                            ['val' => '💐', 'label' => '💐 Hoa thủ công'],
-                            ['val' => '🌿', 'label' => '🌿 Mây tre đan'],
-                            ['val' => '🎨', 'label' => '🎨 Tranh & Decor'],
-                            ['val' => 'bi-bag-heart', 'label' => 'bi-bag-heart'],
-                            ['val' => 'bi-flower1', 'label' => 'bi-flower1'],
+                            // Túi xách & Balo
+                            ['val' => 'bi-bag-heart', 'label' => 'Túi xách'],
+                            ['val' => 'bi-handbag', 'label' => 'Túi xách tay'],
+                            ['val' => 'bi-backpack', 'label' => 'Balo'],
+                            ['val' => 'bi-wallet2', 'label' => 'Ví mini'],
+                            // Móc khóa & Phụ kiện
+                            ['val' => 'bi-key', 'label' => 'Móc khóa'],
+                            ['val' => 'bi-tag', 'label' => 'Thẻ tag'],
+                            ['val' => 'bi-bookmark-star', 'label' => 'Bookmark'],
+                            ['val' => 'bi-pin-angle', 'label' => 'Ghim cài'],
+                            // Trang sức & Đá quý
+                            ['val' => 'bi-gem', 'label' => 'Trang sức'],
+                            ['val' => 'bi-stars', 'label' => 'Lấp lánh'],
+                            ['val' => 'bi-sparkles', 'label' => 'Phụ kiện'],
+                            // Đồ len & Đan móc
+                            ['val' => 'bi-snow', 'label' => 'Khăn len'],
+                            ['val' => 'bi-palette', 'label' => 'Màu sắc'],
+                            ['val' => 'bi-brush', 'label' => 'Thủ công'],
+                            // Gấu bông & Đồ chơi
+                            ['val' => 'bi-heart', 'label' => 'Gấu bông'],
+                            ['val' => 'bi-balloon', 'label' => 'Bong bóng'],
+                            ['val' => 'bi-emoji-smile', 'label' => 'Quà tặng'],
+                            // Hoa & Cây cảnh
+                            ['val' => 'bi-flower1', 'label' => 'Hoa len'],
+                            ['val' => 'bi-flower2', 'label' => 'Bó hoa'],
+                            ['val' => 'bi-tree', 'label' => 'Mây tre'],
+                            ['val' => 'bi-sun', 'label' => 'Decor'],
+                            // Nến thơm & Tinh dầu
+                            ['val' => 'bi-fire', 'label' => 'Nến thơm'],
+                            ['val' => 'bi-droplet', 'label' => 'Tinh dầu'],
+                            ['val' => 'bi-brightness-high', 'label' => 'Hương thơm'],
+                            // Gốm sứ & Đồ nhà
+                            ['val' => 'bi-cup-hot', 'label' => 'Gốm sứ'],
+                            ['val' => 'bi-lamp', 'label' => 'Đèn ngủ'],
+                            ['val' => 'bi-house-heart', 'label' => 'Gia đình'],
+                            // May mặc & Khác
+                            ['val' => 'bi-scissors', 'label' => 'May vá'],
+                            ['val' => 'bi-gift', 'label' => 'Hộp quà'],
+                            ['val' => 'bi-award', 'label' => 'Cao cấp'],
+                            ['val' => 'bi-patch-check', 'label' => 'Chính hãng'],
                         ] as $chip)
-                            <button type="button" class="icon-chip-btn" data-icon="{{ $chip['val'] }}">
-                                {{ $chip['label'] }}
+                            <button type="button"
+                                    class="icon-chip-btn {{ old('icon') === $chip['val'] ? 'active' : '' }}"
+                                    data-icon="{{ $chip['val'] }}"
+                                    style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; font-size: 13px;">
+                                <i class="bi {{ $chip['val'] }}"></i>
+                                <span>{{ $chip['label'] }}</span>
                             </button>
                         @endforeach
                     </div>
@@ -138,12 +175,12 @@
             </div>
             <div class="admin-card-body">
                 <div style="display: flex; align-items: center; gap: 14px; padding: 14px; background: #fff8f6; border: 1px solid #ebdcd7; border-radius: 12px;">
-                    <div class="metric-icon-box" id="previewIconBox" style="margin: 0; width: 46px; height: 46px; font-size: 20px;">
+                    <div class="metric-icon-box" id="previewIconBox" style="margin: 0; width: 46px; height: 46px; font-size: 20px; background: #fff5f2; color: var(--color-primary);">
                         <i class="bi bi-tag"></i>
                     </div>
                     <div>
                         <div id="previewNameText" style="font-size: 15px; font-weight: 800; color: var(--color-on-surface);">
-                            {{ old('name', 'Tên loại sản phẩm') }}
+                            {{ old('name', 'Tên danh mục') }}
                         </div>
                         <div style="margin-top: 4px;">
                             <span class="mono-code" id="previewSlugBadge">slug-danh-muc</span>
@@ -194,19 +231,19 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function updatePreview() {
-        const nameVal = nameInput.value.trim();
+        const nameVal = nameInput ? nameInput.value.trim() : '';
         const slugVal = toSlug(nameVal) || 'slug-danh-muc';
-        slugPreview.value = nameVal ? slugVal : '';
-        previewNameText.textContent = nameVal || 'Tên loại sản phẩm';
-        previewSlugBadge.textContent = slugVal;
+        if (slugPreview) slugPreview.value = nameVal ? slugVal : '';
+        if (previewNameText) previewNameText.textContent = nameVal || 'Tên danh mục';
+        if (previewSlugBadge) previewSlugBadge.textContent = slugVal;
 
-        const iconVal = iconInput.value.trim();
+        const iconVal = iconInput ? iconInput.value.trim() : '';
         if (!iconVal) {
             previewIconBox.innerHTML = '<i class="bi bi-tag"></i>';
         } else if (iconVal.startsWith('bi-')) {
             previewIconBox.innerHTML = `<i class="bi ${iconVal}"></i>`;
         } else {
-            previewIconBox.textContent = iconVal;
+            previewIconBox.innerHTML = `<i class="bi bi-${iconVal}"></i>`;
         }
     }
 
@@ -217,7 +254,9 @@ document.addEventListener('DOMContentLoaded', () => {
         btn.addEventListener('click', function () {
             iconChips.forEach(b => b.classList.remove('active'));
             this.classList.add('active');
-            iconInput.value = this.getAttribute('data-icon');
+            if (iconInput) {
+                iconInput.value = this.getAttribute('data-icon');
+            }
             updatePreview();
         });
     });

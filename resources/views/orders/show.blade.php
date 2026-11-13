@@ -48,11 +48,11 @@
 @section('content')
 <div class="container" style="padding-top: 28px; padding-bottom: 50px;">
     <!-- Breadcrumb -->
-    <nav class="breadcrumb-nav" style="margin-bottom: 24px; font-size: 14px; color: var(--color-on-surface-variant);">
+    <nav class="breadcrumb-nav" style="margin-bottom: 24px; font-size: 14px; color: var(--color-on-surface-variant); display: flex; align-items: center; flex-wrap: wrap;">
         <a href="{{ route('home') }}" style="color: inherit; text-decoration: none;">Trang chủ</a>
-        <span style="margin: 0 8px;">/</span>
+        <i class="bi bi-chevron-right" style="font-size: 11px; margin: 0 8px; opacity: 0.5;"></i>
         <a href="{{ route('orders.index') }}" style="color: inherit; text-decoration: none;">Đơn hàng của tôi</a>
-        <span style="margin: 0 8px;">/</span>
+        <i class="bi bi-chevron-right" style="font-size: 11px; margin: 0 8px; opacity: 0.5;"></i>
         <span style="color: var(--color-primary); font-weight: 600;">Chi tiết #{{ $order->code }}</span>
     </nav>
 
@@ -85,8 +85,9 @@
             @if($order->status === 'pending')
                 <!-- Nút kích hoạt Modal Hủy đơn -->
                 <button type="button" onclick="showCancelOrderModal()" 
-                        style="padding: 6px 16px; border: 1px solid #ef4444; background: #fff; color: #ef4444; border-radius: 20px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s;">
-                    Hủy đơn hàng
+                        style="padding: 6px 16px; border: 1px solid #ef4444; background: #fff; color: #ef4444; border-radius: 20px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 6px;">
+                    <i class="bi bi-x-circle"></i>
+                    <span>Hủy đơn hàng</span>
                 </button>
                 
                 <!-- Form ẩn để thực hiện hủy -->
@@ -134,7 +135,7 @@
                                 $img = $item->product->image ?? null;
                                 $imgSrc = $img 
                                     ? (str_starts_with($img, 'http') ? $img : asset(ltrim($img, '/')))
-                                    : asset('assets/images/logo.png');
+                                    : asset('assets/images/placeholder.svg');
                             @endphp
                             <tr style="border-bottom: 1px solid var(--color-outline-variant, #f0eae1);">
                                 <td style="padding: 14px 10px;">
@@ -143,7 +144,7 @@
                                             <a href="{{ route('products.show', $item->product_id) }}" style="flex-shrink: 0;">
                                                 <img src="{{ $imgSrc }}" alt="{{ $item->product->name }}" 
                                                      style="width: 54px; height: 54px; object-fit: cover; border-radius: 8px; border: 1px solid #f0eae1;"
-                                                     onerror="this.src='{{ asset('assets/images/logo.png') }}'">
+                                                     onerror="this.onerror=null; this.src='{{ asset('assets/images/placeholder.svg') }}';">
                                             </a>
                                             <div>
                                                 <a href="{{ route('products.show', $item->product_id) }}" 
@@ -191,8 +192,9 @@
                                                 </span>
                                                 <button type="button" 
                                                         onclick="const form = document.getElementById('review-form-{{ $item->id }}'); form.style.display = form.style.display === 'none' ? 'block' : 'none';"
-                                                        style="padding: 6px 14px; background: var(--color-primary, #e76f51); color: #fff; border: none; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer;">
-                                                    Đánh giá sản phẩm
+                                                        style="padding: 6px 14px; background: var(--color-primary, #e76f51); color: #fff; border: none; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
+                                                    <i class="bi bi-star"></i>
+                                                    <span>Đánh giá sản phẩm</span>
                                                 </button>
                                             </div>
                                             
@@ -240,8 +242,9 @@
             </div>
 
             <div style="margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--color-outline-variant, #f0eae1);">
-                <a href="{{ route('orders.index') }}" style="color: var(--color-primary); font-size: 14px; font-weight: 600; text-decoration: none;">
-                    &larr; Quay lại danh sách đơn hàng
+                <a href="{{ route('orders.index') }}" style="color: var(--color-primary); font-size: 14px; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
+                    <i class="bi bi-arrow-left"></i>
+                    <span>Quay lại danh sách đơn hàng</span>
                 </a>
             </div>
         </div>
@@ -314,7 +317,7 @@
 <!-- MODAL XÁC NHẬN HỦY ĐƠN HÀNG -->
 <div class="modal-overlay" id="cancelOrderModal">
     <div class="modal-box">
-        <div class="modal-icon">⚠️</div>
+        <div class="modal-icon"><i class="bi bi-exclamation-triangle-fill"></i></div>
         <h3 class="modal-title">Hủy đơn hàng?</h3>
         <p class="modal-desc">Bạn có chắc chắn muốn hủy đơn hàng này không? Hành động này không thể hoàn tác.</p>
         <div class="modal-actions">

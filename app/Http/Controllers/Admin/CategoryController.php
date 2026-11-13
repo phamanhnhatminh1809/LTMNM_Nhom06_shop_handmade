@@ -52,11 +52,11 @@ class CategoryController extends Controller
         Category::create($validated);
 
         return redirect()->route('admin.categories.index')
-            ->with('success', 'Thêm loại sản phẩm "' . $validated['name'] . '" thành công!');
+            ->with('success', 'Thêm danh mục "' . $validated['name'] . '" thành công!');
     }
 
     /**
-     * Hiển thị form chỉnh sửa loại sản phẩm.
+     * Hiển thị form chỉnh sửa danh mục.
      */
     public function edit(Category $category): View
     {
@@ -64,7 +64,7 @@ class CategoryController extends Controller
     }
 
     /**
-     * Cập nhật loại sản phẩm.
+     * Cập nhật danh mục.
      */
     public function update(Request $request, Category $category): RedirectResponse
     {
@@ -88,11 +88,11 @@ class CategoryController extends Controller
         $category->update($validated);
 
         return redirect()->route('admin.categories.index')
-            ->with('success', 'Cập nhật loại sản phẩm "' . $category->name . '" thành công!');
+            ->with('success', 'Cập nhật danh mục "' . $category->name . '" thành công!');
     }
 
     /**
-     * Xóa loại sản phẩm.
+     * Xóa danh mục.
      * Chỉ xóa được nếu không còn sản phẩm thuộc danh mục này.
      */
     public function destroy(Category $category): RedirectResponse
@@ -106,6 +106,6 @@ class CategoryController extends Controller
         $category->delete();
 
         return redirect()->route('admin.categories.index')
-            ->with('success', 'Đã xóa loại sản phẩm "' . $name . '" thành công!');
+            ->with('success', 'Đã xóa danh mục "' . $name . '" thành công!');
     }
 }

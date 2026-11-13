@@ -1,21 +1,28 @@
 @extends('layouts.app')
 
-@section('title', 'Trang chủ')
+@section('title', 'Trang chủ - Đồ thủ công handmade tinh tế')
 
 @section('content')
 <div class="banner-slider">
     @foreach ($banners as $i => $b)
         <div class="banner-slide {{ $i === 0 ? 'banner-slide--active' : '' }}">
-            <img src="{{ $b['image'] }}" alt="{{ $b['title'] }}">
+            <img src="{{ $b['image'] }}" alt="{{ $b['title'] }}" onerror="this.onerror=null; this.src='{{ asset('assets/images/banner-placeholder.svg') }}';">
             <div class="banner-slide__content">
                 <h2>{{ $b['title'] }}</h2>
                 <p>{{ $b['subtitle'] }}</p>
-                <a href="{{ $b['link'] }}" class="btn btn--primary btn--lg">{{ $b['cta'] }} →</a>
+                <a href="{{ $b['link'] }}" class="btn btn--primary btn--lg" style="display: inline-flex; align-items: center; gap: 8px;">
+                    <span>{{ $b['cta'] }}</span>
+                    <i class="bi bi-arrow-right"></i>
+                </a>
             </div>
         </div>
     @endforeach
-    <button class="banner-prev" aria-label="Trước">‹</button>
-    <button class="banner-next" aria-label="Sau">›</button>
+    <button class="banner-prev" aria-label="Trước" style="display: flex; align-items: center; justify-content: center;">
+        <i class="bi bi-chevron-left"></i>
+    </button>
+    <button class="banner-next" aria-label="Sau" style="display: flex; align-items: center; justify-content: center;">
+        <i class="bi bi-chevron-right"></i>
+    </button>
     <div class="banner-dots">
         @foreach ($banners as $i => $b)
             <button class="banner-dot {{ $i === 0 ? 'banner-dot--active' : '' }}" aria-label="Slide {{ $i + 1 }}"></button>
@@ -23,16 +30,25 @@
     </div>
 </div>
 
-<section class="section">
-    <div style="max-width: 1200px; margin: 0 auto; padding: 0 15px;">
-        <div class="section__header">
-            <h2 class="section__title">Danh mục sản phẩm</h2>
-            <a href="{{ route('products.index') }}" class="link-more">Xem tất cả →</a>
+{{-- DANH MỤC SẢN PHẨM --}}
+<section class="section" style="padding: 48px 0 36px; background: #ffffff;">
+    <div class="container">
+        <div class="section__header" style="margin-bottom: 24px;">
+            <div>
+                <h2 class="section__title" style="margin: 0 0 4px;">Danh mục sản phẩm</h2>
+                <p style="margin: 0; font-size: 14px; color: var(--color-on-surface-variant, #55423e);">Khám phá các dòng sản phẩm thủ công được tạo tác tỉ mỉ</p>
+            </div>
+            <a href="{{ route('products.index') }}" class="link-more" style="display: inline-flex; align-items: center; gap: 4px;">
+                <span>Xem tất cả danh mục</span>
+                <i class="bi bi-arrow-right"></i>
+            </a>
         </div>
-        <div class="category-grid" style="display: grid !important; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)) !important; gap: 15px !important;">
+        <div class="category-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 16px;">
             @foreach ($categories as $cat)
                 <a href="{{ route('products.index', ['category' => $cat->slug]) }}" class="category-card">
-                    <div class="category-card__icon">{{ $cat->icon ?? '🧶' }}</div>
+                    <div class="category-card__icon-wrapper">
+                        <i class="bi {{ $cat->display_icon }}"></i>
+                    </div>
                     <span>{{ $cat->name }}</span>
                 </a>
             @endforeach
@@ -40,85 +56,95 @@
     </div>
 </section>
 
-<section class="section section--alt" id="featured-section">
-    <div style="max-width: 1200px; margin: 0 auto; padding: 0 15px;">
-        <div class="section__header">
-            <h2 class="section__title">Sản phẩm nổi bật</h2>
-            <a href="{{ route('products.index') }}" class="link-more">Xem tất cả →</a>
+{{-- SẢN PHẨM NỔI BẬT --}}
+<section class="section section--alt" id="featured-section" style="padding: 48px 0;">
+    <div class="container">
+        <div class="section__header" style="margin-bottom: 28px;">
+            <div>
+                <h2 class="section__title" style="margin: 0 0 4px;">Sản phẩm nổi bật</h2>
+                <p style="margin: 0; font-size: 14px; color: var(--color-on-surface-variant, #55423e);">Những món đồ handmade được yêu thích và đánh giá cao nhất</p>
+            </div>
+            <a href="{{ route('products.index') }}" class="link-more" style="display: inline-flex; align-items: center; gap: 4px;">
+                <span>Xem tất cả</span>
+                <i class="bi bi-arrow-right"></i>
+            </a>
         </div>
         
-        <!-- Lưới sản phẩm gốc (Sẽ bị JS thay thế) -->
-        <div id="featured-grid-source" style="display: none;">
-            @foreach ($featured as $p)
+        <div class="product-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 24px; width: 100%;">
+            @forelse ($featured as $p)
                 @if($p)
                     <x-product-card :product="$p" />
                 @endif
-            @endforeach
+            @empty
+                <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #888;">
+                    Chưa có sản phẩm nổi bật
+                </div>
+            @endforelse
         </div>
-        <!-- Nơi JS sẽ hiển thị lưới mới -->
-        <div id="featured-grid-target" style="display: grid !important; grid-template-columns: repeat(4, 1fr) !important; gap: 20px !important; width: 100% !important;"></div>
     </div>
 </section>
 
-<section class="section" id="newest-section">
-    <div style="max-width: 1200px; margin: 0 auto; padding: 0 15px;">
-        <div class="section__header">
-            <h2 class="section__title">Sản phẩm mới</h2>
-            <a href="{{ route('products.index') }}" class="link-more">Xem tất cả →</a>
+{{-- SẢN PHẨM MỚI --}}
+<section class="section" id="newest-section" style="padding: 48px 0; background: #ffffff;">
+    <div class="container">
+        <div class="section__header" style="margin-bottom: 28px;">
+            <div>
+                <h2 class="section__title" style="margin: 0 0 4px;">Sản phẩm mới ra mắt</h2>
+                <p style="margin: 0; font-size: 14px; color: var(--color-on-surface-variant, #55423e);">Các tác phẩm thủ công vừa được hoàn thiện tại xưởng</p>
+            </div>
+            <a href="{{ route('products.index') }}" class="link-more" style="display: inline-flex; align-items: center; gap: 4px;">
+                <span>Xem tất cả</span>
+                <i class="bi bi-arrow-right"></i>
+            </a>
         </div>
         
-        <!-- Lưới sản phẩm gốc (Sẽ bị JS thay thế) -->
-        <div id="newest-grid-source" style="display: none;">
-            @foreach ($newest as $p)
+        <div class="product-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 24px; width: 100%;">
+            @forelse ($newest as $p)
                 @if($p)
                     <x-product-card :product="$p" />
                 @endif
-            @endforeach
-        </div>
-        <!-- Nơi JS sẽ hiển thị lưới mới -->
-        <div id="newest-grid-target" style="display: grid !important; grid-template-columns: repeat(4, 1fr) !important; gap: 20px !important; width: 100% !important;"></div>
-    </div>
-</section>
-
-<section class="section section--alt">
-    <div style="max-width: 1200px; margin: 0 auto; padding: 0 15px;" class="features">
-        <div class="feature">
-            <div class="feature__icon">🚚</div>
-            <h3>Miễn phí vận chuyển</h3>
-            <p>Đơn từ 300.000đ</p>
-        </div>
-        <div class="feature">
-            <div class="feature__icon">💯</div>
-            <h3>Hàng chính hãng</h3>
-            <p>100% handmade</p>
-        </div>
-        <div class="feature">
-            <div class="feature__icon">🔄</div>
-            <h3>Đổi trả 7 ngày</h3>
-            <p>Nếu lỗi từ shop</p>
-        </div>
-        <div class="feature">
-            <div class="feature__icon">💬</div>
-            <h3>Hỗ trợ 24/7</h3>
-            <p>Hotline luôn mở</p>
+            @empty
+                <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #888;">
+                    Chưa có sản phẩm mới
+                </div>
+            @endforelse
         </div>
     </div>
 </section>
 
-@push('scripts')
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Hàm di chuyển sản phẩm sang lưới mới
-        function cloneGrid(sourceId, targetId) {
-            const source = document.getElementById(sourceId);
-            const target = document.getElementById(targetId);
-            if (source && target) {
-                target.innerHTML = source.innerHTML;
-            }
-        }
-        cloneGrid('featured-grid-source', 'featured-grid-target');
-        cloneGrid('newest-grid-source', 'newest-grid-target');
-    });
-</script>
-@endpush
+{{-- KHỐI TIỆN ÍCH DỊCH VỤ --}}
+<section class="section section--alt" style="padding: 44px 0;">
+    <div class="container">
+        <div class="features">
+            <div class="feature">
+                <div class="feature__icon-wrapper">
+                    <i class="bi bi-truck"></i>
+                </div>
+                <h3>Miễn phí vận chuyển</h3>
+                <p>Áp dụng cho đơn từ 300.000đ toàn quốc</p>
+            </div>
+            <div class="feature">
+                <div class="feature__icon-wrapper">
+                    <i class="bi bi-patch-check"></i>
+                </div>
+                <h3>100% Thủ công</h3>
+                <p>Tỉ mỉ từng đường kim, sợi len tuyển chọn</p>
+            </div>
+            <div class="feature">
+                <div class="feature__icon-wrapper">
+                    <i class="bi bi-arrow-repeat"></i>
+                </div>
+                <h3>Đổi trả linh hoạt</h3>
+                <p>Hỗ trợ đổi trả trong 7 ngày nếu có lỗi</p>
+            </div>
+            <div class="feature">
+                <div class="feature__icon-wrapper">
+                    <i class="bi bi-headset"></i>
+                </div>
+                <h3>Tư vấn tận tâm</h3>
+                <p>Hỗ trợ tư vấn đặt làm theo yêu cầu 24/7</p>
+            </div>
+        </div>
+    </div>
+</section>
 @endsection

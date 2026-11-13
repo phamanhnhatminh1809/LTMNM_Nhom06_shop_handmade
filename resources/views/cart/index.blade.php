@@ -48,9 +48,9 @@
 @section('content')
 <div class="container" style="padding-top: 28px; padding-bottom: 50px;">
     <!-- Breadcrumb -->
-    <nav class="breadcrumb-nav" style="margin-bottom: 24px; font-size: 14px; color: var(--color-on-surface-variant);">
+    <nav class="breadcrumb-nav" style="margin-bottom: 24px; font-size: 14px; color: var(--color-on-surface-variant); display: flex; align-items: center;">
         <a href="{{ route('home') }}" style="color: inherit; text-decoration: none;">Trang chủ</a>
-        <span style="margin: 0 8px;">/</span>
+        <i class="bi bi-chevron-right" style="font-size: 11px; margin: 0 8px; opacity: 0.5;"></i>
         <span style="color: var(--color-primary); font-weight: 600;">Giỏ hàng</span>
     </nav>
 
@@ -79,14 +79,18 @@
     @if($cart->details->isEmpty())
         <!-- Trạng thái giỏ hàng trống -->
         <div style="background: var(--color-surface, #ffffff); border-radius: 16px; padding: 60px 20px; text-align: center; border: 1px solid var(--color-outline-variant, #f0eae1); box-shadow: 0 4px 16px rgba(0,0,0,0.02);">
+            <div style="width: 72px; height: 72px; border-radius: 50%; background: #faf7f5; color: var(--color-primary); display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; font-size: 32px;">
+                <i class="bi bi-bag-x"></i>
+            </div>
             <div style="font-size: 18px; font-weight: 700; color: var(--color-on-surface); margin-bottom: 8px;">
                 Giỏ hàng của bạn đang trống
             </div>
             <p style="color: var(--color-on-surface-variant); font-size: 14px; margin-bottom: 24px; max-width: 460px; margin-left: auto; margin-right: auto;">
                 Hãy khám phá các sản phẩm thủ công tinh tế của chúng tôi và chọn cho mình những món đồ ưng ý nhất.
             </p>
-            <a href="{{ route('products.index') }}" class="btn btn--primary" style="padding: 12px 28px; border-radius: 8px; text-decoration: none; font-weight: 600; display: inline-block;">
-                Khám phá sản phẩm ngay
+            <a href="{{ route('products.index') }}" class="btn btn--primary" style="padding: 12px 28px; border-radius: 8px; text-decoration: none; font-weight: 600; display: inline-flex; align-items: center; gap: 8px;">
+                <i class="bi bi-compass"></i>
+                <span>Khám phá sản phẩm ngay</span>
             </a>
         </div>
     @else
@@ -111,7 +115,7 @@
                                 @php
                                     $imgSrc = $item->image_url 
                                         ? (str_starts_with($item->image_url, 'http') ? $item->image_url : asset(ltrim($item->image_url, '/')))
-                                        : asset('assets/images/logo.png');
+                                        : asset('assets/images/placeholder.svg');
                                 @endphp
                                 <tr style="border-bottom: 1px solid var(--color-outline-variant, #f0eae1);">
                                     <!-- Cột thông tin sản phẩm -->
@@ -120,7 +124,7 @@
                                             <a href="{{ route('products.show', $item->product_id) }}" style="flex-shrink: 0;">
                                                 <img src="{{ $imgSrc }}" alt="{{ $item->name }}" 
                                                      style="width: 64px; height: 64px; object-fit: cover; border-radius: 8px; border: 1px solid #f0eae1;"
-                                                     onerror="this.src='{{ asset('assets/images/logo.png') }}'">
+                                                     onerror="this.onerror=null; this.src='{{ asset('assets/images/placeholder.svg') }}';">
                                             </a>
                                             <div>
                                                 <a href="{{ route('products.show', $item->product_id) }}" 
@@ -179,9 +183,10 @@
                                         </form>
                                         <!-- Nút kích hoạt Modal -->
                                         <button type="button" onclick="showDeleteModal({{ $item->id }})" 
-                                                style="background: none; border: none; color: #9ca3af; cursor: pointer; font-size: 13px; padding: 4px 8px; border-radius: 4px; transition: color 0.2s;"
+                                                style="background: none; border: none; color: #9ca3af; cursor: pointer; font-size: 13px; padding: 4px 8px; border-radius: 4px; transition: color 0.2s; display: inline-flex; align-items: center; gap: 4px;"
                                                 onmouseover="this.style.color='#ef4444'" onmouseout="this.style.color='#9ca3af'">
-                                            Xóa
+                                            <i class="bi bi-trash3"></i>
+                                            <span>Xóa</span>
                                         </button>
                                     </td>
                                 </tr>
@@ -190,16 +195,18 @@
                     </table>
                 </div>
 
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--color-outline-variant, #f0eae1);">
-                    <a href="{{ route('products.index') }}" style="color: var(--color-primary); font-size: 14px; font-weight: 600; text-decoration: none;">
-                        &larr; Tiếp tục xem sản phẩm khác
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--color-outline-variant, #f0eae1); flex-wrap: wrap; gap: 12px;">
+                    <a href="{{ route('products.index') }}" style="color: var(--color-primary); font-size: 14px; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
+                        <i class="bi bi-arrow-left"></i>
+                        <span>Tiếp tục xem sản phẩm khác</span>
                     </a>
                     <!-- Nút xóa toàn bộ giỏ (Cũng dùng Modal) -->
                     <form id="clear-cart-form" action="{{ route('cart.clear') }}" method="POST" style="display: none;">
                         @csrf
                     </form>
-                    <button type="button" onclick="showClearCartModal()" style="background: none; border: 1px solid #d1d5db; padding: 8px 16px; border-radius: 6px; font-size: 13px; color: #4b5563; cursor: pointer;">
-                        Xóa toàn bộ giỏ
+                    <button type="button" onclick="showClearCartModal()" style="background: none; border: 1px solid #d1d5db; padding: 8px 16px; border-radius: 6px; font-size: 13px; color: #4b5563; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
+                        <i class="bi bi-trash3"></i>
+                        <span>Xóa toàn bộ giỏ</span>
                     </button>
                 </div>
             </div>
@@ -236,14 +243,21 @@
 
                 <div style="margin-bottom: 16px;">
                     <a href="{{ route('checkout.index') }}" 
-                       style="display: block; width: 100%; box-sizing: border-box; text-align: center; padding: 14px 20px; background: var(--color-primary, #e76f51); color: #fff; border-radius: 8px; font-size: 15px; font-weight: 700; text-decoration: none; transition: opacity 0.2s;">
-                        Tiến hành đặt hàng
+                       style="display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; box-sizing: border-box; text-align: center; padding: 14px 20px; background: var(--color-primary, #e76f51); color: #fff; border-radius: 8px; font-size: 15px; font-weight: 700; text-decoration: none; transition: opacity 0.2s;">
+                        <span>Tiến hành đặt hàng</span>
+                        <i class="bi bi-arrow-right"></i>
                     </a>
                 </div>
 
                 <div style="background: #f9fafb; border-radius: 8px; padding: 12px; font-size: 12px; color: var(--color-on-surface-variant); line-height: 1.6;">
-                    <div>Hỗ trợ thanh toán trực tiếp khi nhận hàng (COD).</div>
-                    <div>Kiểm tra hàng trước khi thanh toán.</div>
+                    <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 4px;">
+                        <i class="bi bi-truck" style="color: var(--color-primary);"></i>
+                        <span>Hỗ trợ thanh toán trực tiếp khi nhận hàng (COD).</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 6px;">
+                        <i class="bi bi-shield-check" style="color: #10b981;"></i>
+                        <span>Kiểm tra hàng trước khi thanh toán.</span>
+                    </div>
                 </div>
             </div>
 
@@ -254,7 +268,7 @@
 <!-- MODAL XÁC NHẬN XÓA -->
 <div class="modal-overlay" id="deleteModal">
     <div class="modal-box">
-        <div class="modal-icon">🗑️</div>
+        <div class="modal-icon"><i class="bi bi-trash3-fill"></i></div>
         <h3 class="modal-title" id="modalTitle">Xóa sản phẩm?</h3>
         <p class="modal-desc" id="modalDesc">Bạn có chắc chắn muốn xóa sản phẩm này khỏi giỏ hàng không?</p>
         <div class="modal-actions">

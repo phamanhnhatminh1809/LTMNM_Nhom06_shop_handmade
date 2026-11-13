@@ -163,4 +163,102 @@ class StaffController extends Controller
         return redirect()->back()
             ->with('success', 'Đã ' . $actionText . ' tài khoản "' . $user->full_name . '" thành công.');
     }
+
+    /**
+     * Hiển thị form chỉnh sửa chi tiết tài khoản nhân viên (đổi quyền, khóa/mở khóa, đổi thông tin).
+     */
+    public function edit(User $user): View
+    {
+        $this->ensureDefaultRolesExist();
+
+        $roles = Role::orderBy('id')->get();
+        $isCurrentUser = ($user->id === Auth::id());
+
+        return view('admin.staff.edit', compact('user', 'roles', 'isCurrentUser'));
+    }
+
+    /**
+     * Cập nhật thông tin chi tiết tài khoản nhân viên.
+     */
+    public function update(Request $request, User $user): RedirectResponse
+    {
+        $this->ensureDefaultRolesExist();
+
+        $isCurrentUser = ($user->id === Auth::id());
+
+        $validated = $request->validate([
+            'full_name' => 'required|string|max:100',
+            'email'     => 'required|string|email|max:100|unique:users,email,' . $user->id,
+            'phone'     => 'nullable|string|max:20',
+            'role_id'   => 'required|exists:roles,id',
+            'password'  => 'nullable|string|min:8|confirmed',
+        ], [
+            'full_name.required' => 'Họ và tên không được để trống.',
+            'email.required'     => 'Địa chỉ email không được để trống.',
+            'email.unique'       => 'Email này đã được sử dụng bởi tài khoản khác.',
+            'password.min'       => 'Mật khẩu mới phải có ít nhất 8 ký tự.',
+            'password.confirmed' => 'Xác nhận mật khẩu mới không khớp.',
+        ]);
+
+        $newRole = Role::findOrFail((int) $validated['role_id']);
+
+        // Chặn tự hạ quyền chính mình
+        if ($isCurrentUser && $newRole->name !== Role::ADMIN) {
+            return redirect()->back()
+                ->with('error', 'Không thể tự hạ quyền Quản trị viên của tài khoản đang đăng nhập.')
+                ->withInput();
+        }
+
+        // Xử lý trạng thái khóa/mở khóa
+        $isActive = $request->boolean('is_active', true);
+        if ($isCurrentUser && !$isActive) {
+            return redirect()->back()
+                ->with('error', 'Không thể tự khóa tài khoản của chính mình.')
+                ->withInput();
+        }
+
+        $updateData = [
+            'full_name' => $validated['full_name'],
+            'email'     => $validated['email'],
+            'phone'     => $validated['phone'] ?? null,
+            'role_id'   => $newRole->id,
+            'is_active' => $isActive,
+        ];
+
+        // Nếu có nhập mật khẩu mới
+        if (!empty($validated['password'])) {
+            $updateData['password'] = Hash::make($validated['password']);
+        }
+
+        $user->update($updateData);
+
+        return redirect()->route('admin.staff.index')
+            ->with('success', 'Đã cập nhật thông tin tài khoản "' . $user->full_name . '" thành công!');
+    }
+
+    /**
+     * Xóa tài khoản nhân viên.
+     */
+    public function destroy(User $user): RedirectResponse
+    {
+        if ($user->id === Auth::id()) {
+            return redirect()->back()
+                ->with('error', 'Không thể tự xóa tài khoản của chính mình.');
+        }
+
+        // Chặn xóa nếu đây là tài khoản Quản trị viên và chỉ còn 1 Quản trị viên duy nhất
+        if ($user->isAdmin()) {
+            $adminCount = User::whereHas('role', fn ($q) => $q->where('name', Role::ADMIN))->count();
+            if ($adminCount <= 1) {
+                return redirect()->back()
+                    ->with('error', 'Không thể xóa Quản trị viên duy nhất của hệ thống.');
+            }
+        }
+
+        $userName = $user->full_name;
+        $user->delete();
+
+        return redirect()->route('admin.staff.index')
+            ->with('success', 'Đã xóa tài khoản "' . $userName . '" thành công.');
+    }
 }

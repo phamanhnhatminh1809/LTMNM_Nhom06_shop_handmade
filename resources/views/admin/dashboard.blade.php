@@ -164,10 +164,10 @@
                     @php
                         $itemImg = !empty($item->image)
                             ? (str_starts_with($item->image, 'http') ? $item->image : asset(ltrim($item->image, '/')))
-                            : asset('images/logo.png');
+                            : asset('assets/images/placeholder.svg');
                     @endphp
                     <div class="stock-item">
-                        <img src="{{ $itemImg }}" class="stock-thumb" alt="{{ $item->name }}" onerror="this.src='{{ asset('assets/images/logo.png') }}'">
+                        <img src="{{ $itemImg }}" class="stock-thumb" alt="{{ $item->name }}" onerror="this.onerror=null; this.src='{{ asset('assets/images/placeholder.svg') }}';">
                         <div class="stock-details">
                             <div class="stock-name">{{ $item->name }}</div>
                             <div class="stock-code">{{ $item->code }}</div>
@@ -226,7 +226,7 @@
                         $rank = $index + 1;
                         $topImg = !empty($topProd->image)
                             ? (str_starts_with($topProd->image, 'http') ? $topProd->image : asset(ltrim($topProd->image, '/')))
-                            : asset('images/logo.png');
+                            : asset('assets/images/placeholder.svg');
                     @endphp
                     <tr>
                         <td style="text-align: center;">
@@ -236,7 +236,7 @@
                         </td>
                         <td>
                             <div class="customer-cell">
-                                <img src="{{ $topImg }}" class="stock-thumb" alt="{{ $topProd->name }}" onerror="this.src='{{ asset('images/logo.png') }}'">
+                                <img src="{{ $topImg }}" class="stock-thumb" alt="{{ $topProd->name }}" onerror="this.onerror=null; this.src='{{ asset('assets/images/placeholder.svg') }}';">
                                 <div class="customer-info-box">
                                     <a href="{{ route('admin.products.show', $topProd) }}"
                                        class="c-name"

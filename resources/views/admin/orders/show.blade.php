@@ -181,12 +181,12 @@
                             $prod = $item->product;
                             $prodImg = ($prod && !empty($prod->image))
                                 ? (str_starts_with($prod->image, 'http') ? $prod->image : asset(ltrim($prod->image, '/')))
-                                : asset('images/logo.png');
+                                : asset('assets/images/placeholder.svg');
                         @endphp
                         <tr>
                             <td>
                                 <div class="customer-cell">
-                                    <img src="{{ $prodImg }}" class="stock-thumb" alt="{{ $prod->name ?? 'SP' }}" onerror="this.src='{{ asset('images/logo.png') }}'">
+                                    <img src="{{ $prodImg }}" class="stock-thumb" alt="{{ $prod->name ?? 'SP' }}" onerror="this.onerror=null; this.src='{{ asset('assets/images/placeholder.svg') }}';">
                                     <div class="customer-info-box">
                                         @if($prod)
                                             <a href="{{ route('admin.products.show', $prod) }}"

@@ -181,14 +181,14 @@
                 @php
                     $mainImg = !empty($product->image)
                         ? (str_starts_with($product->image, 'http') ? $product->image : asset(ltrim($product->image, '/')))
-                        : asset('images/logo.png');
+                        : asset('assets/images/placeholder.svg');
                 @endphp
                 <div style="margin-bottom: 14px;">
                     <img id="detailMainImage"
                          src="{{ $mainImg }}"
                          alt="{{ $product->name }}"
                          style="width: 100%; height: 320px; object-fit: cover; border-radius: 12px; border: 1px solid #ebdcd7;"
-                         onerror="this.src='{{ asset('images/logo.png') }}'">
+                         onerror="this.onerror=null; this.src='{{ asset('assets/images/placeholder.svg') }}';">
                 </div>
 
                 @if(!empty($product->gallery) && is_array($product->gallery) && count($product->gallery) > 0)

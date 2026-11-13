@@ -30,7 +30,7 @@ class HomeController extends Controller
                 'link' => route('products.index', ['category' => 'khan-len']),
             ],
             [
-                'image' => 'https://images.unsplash.com/photo-1615486364267-3f7a0e9c62e8?w=1600&h=800&fit=crop',
+                'image' => 'https://images.unsplash.com/photo-1627123424574-724758594e93?w=1600&h=800&fit=crop',
                 'title' => 'Móc khóa dễ thương',
                 'subtitle' => 'Làm quà tặng bạn bè, người thân cực xinh',
                 'cta' => 'Xem móc khóa',

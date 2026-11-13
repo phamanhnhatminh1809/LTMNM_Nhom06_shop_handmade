@@ -22,9 +22,9 @@
 @section('content')
 <div class="container" style="padding-top: 28px; padding-bottom: 50px;">
     <!-- Breadcrumb -->
-    <nav class="breadcrumb-nav" style="margin-bottom: 24px; font-size: 14px; color: var(--color-on-surface-variant);">
+    <nav class="breadcrumb-nav" style="margin-bottom: 24px; font-size: 14px; color: var(--color-on-surface-variant); display: flex; align-items: center;">
         <a href="{{ route('home') }}" style="color: inherit; text-decoration: none;">Trang chủ</a>
-        <span style="margin: 0 8px;">/</span>
+        <i class="bi bi-chevron-right" style="font-size: 11px; margin: 0 8px; opacity: 0.5;"></i>
         <span style="color: var(--color-primary); font-weight: 600;">Quản lý tài khoản</span>
     </nav>
 
@@ -44,10 +44,19 @@
 
             <hr style="border: none; border-top: 1px solid var(--color-outline-variant, #f0eae1); margin: 16px 0;">
 
-            <div style="font-size: 13px; color: var(--color-on-surface-variant); line-height: 1.8;">
-                <div><strong>Tên đăng nhập:</strong> {{ $user->username }}</div>
-                <div><strong>Tham gia từ:</strong> {{ $user->created_at->format('d/m/Y') }}</div>
-                <div><strong>Trạng thái:</strong> <span style="color: #10b981; font-weight: 600;">Hoạt động</span></div>
+            <div style="font-size: 13px; color: var(--color-on-surface-variant); line-height: 2;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <i class="bi bi-person-badge" style="color: var(--color-primary);"></i>
+                    <span><strong>Tên đăng nhập:</strong> {{ $user->username }}</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <i class="bi bi-calendar3" style="color: var(--color-primary);"></i>
+                    <span><strong>Tham gia:</strong> {{ $user->created_at->format('d/m/Y') }}</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <i class="bi bi-shield-check" style="color: #10b981;"></i>
+                    <span><strong>Trạng thái:</strong> <span style="color: #10b981; font-weight: 600;">Hoạt động</span></span>
+                </div>
             </div>
         </aside>
 
@@ -156,8 +165,9 @@
                     </div>
 
                     <div style="text-align: right;">
-                        <button type="submit" style="padding: 10px 24px; background: var(--color-primary, #e76f51); color: #fff; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; transition: opacity 0.2s;">
-                            Lưu thông tin thay đổi
+                        <button type="submit" style="padding: 10px 24px; background: var(--color-primary, #e76f51); color: #fff; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; transition: opacity 0.2s; display: inline-flex; align-items: center; gap: 8px;">
+                            <i class="bi bi-check2"></i>
+                            <span>Lưu thông tin thay đổi</span>
                         </button>
                     </div>
                 </form>
@@ -201,8 +211,9 @@
                     </div>
 
                     <div style="text-align: right;">
-                        <button type="submit" style="padding: 10px 24px; background: #374151; color: #fff; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; transition: opacity 0.2s;">
-                            Cập nhật mật khẩu mới
+                        <button type="submit" style="padding: 10px 24px; background: #374151; color: #fff; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; transition: opacity 0.2s; display: inline-flex; align-items: center; gap: 8px;">
+                            <i class="bi bi-shield-lock"></i>
+                            <span>Cập nhật mật khẩu mới</span>
                         </button>
                     </div>
                 </form>
@@ -216,8 +227,9 @@
                         <h2 style="margin: 0; font-size: 18px; font-weight: 700; color: var(--color-on-surface);">Đơn hàng gần đây</h2>
                         <p style="margin: 2px 0 0; font-size: 13px; color: var(--color-on-surface-variant);">Theo dõi trạng thái các đơn hàng bạn đã đặt</p>
                     </div>
-                    <a href="{{ route('orders.index') }}" style="font-size: 13px; font-weight: 600; color: var(--color-primary); text-decoration: none;">
-                        Xem tất cả đơn hàng &rarr;
+                    <a href="{{ route('orders.index') }}" style="font-size: 13px; font-weight: 600; color: var(--color-primary); text-decoration: none; display: inline-flex; align-items: center; gap: 4px;">
+                        <span>Xem tất cả đơn hàng</span>
+                        <i class="bi bi-arrow-right"></i>
                     </a>
                 </div>
 

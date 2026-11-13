@@ -14,9 +14,9 @@
         <span>QUẢN LÝ SẢN PHẨM</span>
     </div>
     <div class="top-bar-right">
-        <a href="{{ route('admin.categories.index') }}" class="btn-secondary-outline" title="Quản lý loại sản phẩm">
+        <a href="{{ route('admin.categories.index') }}" class="btn-secondary-outline" title="Quản lý danh mục sản phẩm">
             <i class="bi bi-tags"></i>
-            <span>Loại sản phẩm</span>
+            <span>Danh mục sản phẩm</span>
         </a>
         <button class="btn-icon-bell" title="Thông báo hệ thống">
             <i class="bi bi-bell"></i>
@@ -63,7 +63,7 @@
 <!-- Welcome Card Sản Phẩm -->
 <div class="product-welcome-card">
     <h2 class="product-welcome-title">
-        Quản lý các danh sách sản phẩm thủ công hiện có<br>trong cửa hàng
+        Quản lý sản phẩm
     </h2>
     <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
         <a href="javascript:void(0)" class="btn-secondary-outline" id="btnAddNewProduct" style="background: rgba(255,255,255,0.92);">
@@ -148,7 +148,7 @@
                     @php
                         $prodImg = !empty($prod->image)
                             ? (str_starts_with($prod->image, 'http') ? $prod->image : asset(ltrim($prod->image, '/')))
-                            : asset('images/logo.png');
+                            : asset('assets/images/placeholder.svg');
                     @endphp
                     <tr data-category="{{ $prod->category->slug ?? 'all' }}">
                         <td style="text-align: center;">
@@ -156,7 +156,7 @@
                         </td>
                         <td>
                             <div class="customer-cell">
-                                <img src="{{ $prodImg }}" class="stock-thumb" alt="{{ $prod->name }}" onerror="this.onerror=null; this.src='{{ asset('assets/images/logo.png') }}'">
+                                <img src="{{ $prodImg }}" class="stock-thumb" alt="{{ $prod->name }}" onerror="this.onerror=null; this.src='{{ asset('assets/images/placeholder.svg') }}';">
                                 <div class="customer-info-box">
                                     <a href="{{ route('admin.products.show', $prod) }}"
                                        class="c-name product-item-name"

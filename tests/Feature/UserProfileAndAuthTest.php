@@ -315,6 +315,12 @@ class UserProfileAndAuthTest extends TestCase
      */
     public function test_guest_can_register_and_logout(): void
     {
+        \App\Models\PasswordResetOtp::create([
+            'email'      => 'new_customer_01@gmail.com',
+            'otp'        => '123456',
+            'expires_at' => now()->addMinutes(10),
+        ]);
+
         $response = $this->post('/register', [
             'full_name'             => 'Khách Hàng Đăng Ký Mới',
             'username'              => 'new_customer_01',
@@ -322,6 +328,7 @@ class UserProfileAndAuthTest extends TestCase
             'phone'                 => '0912345678',
             'password'              => 'password123',
             'password_confirmation' => 'password123',
+            'otp'                   => '123456',
         ]);
 
         $response->assertRedirect(route('home'));

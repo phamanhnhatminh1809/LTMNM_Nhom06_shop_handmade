@@ -63,11 +63,11 @@
 
 @section('content')
 <div class="container checkout-wrap">
-    <nav class="breadcrumb">
+    <nav class="breadcrumb" style="display: flex; align-items: center; flex-wrap: wrap;">
         <a href="{{ route('home') }}">Trang chủ</a>
-        <span>/</span>
+        <i class="bi bi-chevron-right" style="font-size: 11px; margin: 0 8px; opacity: 0.5;"></i>
         <a href="{{ route('cart.index') }}">Giỏ hàng</a>
-        <span>/</span>
+        <i class="bi bi-chevron-right" style="font-size: 11px; margin: 0 8px; opacity: 0.5;"></i>
         <span class="breadcrumb__current">Thanh toán</span>
     </nav>
 
@@ -138,7 +138,10 @@
 
                     {{-- THÔNG BÁO ĐANG DÙNG ĐỊA CHỈ CŨ --}}
                     <div id="usingOldAddressMsg" style="display: none; padding: 12px; background: #ecfdf5; border: 1px solid #10b981; border-radius: 8px; margin-bottom: 16px;">
-                        <div style="color: #065f46; font-weight: 600; font-size: 14px;">✅ Đang sử dụng địa chỉ cũ của bạn</div>
+                        <div style="color: #065f46; font-weight: 600; font-size: 14px; display: flex; align-items: center; gap: 6px;">
+                            <i class="bi bi-check-circle-fill" style="color: #10b981;"></i>
+                            <span>Đang sử dụng địa chỉ cũ của bạn</span>
+                        </div>
                         <div style="color: #666; font-size: 13px; margin-top: 4px;" id="oldAddressText"></div>
                         <button type="button" onclick="changeToNewAddress()" style="margin-top: 8px; background: none; border: none; color: #ef4444; font-size: 12px; text-decoration: underline; cursor: pointer;">Thay đổi địa chỉ khác</button>
                     </div>
@@ -153,14 +156,20 @@
                     <label class="payment-option">
                         <input type="radio" name="payment_method" value="cod" checked onchange="toggleQrModal()">
                         <div class="payment-option__body">
-                            <span class="payment-option__title">Thanh toán khi nhận hàng (COD)</span>
+                            <span class="payment-option__title" style="display: flex; align-items: center; gap: 8px;">
+                                <i class="bi bi-cash-coin" style="color: var(--color-primary); font-size: 18px;"></i>
+                                Thanh toán khi nhận hàng (COD)
+                            </span>
                             <span class="payment-option__desc">Bạn thanh toán bằng tiền mặt trực tiếp cho nhân viên vận chuyển.</span>
                         </div>
                     </label>
                     <label class="payment-option">
                         <input type="radio" name="payment_method" value="qr" onchange="toggleQrModal()">
                         <div class="payment-option__body">
-                            <span class="payment-option__title">Chuyển khoản qua mã QR (VietQR)</span>
+                            <span class="payment-option__title" style="display: flex; align-items: center; gap: 8px;">
+                                <i class="bi bi-qr-code" style="color: var(--color-primary); font-size: 18px;"></i>
+                                Chuyển khoản qua mã QR (VietQR)
+                            </span>
                             <span class="payment-option__desc">Quét mã QR bằng App Ngân hàng để thanh toán.</span>
                         </div>
                     </label>
@@ -173,10 +182,10 @@
                 <div class="checkout-items">
                     @foreach($cart->details as $item)
                         @php
-                            $imgSrc = $item->image_url ? (str_starts_with($item->image_url, 'http') ? $item->image_url : asset(ltrim($item->image_url, '/'))) : asset('assets/images/logo.png');
+                            $imgSrc = $item->image_url ? (str_starts_with($item->image_url, 'http') ? $item->image_url : asset(ltrim($item->image_url, '/'))) : asset('assets/images/placeholder.svg');
                         @endphp
                         <div class="checkout-item">
-                            <img src="{{ $imgSrc }}" alt="{{ $item->name }}" class="checkout-item__img" onerror="this.src='{{ asset('assets/images/logo.png') }}'">
+                            <img src="{{ $imgSrc }}" alt="{{ $item->name }}" class="checkout-item__img" onerror="this.onerror=null; this.src='{{ asset('assets/images/placeholder.svg') }}';">
                             <div class="checkout-item__info">
                                 <div class="checkout-item__name">{{ $item->name }}</div>
                                 <div class="checkout-item__qty">SL: {{ $item->quantity }} × {{ number_format($item->unit_price, 0, ',', '.') }}đ</div>
@@ -209,7 +218,9 @@
                         @if($cart->total_amount < 450000)
                             Mua thêm <strong style="color: #c0392b;">{{ number_format(450000 - $cart->total_amount, 0, ',', '.') }}đ</strong> để được <strong>Miễn phí vận chuyển</strong>!
                         @else
-                            <span style="color: #10b981; font-weight: 600;">🎉 Bạn đã được Miễn phí vận chuyển!</span>
+                            <span style="color: #10b981; font-weight: 600; display: inline-flex; align-items: center; gap: 4px;">
+                                <i class="bi bi-patch-check-fill"></i> Bạn đã được Miễn phí vận chuyển!
+                            </span>
                         @endif
                     </div>
                     <hr class="checkout-divider">
@@ -220,7 +231,7 @@
                 </div>
 
                 <button type="button" onclick="showCheckoutModal()" class="btn btn--primary btn--block btn--lg" id="placeOrderBtn">Xác nhận đặt hàng</button>
-                <div class="checkout-back"><a href="{{ route('cart.index') }}">← Chỉnh sửa lại giỏ hàng</a></div>
+                <div class="checkout-back"><a href="{{ route('cart.index') }}" style="display: inline-flex; align-items: center; gap: 6px;"><i class="bi bi-arrow-left"></i> Chỉnh sửa lại giỏ hàng</a></div>
             </aside>
         </div>
     </form>
@@ -229,7 +240,7 @@
 <!-- MODAL XÁC NHẬN ĐẶT HÀNG (Dành cho COD) -->
 <div class="modal-overlay" id="checkoutModal">
     <div class="modal-box">
-        <div class="modal-icon">🛒</div>
+        <div class="modal-icon"><i class="bi bi-bag-check-fill"></i></div>
         <h3 class="modal-title">Xác nhận đặt hàng</h3>
         <p class="modal-desc">Bạn có chắc chắn muốn đặt đơn hàng này không?</p>
         <div class="modal-actions">
@@ -243,7 +254,7 @@
 <div class="modal-overlay" id="qrModal">
     <div class="modal-box">
         <div id="qrContentBox">
-            <div class="modal-icon" style="background: #e0e7ff; color: #4338ca;">📱</div>
+            <div class="modal-icon" style="background: #e0e7ff; color: #4338ca;"><i class="bi bi-qr-code-scan"></i></div>
             <h3 class="modal-title">Quét mã để thanh toán</h3>
             <p class="modal-desc">Mở App ngân hàng và quét mã bên dưới.</p>
             <img id="qrImage" src="" alt="Mã QR Thanh Toán">

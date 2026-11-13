@@ -1,8 +1,11 @@
 <footer class="site-footer">
     <div class="container footer-grid">
         <div class="footer-col">
-            <h4>🧶 Shop Handmade</h4>
-            <p>Đồ thủ công len, móc khóa, túi xách handmade dễ thương. Mỗi sản phẩm là một tác phẩm nhỏ xinh được làm bằng cả trái tim.</p>
+            <h4 style="display: flex; align-items: center; gap: 8px;">
+                <i class="bi bi-gem"></i>
+                <span>Shop Handmade</span>
+            </h4>
+            <p>Đồ thủ công len, móc khóa, túi xách handmade dễ thương. Mỗi sản phẩm là một tác phẩm nhỏ xinh được làm bằng cả trái tim người thợ thủ công.</p>
         </div>
 
         <div class="footer-col">
@@ -27,13 +30,19 @@
 
         <div class="footer-col">
             <h4>Liên hệ</h4>
-            <p>📍 123 Nguyễn Văn Cừ, Q.5, TP.HCM</p>
-            <p>📞 0123 456 789</p>
-            <p>✉️ hello@shophandmade.vn</p>
-            <div class="socials">
-                <a href="#" aria-label="Facebook">📘</a>
-                <a href="#" aria-label="Instagram">📷</a>
-                <a href="#" aria-label="TikTok">🎵</a>
+            <p style="display: flex; align-items: center; gap: 8px;">
+                <i class="bi bi-geo-alt"></i> 123 Nguyễn Văn Cừ, Q.5, TP.HCM
+            </p>
+            <p style="display: flex; align-items: center; gap: 8px;">
+                <i class="bi bi-telephone"></i> 0123 456 789
+            </p>
+            <p style="display: flex; align-items: center; gap: 8px;">
+                <i class="bi bi-envelope"></i> hello@shophandmade.vn
+            </p>
+            <div class="socials" style="margin-top: 12px;">
+                <a href="#" aria-label="Facebook" title="Facebook"><i class="bi bi-facebook"></i></a>
+                <a href="#" aria-label="Instagram" title="Instagram"><i class="bi bi-instagram"></i></a>
+                <a href="#" aria-label="TikTok" title="TikTok"><i class="bi bi-tiktok"></i></a>
             </div>
         </div>
     </div>

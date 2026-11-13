@@ -109,8 +109,10 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
         Route::patch('customers/{customer}/unlock', [AdminCustomerController::class, 'unlock'])
             ->name('customers.unlock');
 
-        // Quản lý nhân viên & Phân quyền (Admin, Nhân viên kho, Nhân viên bán hàng)
-        Route::resource('staff', AdminStaffController::class)->only(['index', 'create', 'store']);
+        // Quản lý nhân viên (Admin, Nhân viên kho, Nhân viên bán hàng)
+        Route::resource('staff', AdminStaffController::class)
+            ->parameters(['staff' => 'user'])
+            ->except(['show']);
         Route::patch('staff/{user}/role', [AdminStaffController::class, 'updateRole'])
             ->name('staff.updateRole');
         Route::patch('staff/{user}/status', [AdminStaffController::class, 'toggleStatus'])

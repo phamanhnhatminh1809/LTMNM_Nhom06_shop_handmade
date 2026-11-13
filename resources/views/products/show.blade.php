@@ -85,16 +85,16 @@
 
 @section('content')
 <div class="breadcrumb">
-    <div class="container">
+    <div class="container" style="display: flex; align-items: center; flex-wrap: wrap;">
         <a href="{{ route('home') }}">Trang chủ</a>
-        <span>/</span>
+        <i class="bi bi-chevron-right" style="font-size: 11px; margin: 0 8px; opacity: 0.5;"></i>
         <a href="{{ route('products.index') }}">Sản phẩm</a>
-        <span>/</span>
+        <i class="bi bi-chevron-right" style="font-size: 11px; margin: 0 8px; opacity: 0.5;"></i>
         @if($product->category)
         <a href="{{ route('products.index', ['category' => $product->category->slug]) }}">{{ $product->category->name }}</a>
-        <span>/</span>
+        <i class="bi bi-chevron-right" style="font-size: 11px; margin: 0 8px; opacity: 0.5;"></i>
         @endif
-        <span>{{ $product->name }}</span>
+        <span style="color: var(--color-on-surface-variant);">{{ $product->name }}</span>
     </div>
 </div>
 
@@ -108,7 +108,7 @@
                     <img id="mainImage"
                          src="{{ $mainImgUrl }}"
                          alt="{{ $product->name }}"
-                         onerror="this.onerror=null; this.src='{{ asset('assets/images/logo.png') }}';">
+                         onerror="this.onerror=null; this.src='{{ asset('assets/images/placeholder.svg') }}';">
 
                     @if ($discount > 0)
                     <span class="badge badge--sale badge--lg" style="position: absolute; top: 12px; left: 12px; z-index: 2;">
@@ -128,7 +128,7 @@
                     <img src="{{ $thumbUrl }}"
                          alt="thumb {{ $i + 1 }}"
                          class="thumb {{ $i === 0 ? 'active' : '' }}"
-                         onerror="this.onerror=null; this.src='{{ asset('assets/images/logo.png') }}';"
+                         onerror="this.onerror=null; this.src='{{ asset('assets/images/placeholder.svg') }}';"
                          onclick="
                             document.getElementById('mainImage').src = this.src;
                             document.querySelectorAll('.thumb').forEach(t => t.classList.remove('active'));
@@ -198,25 +198,37 @@
 
                     <div style="display: flex; gap: 12px; flex-wrap: wrap;">
                         <button type="submit" class="btn btn--primary btn--lg"
-                            style="flex: 1; min-width: 160px; padding: 12px 20px; font-weight: 700; border-radius: 8px; background: #6b3e26; color: white; border: none; cursor: pointer;">
-                            🛒 Thêm vào giỏ
+                            style="flex: 1; min-width: 160px; padding: 12px 20px; font-weight: 700; border-radius: 8px; background: var(--color-primary); color: white; border: none; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 8px;">
+                            <i class="bi bi-cart-plus" style="font-size: 18px;"></i>
+                            <span>Thêm vào giỏ</span>
                         </button>
                         <button type="submit" name="buy_now" value="1" class="btn btn--outline btn--lg"
-                            style="flex: 1; min-width: 160px; padding: 12px 20px; font-weight: 700; border-radius: 8px; background: #fff; color: #6b3e26; border: 2px solid #6b3e26; cursor: pointer;">
-                            ⚡ Mua ngay
+                            style="flex: 1; min-width: 160px; padding: 12px 20px; font-weight: 700; border-radius: 8px; background: #fff; color: var(--color-primary); border: 2px solid var(--color-primary); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 8px;">
+                            <i class="bi bi-lightning-charge-fill" style="font-size: 18px;"></i>
+                            <span>Mua ngay</span>
                         </button>
                     </div>
                 </form>
                 @else
-                <div style="background: #f3f4f6; color: #6b7280; padding: 14px 18px; border-radius: 8px; font-size: 14px; font-weight: 600; margin-bottom: 24px;">
-                    Sản phẩm hiện đang tạm hết hàng
+                <div style="background: #f3f4f6; color: #6b7280; padding: 14px 18px; border-radius: 8px; font-size: 14px; font-weight: 600; margin-bottom: 24px; display: flex; align-items: center; gap: 8px;">
+                    <i class="bi bi-exclamation-circle"></i>
+                    <span>Sản phẩm hiện đang tạm hết hàng</span>
                 </div>
                 @endif
 
-                <ul class="product-info__meta" style="list-style: none; padding: 0; margin: 0; font-size: 14px; color: #666; display: flex; flex-direction: column; gap: 10px;">
-                    <li>✅ Cam kết sản phẩm làm thủ công 100%</li>
-                    <li>🚚 Giao hàng toàn quốc, thanh toán khi nhận hàng (COD)</li>
-                    <li>🔄 Đổi trả trong 7 ngày nếu lỗi từ shop</li>
+                <ul class="product-info__meta" style="list-style: none; padding: 0; margin: 0; font-size: 14px; color: var(--color-on-surface-variant); display: flex; flex-direction: column; gap: 10px;">
+                    <li style="display: flex; align-items: center; gap: 10px;">
+                        <i class="bi bi-patch-check-fill" style="color: #059669; font-size: 18px;"></i>
+                        <span>Cam kết sản phẩm làm thủ công 100%</span>
+                    </li>
+                    <li style="display: flex; align-items: center; gap: 10px;">
+                        <i class="bi bi-truck" style="color: var(--color-primary); font-size: 18px;"></i>
+                        <span>Giao hàng toàn quốc, thanh toán khi nhận hàng (COD)</span>
+                    </li>
+                    <li style="display: flex; align-items: center; gap: 10px;">
+                        <i class="bi bi-arrow-repeat" style="color: var(--color-primary); font-size: 18px;"></i>
+                        <span>Đổi trả trong 7 ngày nếu lỗi từ shop</span>
+                    </li>
                 </ul>
             </div>
         </div>
@@ -257,9 +269,9 @@
                                 <span style="font-size: 12px; color: #666;">{{ $rev->created_at->format('d/m/Y') }}</span>
                             </div>
                         </div>
-                        <span style="display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; border-radius: 12px; font-size: 12px; font-weight: 700; background: #fef3c7; color: #d97706;">
+                        <span style="display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; border-radius: 12px; font-size: 12px; font-weight: 700; background: #fef3c7; color: #b45309;">
                             <x-star-rating :rating="$rev->rating" size="12" />
-                            {{ $rev->rating }}/5
+                            {{ $rev->rating }}/5 sao
                         </span>
                     </div>
                     @if(!empty($rev->comment))

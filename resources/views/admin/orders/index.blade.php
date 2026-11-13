@@ -129,7 +129,7 @@
                 Danh sách đơn hàng ({{ $orders->total() }})
             </h3>
             <p style="font-size: 12px; color: var(--color-outline);">
-                Quy trình xử lý một chiều: Chờ xác nhận ➔ Đang giao ➔ Hoàn thành (hoặc Hủy đơn khi đang chờ xác nhận)
+                Quy trình xử lý một chiều: Chờ xác nhận <i class="bi bi-arrow-right"></i> Đang giao <i class="bi bi-arrow-right"></i> Hoàn thành (hoặc Hủy đơn khi đang chờ xác nhận)
             </p>
         </div>
     </div>

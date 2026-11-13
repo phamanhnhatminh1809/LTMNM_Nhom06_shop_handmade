@@ -5,11 +5,11 @@
 @section('content')
 <div class="container" style="padding-top: 28px; padding-bottom: 50px;">
     <!-- Breadcrumb -->
-    <nav class="breadcrumb-nav" style="margin-bottom: 24px; font-size: 14px; color: var(--color-on-surface-variant);">
+    <nav class="breadcrumb-nav" style="margin-bottom: 24px; font-size: 14px; color: var(--color-on-surface-variant); display: flex; align-items: center; flex-wrap: wrap;">
         <a href="{{ route('home') }}" style="color: inherit; text-decoration: none;">Trang chủ</a>
-        <span style="margin: 0 8px;">/</span>
+        <i class="bi bi-chevron-right" style="font-size: 11px; margin: 0 8px; opacity: 0.5;"></i>
         <a href="{{ route('profile.show') }}" style="color: inherit; text-decoration: none;">Tài khoản</a>
-        <span style="margin: 0 8px;">/</span>
+        <i class="bi bi-chevron-right" style="font-size: 11px; margin: 0 8px; opacity: 0.5;"></i>
         <span style="color: var(--color-primary); font-weight: 600;">Đơn hàng của tôi</span>
     </nav>
 
@@ -62,14 +62,18 @@
     @if($orders->isEmpty())
         <!-- Trạng thái trống -->
         <div style="background: var(--color-surface, #ffffff); border-radius: 16px; padding: 50px 20px; text-align: center; border: 1px solid var(--color-outline-variant, #f0eae1);">
+            <div style="width: 64px; height: 64px; border-radius: 50%; background: #faf7f5; color: var(--color-primary); display: flex; align-items: center; justify-content: center; font-size: 28px; margin: 0 auto 14px;">
+                <i class="bi bi-receipt"></i>
+            </div>
             <div style="font-size: 16px; font-weight: 700; color: var(--color-on-surface); margin-bottom: 6px;">
                 Không có đơn hàng nào
             </div>
             <p style="color: var(--color-on-surface-variant); font-size: 14px; margin-bottom: 20px;">
                 Bạn chưa có đơn hàng nào trong mục này.
             </p>
-            <a href="{{ route('products.index') }}" class="btn btn--primary" style="padding: 10px 24px; border-radius: 8px; text-decoration: none; font-weight: 600; display: inline-block;">
-                Mua sắm ngay
+            <a href="{{ route('products.index') }}" class="btn btn--primary" style="padding: 10px 24px; border-radius: 8px; text-decoration: none; font-weight: 600; display: inline-flex; align-items: center; gap: 8px;">
+                <i class="bi bi-compass"></i>
+                <span>Mua sắm ngay</span>
             </a>
         </div>
     @else
@@ -109,12 +113,12 @@
                                 $img = $item->product->image ?? null;
                                 $imgSrc = $img 
                                     ? (str_starts_with($img, 'http') ? $img : asset(ltrim($img, '/')))
-                                    : asset('assets/images/logo.png');
+                                    : asset('assets/images/placeholder.svg');
                             @endphp
                             <div style="display: flex; gap: 14px; align-items: center;">
                                 <img src="{{ $imgSrc }}" alt="{{ $item->product->name ?? 'Sản phẩm' }}" 
                                      style="width: 56px; height: 56px; object-fit: cover; border-radius: 8px; border: 1px solid #f0eae1; flex-shrink: 0;"
-                                     onerror="this.src='{{ asset('assets/images/logo.png') }}'">
+                                     onerror="this.onerror=null; this.src='{{ asset('assets/images/placeholder.svg') }}';">
                                 <div style="flex-grow: 1; min-width: 0;">
                                     <div style="font-weight: 600; font-size: 14px; color: var(--color-on-surface); line-height: 1.4;">
                                         {{ $item->product->name ?? 'Sản phẩm' }}
@@ -145,9 +149,10 @@
                                       onsubmit="return openCancelModal(this, '{{ $order->code }}');">
                                     @csrf
                                     <button type="submit" 
-                                            style="padding: 8px 16px; border: 1px solid #ef4444; background: #fff; color: #ef4444; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; transition: background 0.2s;"
+                                            style="padding: 8px 16px; border: 1px solid #ef4444; background: #fff; color: #ef4444; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; transition: background 0.2s; display: inline-flex; align-items: center; gap: 6px;"
                                             onmouseover="this.style.background='#fef2f2'" onmouseout="this.style.background='#fff'">
-                                        Hủy đơn hàng
+                                        <i class="bi bi-x-circle"></i>
+                                        <span>Hủy đơn hàng</span>
                                     </button>
                                 </form>
                             @endif
@@ -157,16 +162,18 @@
                                 <form action="{{ route('orders.reorder', $order->id) }}" method="POST" style="margin: 0;">
                                     @csrf
                                     <button type="submit" 
-                                            style="padding: 8px 16px; background: #fff; color: #10b981; border: 1px solid #10b981; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; transition: background 0.2s;"
+                                            style="padding: 8px 16px; background: #fff; color: #10b981; border: 1px solid #10b981; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; transition: background 0.2s; display: inline-flex; align-items: center; gap: 6px;"
                                             onmouseover="this.style.background='#ecfdf5'" onmouseout="this.style.background='#fff'">
-                                        Mua lại
+                                        <i class="bi bi-arrow-repeat"></i>
+                                        <span>Mua lại</span>
                                     </button>
                                 </form>
                             @endif
 
                             <a href="{{ route('orders.show', $order->id) }}" 
-                               style="padding: 8px 18px; background: #374151; color: #fff; border-radius: 6px; font-size: 13px; font-weight: 600; text-decoration: none;">
-                                Chi tiết đơn hàng
+                               style="padding: 8px 18px; background: #374151; color: #fff; border-radius: 6px; font-size: 13px; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
+                                <i class="bi bi-eye"></i>
+                                <span>Chi tiết đơn hàng</span>
                             </a>
                         </div>
                     </div>
@@ -185,7 +192,17 @@
 <!-- Modal Hủy Đơn Hàng -->
 <div id="cancelModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:9999; align-items:center; justify-content:center;">
     <div style="background:#fff; padding:30px; border-radius:12px; width:400px; text-align:center; box-shadow: 0 10px 25px rgba(0,0,0,0.1); position: relative;">
-        <div style="font-size: 40px; color: #ef4444; margin-bottom: 10px;">⚠️</div>
+        <div style="width: 56px; height: 56px; border-radius: 50%; background: #fee2e2; color: #dc2626; display: flex; align-items: center; justify-content: center; font-size: 28px; margin: 0 auto 14px;">
+            <i class="bi bi-exclamation-triangle-fill"></i>
+        </div>
+        <h3 style="margin-bottom:15px; color:#ef4444; font-weight: 800; font-size: 20px;">Xác nhận hủy đơn</h3>
+        <p id="cancelOrderCode" style="margin-bottom:20px; font-weight:bold; color: #555;"></p>
+        <div style="display:flex; gap:10px; justify-content:center;">
+            <button onclick="document.getElementById('cancelModal').style.display='none'" class="btn btn--outline" style="padding: 10px 20px; flex: 1;">Đóng</button>
+            <button id="confirmCancelBtn" class="btn btn--primary" style="background:#ef4444; border-color:#ef4444; padding: 10px 20px; flex: 1;">Đồng ý hủy</button>
+        </div>
+    </div>
+</div>
         <h3 style="margin-bottom:15px; color:#ef4444; font-weight: 800; font-size: 20px;">Xác nhận hủy đơn</h3>
         <p id="cancelOrderCode" style="margin-bottom:20px; font-weight:bold; color: #555;"></p>
         <div style="display:flex; gap:10px; justify-content:center;">

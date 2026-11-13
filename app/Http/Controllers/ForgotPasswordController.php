@@ -60,11 +60,15 @@ class ForgotPasswordController extends Controller
         // Gửi email chứa mã OTP
         try {
             Mail::to($email)->send(new ResetPasswordOtpMail($otp, $user->full_name));
-        } catch (Exception $e) {
-            Log::error('Lỗi khi gửi email OTP: ' . $e->getMessage(), [
-                'email' => $email,
-                'otp' => $otp,
-            ]);
+        } catch (\Throwable $e) {
+            try {
+                Log::error('Lỗi khi gửi email OTP: ' . $e->getMessage(), [
+                    'email' => $email,
+                    'otp' => $otp,
+                ]);
+            } catch (\Throwable $logEx) {
+                // Không để lỗi ghi log làm sập luồng gửi OTP
+            }
 
             // Nếu chưa thiết lập thông số Mail Server, hệ thống vẫn lưu OTP và thông báo hướng dẫn
             return response()->json([

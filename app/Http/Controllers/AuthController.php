@@ -89,8 +89,12 @@ class AuthController extends Controller
         // Gửi mail
         try {
             Mail::to($email)->send(new ResetPasswordOtpMail($otp, 'Khách hàng mới'));
-        } catch (\Exception $e) {
-            Log::error('Lỗi gửi mail OTP đăng ký: ' . $e->getMessage());
+        } catch (\Throwable $e) {
+            try {
+                Log::error('Lỗi gửi mail OTP đăng ký: ' . $e->getMessage());
+            } catch (\Throwable $logEx) {
+                // Không để lỗi ghi log làm gián đoạn luồng trả mã OTP
+            }
         }
 
         return response()->json([

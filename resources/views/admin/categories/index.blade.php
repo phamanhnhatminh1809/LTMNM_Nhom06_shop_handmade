@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'Quản lý loại sản phẩm')
+@section('title', 'Quản lý danh mục sản phẩm')
 
 @php $activeMenu = 'categories'; @endphp
 
@@ -9,7 +9,7 @@
 <div class="admin-top-bar">
     <div class="page-main-title">
         <i class="bi bi-tags"></i>
-        <span>QUẢN LÝ LOẠI SẢN PHẨM</span>
+        <span>QUẢN LÝ DANH MỤC SẢN PHẨM</span>
     </div>
     <div class="top-bar-right">
         <button class="btn-icon-bell" title="Thông báo hệ thống">
@@ -42,12 +42,12 @@
 <div class="product-welcome-card">
     <div>
         <h2 class="product-welcome-title">
-            Phân loại & tổ chức các dòng sản phẩm thủ công<br>trong cửa hàng Handmade House
+            Quản lý danh mục sản phẩm
         </h2>
     </div>
     <a href="{{ route('admin.categories.create') }}" class="btn-add-product">
         <i class="bi bi-plus-lg"></i>
-        <span>Thêm loại sản phẩm</span>
+        <span>Thêm danh mục</span>
     </a>
 </div>
 
@@ -72,12 +72,12 @@
     </div>
 </div>
 
-<!-- Bảng Danh sách Loại sản phẩm -->
+<!-- Bảng Danh sách Danh mục sản phẩm -->
 <div class="table-card">
     <div class="table-header-flex">
         <div>
             <h3 style="font-size: 15px; font-weight: 800; color: var(--color-on-surface); margin-bottom: 3px;">
-                Danh sách loại sản phẩm ({{ $categories->count() }})
+                Danh sách danh mục sản phẩm ({{ $categories->count() }})
             </h3>
             <p style="font-size: 12px; color: var(--color-outline);">
                 Lưu ý: Hệ thống tự động chặn xóa đối với những danh mục đang có sản phẩm liên kết.
@@ -105,14 +105,8 @@
                             <span class="order-code-text">#{{ $category->id }}</span>
                         </td>
                         <td style="text-align: center;">
-                            <div class="metric-icon-box" style="margin: 0 auto; width: 38px; height: 38px; border-radius: 10px; font-size: 17px;">
-                                @if(!empty($category->icon) && str_starts_with($category->icon, 'bi-'))
-                                    <i class="bi {{ $category->icon }}"></i>
-                                @elseif(!empty($category->icon))
-                                    <span>{{ $category->icon }}</span>
-                                @else
-                                    <i class="bi bi-tag"></i>
-                                @endif
+                            <div class="metric-icon-box" style="margin: 0 auto; width: 38px; height: 38px; border-radius: 10px; font-size: 17px; background: #fff5f2; color: var(--color-primary);">
+                                <i class="bi {{ $category->display_icon }}"></i>
                             </div>
                         </td>
                         <td>
@@ -172,7 +166,7 @@
                 @empty
                     <tr>
                         <td colspan="7" style="text-align: center; padding: 32px; color: var(--color-outline);">
-                            Chưa có loại sản phẩm nào. Hãy nhấn <strong>Thêm loại sản phẩm</strong> để bắt đầu.
+                            Chưa có danh mục nào. Hãy nhấn <strong>Thêm danh mục</strong> để bắt đầu.
                         </td>
                     </tr>
                 @endforelse

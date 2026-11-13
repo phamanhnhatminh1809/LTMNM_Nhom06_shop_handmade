@@ -315,4 +315,74 @@ class AdminStaffAndRbacTest extends TestCase
         $response->assertSessionHasErrors(['account']);
         $this->assertGuest();
     }
+
+    /**
+     * Admin có thể xem trang sửa chi tiết, cập nhật thông tin và khóa tài khoản nhân viên
+     */
+    public function test_admin_can_edit_staff_account_and_toggle_lock(): void
+    {
+        $this->actingAs($this->admin)->get("/admin/staff/{$this->warehouseStaff->id}/edit")
+            ->assertStatus(200)
+            ->assertSee($this->warehouseStaff->full_name);
+
+        $response = $this->actingAs($this->admin)->put("/admin/staff/{$this->warehouseStaff->id}", [
+            'full_name' => 'Nhân Viên Kho Đã Sửa',
+            'email'     => 'nv_kho_sua@example.com',
+            'phone'     => '0988776655',
+            'role_id'   => $this->roleSales->id, // Chuyển sang NV Bán hàng
+            'is_active' => '0',                  // Khóa tài khoản
+        ]);
+
+        $response->assertRedirect(route('admin.staff.index'));
+        $response->assertSessionHas('success');
+
+        $updated = $this->warehouseStaff->fresh();
+        $this->assertEquals('Nhân Viên Kho Đã Sửa', $updated->full_name);
+        $this->assertEquals('nv_kho_sua@example.com', $updated->email);
+        $this->assertEquals($this->roleSales->id, $updated->role_id);
+        $this->assertFalse($updated->is_active);
+    }
+
+    /**
+     * Admin có thể xóa tài khoản nhân viên nhưng không thể tự xóa chính mình
+     */
+    public function test_admin_can_delete_staff_and_cannot_delete_self(): void
+    {
+        // 1. Chặn tự xóa chính mình
+        $selfDelete = $this->actingAs($this->admin)->delete("/admin/staff/{$this->admin->id}");
+        $selfDelete->assertSessionHas('error');
+        $this->assertDatabaseHas('users', ['id' => $this->admin->id]);
+
+        // 2. Xóa thành công tài khoản nhân viên kho
+        $deleteStaff = $this->actingAs($this->admin)->delete("/admin/staff/{$this->warehouseStaff->id}");
+        $deleteStaff->assertRedirect(route('admin.staff.index'));
+        $deleteStaff->assertSessionHas('success');
+        $this->assertDatabaseMissing('users', ['id' => $this->warehouseStaff->id]);
+    }
+
+    /**
+     * Admin không thể tự hạ quyền hoặc tự khóa tài khoản của chính mình qua form update
+     */
+    public function test_admin_cannot_demote_or_lock_self_in_update(): void
+    {
+        // Tự hạ quyền
+        $demote = $this->actingAs($this->admin)->put("/admin/staff/{$this->admin->id}", [
+            'full_name' => $this->admin->full_name,
+            'email'     => $this->admin->email,
+            'role_id'   => $this->roleSales->id,
+            'is_active' => '1',
+        ]);
+        $demote->assertSessionHas('error');
+        $this->assertEquals($this->roleAdmin->id, $this->admin->fresh()->role_id);
+
+        // Tự khóa
+        $lock = $this->actingAs($this->admin)->put("/admin/staff/{$this->admin->id}", [
+            'full_name' => $this->admin->full_name,
+            'email'     => $this->admin->email,
+            'role_id'   => $this->roleAdmin->id,
+            'is_active' => '0',
+        ]);
+        $lock->assertSessionHas('error');
+        $this->assertTrue($this->admin->fresh()->is_active);
+    }
 }

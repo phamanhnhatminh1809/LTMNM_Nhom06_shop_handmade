@@ -88,7 +88,7 @@
                                 Danh mục sản phẩm <span class="required-star">*</span>
                             </label>
                             <select id="category_id" name="category_id" class="modal-input" required>
-                                <option value="">-- Chọn loại sản phẩm --</option>
+                                <option value="">-- Chọn danh mục sản phẩm --</option>
                                 @foreach($categories as $cat)
                                     <option value="{{ $cat->id }}" {{ old('category_id') == $cat->id ? 'selected' : '' }}>
                                         {{ $cat->name }}

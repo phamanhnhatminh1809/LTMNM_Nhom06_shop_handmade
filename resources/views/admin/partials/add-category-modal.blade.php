@@ -8,7 +8,7 @@
                 <i class="bi bi-plus-circle category-modal-header-icon"></i>
                 <div>
                     <h3 class="category-modal-title">Thêm danh mục mới</h3>
-                    <p class="category-modal-subtitle">Tạo loại sản phẩm mới và lưu trực tiếp vào cơ sở dữ liệu</p>
+                    <p class="category-modal-subtitle">Tạo danh mục sản phẩm mới và lưu trực tiếp vào cơ sở dữ liệu</p>
                 </div>
             </div>
             <button type="button" class="btn-close-category-modal" id="btnCloseCategoryModal" title="Đóng">
@@ -52,13 +52,17 @@
             <!-- Biểu tượng (Icon) -->
             <div class="modal-form-group">
                 <label class="modal-label" for="categoryIconInput">
-                    Biểu tượng (Emoji hoặc Bootstrap Icon)
+                    Biểu tượng danh mục (Mã Bootstrap Icon)
                 </label>
                 <input type="text"
                        id="categoryIconInput"
                        name="icon"
                        class="modal-input"
-                       placeholder="VD: 🕯️, 🏺, 🧶 hoặc bi-tag">
+                       value="bi-tag"
+                       placeholder="VD: bi-bag-heart, bi-gem, bi-flower1">
+                <div class="form-help-text" style="margin-top: 6px;">
+                    Gợi ý: <code>bi-bag-heart</code> (Túi), <code>bi-key</code> (Móc khóa), <code>bi-gem</code> (Trang sức), <code>bi-heart</code> (Gấu bông), <code>bi-snow</code> (Khăn len), <code>bi-flower1</code> (Hoa).
+                </div>
             </div>
         </div>
 

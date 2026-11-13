@@ -31,3 +31,9 @@ RUN { \
         echo '    Require all granted'; \
         echo '</Directory>'; \
     } >> /etc/apache2/apache2.conf
+
+# Script khởi động tự động kiểm tra và phân quyền storage cho www-data
+COPY docker/entrypoint-web.sh /usr/local/bin/entrypoint-web.sh
+RUN sed -i -e 's/\r$//' /usr/local/bin/entrypoint-web.sh && chmod +x /usr/local/bin/entrypoint-web.sh
+
+ENTRYPOINT ["/usr/local/bin/entrypoint-web.sh"]

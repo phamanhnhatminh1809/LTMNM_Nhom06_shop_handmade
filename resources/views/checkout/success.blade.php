@@ -44,6 +44,10 @@
     <!-- Thông báo thành công -->
     <div style="background: var(--color-surface, #ffffff); border-radius: 16px; padding: 36px; border: 1px solid var(--color-outline-variant, #f0eae1); box-shadow: 0 4px 20px rgba(0,0,0,0.03); text-align: center;">
         
+        <div style="width: 64px; height: 64px; border-radius: 50%; background: #ecfdf5; color: #059669; display: flex; align-items: center; justify-content: center; font-size: 32px; margin: 0 auto 16px;">
+            <i class="bi bi-check-circle-fill"></i>
+        </div>
+
         <div style="display: inline-block; padding: 6px 16px; border-radius: 20px; font-size: 13px; font-weight: 700; background: #ecfdf5; color: #059669; margin-bottom: 16px;">
             ĐẶT HÀNG THÀNH CÔNG
         </div>
@@ -168,17 +172,20 @@
         <!-- Các nút điều hướng -->
         <div style="display: flex; gap: 14px; justify-content: center; flex-wrap: wrap;">
             <a href="{{ route('products.index') }}" 
-               style="padding: 12px 24px; border-radius: 8px; font-size: 14px; font-weight: 600; text-decoration: none; background: var(--color-primary, #e76f51); color: #fff;">
-                Tiếp tục mua hàng
+               style="padding: 12px 24px; border-radius: 8px; font-size: 14px; font-weight: 600; text-decoration: none; background: var(--color-primary, #e76f51); color: #fff; display: inline-flex; align-items: center; gap: 8px;">
+                <i class="bi bi-bag"></i>
+                <span>Tiếp tục mua hàng</span>
             </a>
             <a href="{{ route('profile.show') }}" 
-               style="padding: 12px 24px; border-radius: 8px; font-size: 14px; font-weight: 600; text-decoration: none; border: 1px solid #d1d5db; color: #374151; background: #fff;">
-                Quản lý tài khoản
+               style="padding: 12px 24px; border-radius: 8px; font-size: 14px; font-weight: 600; text-decoration: none; border: 1px solid #d1d5db; color: #374151; background: #fff; display: inline-flex; align-items: center; gap: 8px;">
+                <i class="bi bi-person"></i>
+                <span>Quản lý tài khoản</span>
             </a>
             @if($order->status === 'pending')
                 <button type="button" onclick="showCancelModal()" 
-                        style="padding: 12px 24px; border-radius: 8px; font-size: 14px; font-weight: 600; border: 1px solid #ef4444; color: #ef4444; background: #fff; cursor: pointer;">
-                    Hủy đơn hàng
+                        style="padding: 12px 24px; border-radius: 8px; font-size: 14px; font-weight: 600; border: 1px solid #ef4444; color: #ef4444; background: #fff; cursor: pointer; display: inline-flex; align-items: center; gap: 8px;">
+                    <i class="bi bi-x-circle"></i>
+                    <span>Hủy đơn hàng</span>
                 </button>
             @endif
         </div>
@@ -189,7 +196,7 @@
 <!-- MODAL XÁC NHẬN HỦY ĐƠN -->
 <div class="modal-overlay" id="cancelOrderModal">
     <div class="modal-box">
-        <div class="modal-icon">⚠️</div>
+        <div class="modal-icon"><i class="bi bi-exclamation-triangle-fill"></i></div>
         <h3 class="modal-title">Hủy đơn hàng?</h3>
         <p class="modal-desc">Bạn có chắc chắn muốn hủy đơn hàng này không? Đơn hàng đã đặt sẽ không thể khôi phục.</p>
         <div class="modal-actions">
