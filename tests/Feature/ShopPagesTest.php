@@ -105,4 +105,19 @@ class ShopPagesTest extends TestCase
         $response = $this->get('/index.php?route=products');
         $response->assertRedirect('/products');
     }
+
+    public function test_about_page_is_accessible(): void
+    {
+        $response = $this->get('/about');
+        $response->assertStatus(200);
+        $response->assertSee('Giới thiệu về Shop Handmade');
+        $response->assertSee(route('contact'));
+    }
+
+    public function test_contact_page_is_accessible(): void
+    {
+        $response = $this->get('/contact');
+        $response->assertStatus(200);
+        $response->assertSee('Liên hệ với chúng tôi');
+    }
 }

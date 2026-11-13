@@ -176,6 +176,25 @@ class ProductSearchAndFilterTest extends TestCase
     }
 
     /**
+     * 6b. Sắp xếp sản phẩm theo mới nhất và cũ nhất
+     */
+    public function test_user_can_sort_products_by_latest_and_oldest(): void
+    {
+        $sp1 = Product::where('code', 'SP-01')->firstOrFail();
+        $sp1->forceFill(['created_at' => now()->subDays(10)])->save();
+
+        $responseLatest = $this->get('/products?sort=latest');
+        $responseLatest->assertStatus(200);
+        $contentLatest = $responseLatest->getContent();
+        $this->assertTrue(strpos($contentLatest, 'Bình hoa gốm mộc') < strpos($contentLatest, 'Khăn len cashmere'));
+
+        $responseOldest = $this->get('/products?sort=oldest');
+        $responseOldest->assertStatus(200);
+        $contentOldest = $responseOldest->getContent();
+        $this->assertTrue(strpos($contentOldest, 'Khăn len cashmere') < strpos($contentOldest, 'Bình hoa gốm mộc'));
+    }
+
+    /**
      * 7. Tìm kiếm không có kết quả hiển thị thông báo trống phù hợp
      */
     public function test_search_with_no_matches_displays_empty_state(): void

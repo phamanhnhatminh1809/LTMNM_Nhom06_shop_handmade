@@ -434,7 +434,15 @@ class AdminProductManagementTest extends TestCase
         $outFilter->assertSee('Bình gốm nghệ nhân lớn');
         $outFilter->assertDontSee('Ly gốm men hỏa biến');
 
-        // 3. Sắp xếp theo bán chạy nhất và giá tăng dần
+        // 3. Sắp xếp theo mới nhất, cũ nhất, bán chạy nhất và giá tăng/giảm dần
+        $newest = $this->actingAs($this->warehouseStaff)->get('/admin/products?sort=newest');
+        $newest->assertStatus(200);
+        $newest->assertViewHas('products', fn ($paginator) => $paginator->first()->id === $prodOutExpensive->id);
+
+        $oldest = $this->actingAs($this->warehouseStaff)->get('/admin/products?sort=oldest');
+        $oldest->assertStatus(200);
+        $oldest->assertViewHas('products', fn ($paginator) => $paginator->first()->id === $prodActiveCheap->id);
+
         $bestSelling = $this->actingAs($this->warehouseStaff)->get('/admin/products?sort=best_selling');
         $bestSelling->assertStatus(200);
         $bestSelling->assertViewHas('products', fn ($paginator) => $paginator->first()->id === $prodLowMid->id);
@@ -446,6 +454,39 @@ class AdminProductManagementTest extends TestCase
         $priceDesc = $this->actingAs($this->warehouseStaff)->get('/admin/products?sort=price_desc');
         $priceDesc->assertStatus(200);
         $priceDesc->assertViewHas('products', fn ($paginator) => $paginator->first()->id === $prodOutExpensive->id);
+    }
+
+    /**
+     * Ngưỡng tồn kho tối thiểu mặc định là 5 và hỗ trợ cấu hình riêng theo từng sản phẩm
+     */
+    public function test_product_supports_default_and_custom_min_stock_threshold(): void
+    {
+        // Không truyền min_stock_threshold -> tự động gán mặc định 5
+        $this->actingAs($this->warehouseStaff)->post('/admin/products', [
+            'name'           => 'Túi cói mặc định ngưỡng',
+            'code'           => 'SP-THR-DEF',
+            'category_id'    => $this->categoryLen->id,
+            'price'          => 180000,
+            'stock_quantity' => 8,
+        ])->assertRedirect(route('admin.products.index'));
+
+        $defaultProduct = Product::where('code', 'SP-THR-DEF')->firstOrFail();
+        $this->assertEquals(5, $defaultProduct->min_stock_threshold);
+
+        // Cấu hình ngưỡng riêng = 12, tồn = 10 -> thuộc trạng thái sắp hết hàng (low)
+        $this->actingAs($this->warehouseStaff)->post('/admin/products', [
+            'name'                => 'Sản phẩm ngưỡng riêng 12',
+            'code'                => 'SP-THR-CUS',
+            'category_id'         => $this->categoryGom->id,
+            'price'               => 220000,
+            'stock_quantity'      => 10,
+            'min_stock_threshold' => 12,
+        ])->assertRedirect(route('admin.products.index'));
+
+        $lowFilter = $this->actingAs($this->warehouseStaff)->get('/admin/products?stock_status=low');
+        $lowFilter->assertStatus(200);
+        $lowFilter->assertSee('Sản phẩm ngưỡng riêng 12');
+        $lowFilter->assertDontSee('Túi cói mặc định ngưỡng');
     }
 
     /**

@@ -262,4 +262,47 @@ class CustomerOrderTrackingTest extends TestCase
         $orderCust2->refresh();
         $this->assertEquals('pending', $orderCust2->status);
     }
+
+    /**
+     * 8. Mua lại đơn hàng (reorder) sao chép image_url, giới hạn tồn kho và cập nhật total_quantity
+     */
+    public function test_customer_can_reorder_and_cart_syncs_image_and_totals(): void
+    {
+        $order = Order::create([
+            'code'             => 'ORD-REORDER-01',
+            'user_id'          => $this->customer1->id,
+            'shipping_name'    => 'Khách Hàng Một',
+            'shipping_phone'   => '0911223344',
+            'shipping_address' => '123 Đường Số 1',
+            'total_amount'     => 240000,
+            'status'           => 'completed',
+        ]);
+
+        OrderItem::create([
+            'order_id'    => $order->id,
+            'product_id'  => $this->product->id,
+            'quantity'    => 2,
+            'unit_price'  => 120000,
+            'total_price' => 240000,
+        ]);
+
+        $response = $this->actingAs($this->customer1)->post("/orders/{$order->id}/reorder");
+        $response->assertRedirect(route('cart.index'));
+        $response->assertSessionHas('success');
+
+        $this->assertDatabaseHas('cart_details', [
+            'product_id' => $this->product->id,
+            'quantity'   => 2,
+            'image_url'  => $this->product->image,
+        ]);
+
+        $this->assertDatabaseHas('carts', [
+            'user_id'        => $this->customer1->id,
+            'total_quantity' => 2,
+        ]);
+
+        $cart = \App\Models\Cart::with('details')->where('user_id', $this->customer1->id)->first();
+        $this->assertNotNull($cart);
+        $this->assertEquals(240000, $cart->total_amount);
+    }
 }

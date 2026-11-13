@@ -2,11 +2,17 @@
 
 namespace Tests\Feature;
 
+use App\Mail\ResetPasswordOtpMail;
+use App\Models\Cart;
+use App\Models\CartDetail;
+use App\Models\Category;
 use App\Models\PasswordResetOtp;
+use App\Models\Product;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Tests\TestCase;
 
 class UserProfileAndAuthTest extends TestCase
@@ -214,14 +220,19 @@ class UserProfileAndAuthTest extends TestCase
      */
     public function test_forgot_password_send_otp_success_and_stores_otp(): void
     {
+        Mail::fake();
+
         $response = $this->postJson('/forgot-password/send-otp', [
             'email' => 'test_user@gmail.com',
         ]);
 
-        $response->assertStatus(200);
-        $response->assertJson([
-            'success' => true,
-        ]);
+        $response->assertStatus(200)
+            ->assertJson(['success' => true])
+            ->assertJsonMissing(['dev_otp']);
+
+        Mail::assertSent(ResetPasswordOtpMail::class, function (ResetPasswordOtpMail $mail) {
+            return $mail->hasTo('test_user@gmail.com') && $mail->purpose === 'reset_password';
+        });
 
         $this->assertDatabaseHas('password_reset_otps', [
             'email' => 'test_user@gmail.com',
@@ -326,9 +337,10 @@ class UserProfileAndAuthTest extends TestCase
             'username'              => 'new_customer_01',
             'email'                 => 'new_customer_01@gmail.com',
             'phone'                 => '0912345678',
-            'password'              => 'password123',
-            'password_confirmation' => 'password123',
+            'password'              => 'Password@123',
+            'password_confirmation' => 'Password@123',
             'otp'                   => '123456',
+            'terms'                 => '1',
         ]);
 
         $response->assertRedirect(route('home'));
@@ -390,5 +402,97 @@ class UserProfileAndAuthTest extends TestCase
         ]);
 
         $response->assertSessionHasErrors(['password']);
+    }
+
+    /**
+     * 14. Đăng ký: Gửi OTP qua Mail thật (register purpose) và không lộ dev_otp
+     */
+    public function test_register_send_otp_uses_real_mail_and_hides_dev_otp(): void
+    {
+        Mail::fake();
+
+        $response = $this->postJson('/register/send-otp', [
+            'email' => 'brand_new_buyer@gmail.com',
+        ]);
+
+        $response->assertStatus(200)
+            ->assertJson(['success' => true])
+            ->assertJsonMissing(['dev_otp']);
+
+        Mail::assertSent(ResetPasswordOtpMail::class, function (ResetPasswordOtpMail $mail) {
+            return $mail->hasTo('brand_new_buyer@gmail.com') && $mail->purpose === 'register';
+        });
+
+        $this->assertDatabaseHas('password_reset_otps', [
+            'email' => 'brand_new_buyer@gmail.com',
+        ]);
+    }
+
+    /**
+     * 15. Khi gửi mail SMTP thất bại -> trả HTTP 503 và xóa OTP vừa tạo trong DB
+     */
+    public function test_otp_endpoint_returns_503_and_clears_otp_when_smtp_fails(): void
+    {
+        Mail::shouldReceive('to')
+            ->once()
+            ->with('test_user@gmail.com')
+            ->andThrow(new \RuntimeException('SMTP connection refused'));
+
+        $response = $this->postJson('/forgot-password/send-otp', [
+            'email' => 'test_user@gmail.com',
+        ]);
+
+        $response->assertStatus(503)->assertJson(['success' => false]);
+        $this->assertDatabaseMissing('password_reset_otps', [
+            'email' => 'test_user@gmail.com',
+        ]);
+    }
+
+    /**
+     * 16. Gộp giỏ hàng khách vãng lai (session) vào giỏ hàng user sau khi đăng nhập
+     */
+    public function test_guest_cart_is_merged_into_user_cart_on_login(): void
+    {
+        $category = Category::create([
+            'name' => 'Đồ len test',
+            'slug' => 'do-len-test',
+        ]);
+
+        $product = Product::create([
+            'code'           => 'SP-MERGE-01',
+            'category_id'    => $category->id,
+            'name'           => 'Móc khóa len Merge',
+            'slug'           => 'moc-khoa-len-merge',
+            'price'          => 50000,
+            'stock_quantity' => 5,
+            'image'          => 'images/products/merge.jpg',
+        ]);
+
+        // Thêm vào giỏ khi chưa đăng nhập (lưu theo session_id)
+        $cartResponse = $this->post('/cart', [
+            'product_id' => $product->id,
+            'quantity'   => 2,
+        ]);
+        $cartResponse->assertRedirect(route('cart.index'));
+        $guestCart = Cart::whereNull('user_id')->first();
+        $this->assertNotNull($guestCart);
+
+        // Đăng nhập bằng tài khoản customer trên cùng session của khách vãng lai
+        $loginResponse = $this->withCookie(config('session.cookie'), $guestCart->session_id)->post('/login', [
+            'account'  => 'test_user',
+            'password' => 'old_password123',
+        ]);
+        $loginResponse->assertRedirect(route('home'));
+        $this->assertAuthenticatedAs($this->customer);
+
+        // Giỏ hàng thuộc về user phải có 2 sản phẩm
+        $userCart = Cart::where('user_id', $this->customer->id)->first();
+        $this->assertNotNull($userCart);
+        $this->assertEquals(2, $userCart->total_quantity);
+        $this->assertDatabaseHas('cart_details', [
+            'cart_id'    => $userCart->id,
+            'product_id' => $product->id,
+            'quantity'   => 2,
+        ]);
     }
 }
