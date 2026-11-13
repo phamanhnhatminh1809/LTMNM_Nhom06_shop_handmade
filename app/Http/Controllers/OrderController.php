@@ -5,10 +5,10 @@ namespace App\Http\Controllers;
 use App\Models\Cart;
 use App\Models\Order;
 use App\Models\Product;
+use App\Services\PayosService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
 class OrderController extends Controller
@@ -32,12 +32,17 @@ class OrderController extends Controller
 
         $orders = $query->paginate(10)->withQueryString();
 
+        $countsByStatus = Order::where('user_id', $userId)
+            ->selectRaw('status, COUNT(*) as aggregate')
+            ->groupBy('status')
+            ->pluck('aggregate', 'status');
+
         $statusCounts = [
-            'all'       => Order::where('user_id', $userId)->count(),
-            'pending'   => Order::where('user_id', $userId)->where('status', 'pending')->count(),
-            'shipping'  => Order::where('user_id', $userId)->where('status', 'shipping')->count(),
-            'completed' => Order::where('user_id', $userId)->where('status', 'completed')->count(),
-            'cancelled' => Order::where('user_id', $userId)->where('status', 'cancelled')->count(),
+            'all'       => (int) $countsByStatus->sum(),
+            'pending'   => (int) ($countsByStatus['pending'] ?? 0),
+            'shipping'  => (int) ($countsByStatus['shipping'] ?? 0),
+            'completed' => (int) ($countsByStatus['completed'] ?? 0),
+            'cancelled' => (int) ($countsByStatus['cancelled'] ?? 0),
         ];
 
         return view('orders.index', compact('orders', 'status', 'statusCounts'));
@@ -71,22 +76,17 @@ class OrderController extends Controller
             return back()->with('error', 'Chỉ có thể hủy đơn hàng khi đơn hàng đang ở trạng thái Chờ xác nhận.');
         }
 
-        DB::transaction(function () use ($order) {
-            $order->update(['status' => 'cancelled']);
+        if ($order->isPaid()) {
+            return back()->with('error', 'Đơn hàng này đã thanh toán trực tuyến. Vui lòng liên hệ cửa hàng để được hỗ trợ hoàn tiền trước khi hủy.');
+        }
 
-            // Hoàn lại tồn kho cho từng sản phẩm
-            foreach ($order->items as $item) {
-                if ($item->product_id) {
-                    $product = Product::find($item->product_id);
-                    if ($product) {
-                        $product->increment('stock_quantity', $item->quantity);
-                        if ($product->sold >= $item->quantity) {
-                            $product->decrement('sold', $item->quantity);
-                        }
-                    }
-                }
-            }
-        });
+        if ($order->payment_gateway === 'payos' && $order->payment_reference) {
+            app(PayosService::class)->cancelPaymentLink($order->payment_reference, 'Khách hàng chủ động hủy đơn');
+        }
+
+        $order->cancelAndRestoreInventory(
+            $order->payment_method === 'qr' ? Order::PAYMENT_STATUS_CANCELLED : null
+        );
 
         return back()->with('success', 'Đơn hàng #' . $order->code . ' đã được hủy thành công.');
     }
@@ -111,15 +111,16 @@ class OrderController extends Controller
         foreach ($order->items as $item) {
             $product = $item->product;
             
-            // Bỏ qua nếu sản phẩm đã bị xóa khỏi shop
-            if (!$product) {
+            // Bỏ qua nếu sản phẩm đã bị xóa khỏi shop hoặc hết sạch hàng
+            if (!$product || $product->stock_quantity <= 0) {
+                $errorMessages[] = "Sản phẩm \"" . ($product->name ?? 'không xác định') . "\" hiện đã hết hàng.";
                 continue;
             }
 
-            // Kiểm tra tồn kho
-            if ($product->stock_quantity < $item->quantity) {
-                $errorMessages[] = "Sản phẩm \"{$product->name}\" chỉ còn {$product->stock_quantity} cái.";
-                continue;
+            $desiredQty = (int) $item->quantity;
+            if ($product->stock_quantity < $desiredQty) {
+                $desiredQty = (int) $product->stock_quantity;
+                $errorMessages[] = "Sản phẩm \"{$product->name}\" chỉ còn {$product->stock_quantity} cái nên đã điều chỉnh số lượng.";
             }
 
             // Kiểm tra xem sản phẩm đã có trong giỏ hàng chưa
@@ -127,24 +128,31 @@ class OrderController extends Controller
 
             if ($existingDetail) {
                 // Nếu có rồi, cộng dồn số lượng (không vượt quá tồn kho)
-                $newQty = $existingDetail->quantity + $item->quantity;
+                $newQty = $existingDetail->quantity + $desiredQty;
                 if ($newQty > $product->stock_quantity) {
                     $newQty = $product->stock_quantity;
                     $errorMessages[] = "Sản phẩm \"{$product->name}\" đã được thêm tối đa (chỉ còn {$product->stock_quantity} cái).";
                 }
-                $existingDetail->update(['quantity' => $newQty]);
+                $existingDetail->update([
+                    'quantity'   => $newQty,
+                    'unit_price' => $product->price,
+                    'image_url'  => $product->image,
+                ]);
             } else {
                 // Nếu chưa có, thêm mới vào giỏ
                 $cart->details()->create([
-                    'product_id' => $product->id,
+                    'product_id'   => $product->id,
                     'product_code' => $product->code,
                     'name'         => $product->name,
-                    'quantity'   => $item->quantity,
-                    'unit_price' => $product->price, // Lấy giá hiện tại, không lấy giá cũ
+                    'image_url'    => $product->image,
+                    'quantity'     => $desiredQty,
+                    'unit_price'   => $product->price, // Lấy giá hiện tại, không lấy giá cũ
                 ]);
             }
             $addedCount++;
         }
+
+        $cart->recalculateTotals();
 
         if ($addedCount > 0) {
             $msg = "Đã thêm {$addedCount} sản phẩm vào giỏ hàng.";

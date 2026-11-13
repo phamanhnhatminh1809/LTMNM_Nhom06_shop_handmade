@@ -4,15 +4,17 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use App\Models\Product;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class HomeController extends Controller
 {
     public function index(): View
     {
-        $categories = Category::all();
-        $featured = Product::featured()->with('category')->take(8)->get();
-        $newest = Product::latest()->with('category')->take(8)->get();
+        $categories = Category::cachedAll();
+        $featured = Product::featured()->with('category')->withCount('reviews')->take(8)->get();
+        $newest = Product::latest()->with('category')->withCount('reviews')->take(8)->get();
 
         $banners = [
             [
@@ -46,5 +48,23 @@ class HomeController extends Controller
         ];
 
         return view('home', compact('categories', 'featured', 'newest', 'banners'));
+    }
+
+    /**
+     * Điều hướng tương thích ngược cho ?route=... (không dùng Closure để bật route:cache).
+     */
+    public function legacyRedirect(Request $request): RedirectResponse
+    {
+        $route = $request->input('route', 'home');
+
+        return match ($route) {
+            'products'       => redirect()->route('products.index', $request->except('route')),
+            'product-detail' => redirect()->route('products.show', $request->input('id', 1)),
+            'login'          => redirect()->route('login'),
+            'register'       => redirect()->route('register'),
+            'about'          => redirect()->route('about'),
+            'contact'        => redirect()->route('contact'),
+            default          => redirect()->route('home'),
+        };
     }
 }

@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Cache;
 
 class Product extends Model
 {
@@ -21,6 +22,7 @@ class Product extends Model
         'price',
         'old_price',
         'stock_quantity',
+        'min_stock_threshold',
         'rating',
         'sold',
         'is_featured',
@@ -35,8 +37,14 @@ class Product extends Model
             'old_price' => 'float',
             'rating' => 'float',
             'stock_quantity' => 'integer',
+            'min_stock_threshold' => 'integer',
             'sold' => 'integer',
         ];
+    }
+
+    public function effectiveMinStockThreshold(): int
+    {
+        return max(0, (int) ($this->attributes['min_stock_threshold'] ?? $this->min_stock_threshold ?? 5));
     }
 
     public function category(): BelongsTo
@@ -83,13 +91,27 @@ class Product extends Model
         });
     }
 
-    /**
-     * Tính rating trung bình từ reviews thực tế.
-     */
-    public function getRatingAttribute()
+    public function hasReviews(): bool
     {
-        $avg = $this->reviews()->avg('rating');
-        return $avg > 0 ? round($avg, 1) : ($this->attributes['rating'] ?? 5.0);
+        if (array_key_exists('reviews_count', $this->attributes)) {
+            return (int) $this->attributes['reviews_count'] > 0;
+        }
+
+        return $this->reviews()->exists();
+    }
+
+    /**
+     * Trả về điểm đánh giá trung bình đã lưu sẵn trên bảng products (tránh N+1 query).
+     */
+    public function getRatingAttribute($value): float
+    {
+        $rating = $this->attributes['reviews_avg_rating'] ?? $value;
+
+        if ($rating !== null && (float) $rating > 0) {
+            return round((float) $rating, 1);
+        }
+
+        return 5.0;
     }
 
     /**
@@ -100,5 +122,16 @@ class Product extends Model
         $avg = (float) $this->reviews()->avg('rating');
         $this->attributes['rating'] = $avg > 0 ? round($avg, 1) : 5.0;
         $this->save();
+    }
+
+    protected static function booted(): void
+    {
+        $clearCaches = static function (): void {
+            Cache::forget('admin_dashboard_stats');
+            Cache::forget('admin_review_filter_products');
+        };
+
+        static::saved($clearCaches);
+        static::deleted($clearCaches);
     }
 }

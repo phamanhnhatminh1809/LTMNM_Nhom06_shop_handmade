@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Support\Facades\Cache;
 
 class OrderItem extends Model
 {
@@ -38,5 +39,13 @@ class OrderItem extends Model
     public function review(): HasOne
     {
         return $this->hasOne(Review::class);
+    }
+
+    protected static function booted(): void
+    {
+        $clearDashboardCache = static fn () => Cache::forget('admin_dashboard_stats');
+
+        static::saved($clearDashboardCache);
+        static::deleted($clearDashboardCache);
     }
 }

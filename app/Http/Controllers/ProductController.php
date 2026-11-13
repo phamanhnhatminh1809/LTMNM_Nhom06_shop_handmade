@@ -17,7 +17,7 @@ class ProductController extends Controller
         $maxPrice = $request->input('max_price');
         $sort = $request->input('sort', 'default');
 
-        $query = Product::with('category');
+        $query = Product::with('category')->withCount('reviews');
 
         if ($keyword !== '') {
             $query->search($keyword);
@@ -42,16 +42,19 @@ class ProductController extends Controller
 
         switch ($sort) {
             case 'price_asc':
-                $query->orderBy('price', 'asc');
+                $query->orderBy('price', 'asc')->orderByDesc('id');
                 break;
             case 'price_desc':
-                $query->orderBy('price', 'desc');
+                $query->orderBy('price', 'desc')->orderByDesc('id');
                 break;
             case 'latest':
-                $query->latest();
+                $query->orderByDesc('created_at')->orderByDesc('id');
+                break;
+            case 'oldest':
+                $query->orderBy('created_at', 'asc')->orderBy('id', 'asc');
                 break;
             case 'bestseller':
-                $query->orderBy('sold', 'desc');
+                $query->orderBy('sold', 'desc')->orderByDesc('id');
                 break;
             default:
                 $query->latest('id');
@@ -60,8 +63,8 @@ class ProductController extends Controller
 
         $products = $query->paginate(12)->withQueryString();
         $total = $products->total();
-        $categories = Category::all();
-        $currentCategory = $categorySlug !== '' ? Category::where('slug', $categorySlug)->first() : null;
+        $categories = Category::cachedAll();
+        $currentCategory = $categorySlug !== '' ? $categories->firstWhere('slug', $categorySlug) : null;
 
         return view('products.index', compact(
             'products',
@@ -76,10 +79,11 @@ class ProductController extends Controller
     public function show(string|int $id): View
     {
         $product = is_numeric($id)
-            ? Product::with(['category', 'reviews.user'])->findOrFail((int) $id)
-            : Product::with(['category', 'reviews.user'])->where('slug', $id)->firstOrFail();
+            ? Product::with(['category', 'reviews.user'])->withCount('reviews')->findOrFail((int) $id)
+            : Product::with(['category', 'reviews.user'])->withCount('reviews')->where('slug', $id)->firstOrFail();
 
-        $related = Product::where('category_id', $product->category_id)
+        $related = Product::withCount('reviews')
+            ->where('category_id', $product->category_id)
             ->where('id', '!=', $product->id)
             ->take(4)
             ->get();

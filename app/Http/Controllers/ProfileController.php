@@ -79,11 +79,12 @@ class ProfileController extends Controller
 
         $request->validate([
             'current_password' => 'required|string',
-            'password'         => 'required|string|min:8|confirmed|different:current_password',
+            'password'         => ['required', 'string', 'min:8', 'confirmed', 'different:current_password', 'regex:/[^a-zA-Z0-9]/'],
         ], [
             'current_password.required' => 'Vui lòng nhập mật khẩu hiện tại.',
             'password.required'         => 'Vui lòng nhập mật khẩu mới.',
             'password.min'              => 'Mật khẩu mới phải có tối thiểu 8 ký tự.',
+            'password.regex'            => 'Mật khẩu mới phải chứa ít nhất 1 ký tự đặc biệt (ví dụ: @, #, $, %, !...).',
             'password.confirmed'        => 'Xác nhận mật khẩu mới không khớp.',
             'password.different'        => 'Mật khẩu mới không được trùng với mật khẩu hiện tại.',
         ]);

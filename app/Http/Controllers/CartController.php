@@ -57,11 +57,20 @@ class CartController extends Controller
         $detail = $cart->details()->where('product_id', $product->id)->first();
 
         $requestedQty = (int) $validated['quantity'];
+        $cappedByStock = false;
 
         if ($detail) {
+            if ($detail->quantity >= $product->stock_quantity && ($request->wantsJson() || $request->ajax()) && empty($validated['buy_now'])) {
+                return response()->json([
+                    'success' => false,
+                    'message' => "Số lượng trong giỏ đã đạt tối đa tồn kho ({$product->stock_quantity} sản phẩm).",
+                ], 422);
+            }
+
             $newQty = $detail->quantity + $requestedQty;
             if ($newQty > $product->stock_quantity) {
                 $newQty = $product->stock_quantity;
+                $cappedByStock = true;
             }
             $detail->update([
                 'quantity'   => $newQty,
@@ -69,6 +78,9 @@ class CartController extends Controller
             ]);
         } else {
             $initialQty = min($requestedQty, $product->stock_quantity);
+            if ($requestedQty > $product->stock_quantity) {
+                $cappedByStock = true;
+            }
             $cart->details()->create([
                 'product_id'   => $product->id,
                 'product_code' => $product->code,
@@ -85,16 +97,21 @@ class CartController extends Controller
             return redirect()->route('checkout.index');
         }
 
+        $successMessage = $cappedByStock
+            ? "Đã thêm vào giỏ hàng (tối đa {$product->stock_quantity} sản phẩm hiện có trong kho)."
+            : "Đã thêm \"{$product->name}\" vào giỏ hàng!";
+
         if ($request->wantsJson() || $request->ajax()) {
             return response()->json([
                 'success'        => true,
-                'message'        => 'Đã thêm sản phẩm vào giỏ hàng thành công.',
+                'message'        => $successMessage,
                 'total_quantity' => $cart->total_quantity,
                 'total_amount'   => $cart->total_amount,
+                'cart_url'       => route('cart.index'),
             ]);
         }
 
-        return redirect()->route('cart.index')->with('success', 'Đã thêm sản phẩm vào giỏ hàng thành công.');
+        return redirect()->route('cart.index')->with('success', $successMessage);
     }
 
     /**

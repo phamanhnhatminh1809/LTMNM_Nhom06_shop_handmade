@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Cache;
 
 class Role extends Model
 {
@@ -17,6 +18,16 @@ class Role extends Model
     public function users(): HasMany
     {
         return $this->hasMany(User::class);
+    }
+
+    /**
+     * Trả về bảng ánh xạ [role_id => role_name] có cache để kiểm tra phân quyền không cần query lặp.
+     */
+    public static function cachedMap(): array
+    {
+        return Cache::remember('global_roles_by_id', 3600, function () {
+            return static::pluck('name', 'id')->all();
+        });
     }
 
     /**
@@ -35,5 +46,16 @@ class Role extends Model
     public function getLabelAttribute(): string
     {
         return self::roleLabels()[$this->name] ?? $this->name;
+    }
+
+    protected static function booted(): void
+    {
+        $clearRoleCaches = static function (): void {
+            Cache::forget('global_roles_by_id');
+            Cache::forget('default_roles_seeded');
+        };
+
+        static::saved($clearRoleCaches);
+        static::deleted($clearRoleCaches);
     }
 }

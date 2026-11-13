@@ -87,4 +87,14 @@ class Review extends Model
               });
         });
     }
+
+    protected static function booted(): void
+    {
+        $syncProductRating = static function (self $review): void {
+            $review->product?->recalculateRating();
+        };
+
+        static::saved($syncProductRating);
+        static::deleted($syncProductRating);
+    }
 }

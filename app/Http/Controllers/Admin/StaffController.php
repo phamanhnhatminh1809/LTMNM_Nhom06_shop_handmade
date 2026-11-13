@@ -8,20 +8,29 @@ use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\View\View;
 
 class StaffController extends Controller
 {
     /**
-     * Đảm bảo bảng roles luôn có đủ 4 quyền cơ bản của hệ thống.
+     * Đảm bảo bảng roles luôn có đủ 4 quyền cơ bản của hệ thống (cache sau lần kiểm tra đầu).
      */
     private function ensureDefaultRolesExist(): void
     {
-        Role::firstOrCreate(['id' => 1], ['name' => Role::ADMIN]);
-        Role::firstOrCreate(['id' => 2], ['name' => Role::CUSTOMER]);
-        Role::firstOrCreate(['id' => 3], ['name' => Role::WAREHOUSE_STAFF]);
-        Role::firstOrCreate(['id' => 4], ['name' => Role::SALES_STAFF]);
+        if (Cache::get('default_roles_seeded')) {
+            return;
+        }
+
+        if (Role::count() < 4) {
+            Role::firstOrCreate(['id' => 1], ['name' => Role::ADMIN]);
+            Role::firstOrCreate(['id' => 2], ['name' => Role::CUSTOMER]);
+            Role::firstOrCreate(['id' => 3], ['name' => Role::WAREHOUSE_STAFF]);
+            Role::firstOrCreate(['id' => 4], ['name' => Role::SALES_STAFF]);
+        }
+
+        Cache::forever('default_roles_seeded', true);
     }
 
     /**
@@ -46,14 +55,25 @@ class StaffController extends Controller
         $users = $query->latest('id')->paginate(15)->withQueryString();
         $roles = Role::orderBy('id')->get();
 
-        // Thống kê số lượng theo từng nhóm quyền
+        // Gộp thành 1 query GROUP BY role_id thay vì 6 query COUNT(*)/EXISTS rời rạc
+        $roleIdByName = $roles->pluck('id', 'name');
+        $countsByRoleId = User::query()
+            ->selectRaw('role_id, COUNT(*) as aggregate')
+            ->groupBy('role_id')
+            ->pluck('aggregate', 'role_id');
+
+        $adminCount     = (int) ($countsByRoleId[$roleIdByName[Role::ADMIN] ?? -1] ?? 0);
+        $warehouseCount = (int) ($countsByRoleId[$roleIdByName[Role::WAREHOUSE_STAFF] ?? -1] ?? 0);
+        $salesCount     = (int) ($countsByRoleId[$roleIdByName[Role::SALES_STAFF] ?? -1] ?? 0);
+        $customerCount  = (int) ($countsByRoleId[$roleIdByName[Role::CUSTOMER] ?? -1] ?? 0);
+
         $roleCounts = [
-            'all'             => User::count(),
-            'staff_only'      => User::staff()->count(),
-            'admin'           => User::whereHas('role', fn ($q) => $q->where('name', Role::ADMIN))->count(),
-            'warehouse_staff' => User::whereHas('role', fn ($q) => $q->where('name', Role::WAREHOUSE_STAFF))->count(),
-            'sales_staff'     => User::whereHas('role', fn ($q) => $q->where('name', Role::SALES_STAFF))->count(),
-            'customer'        => User::whereHas('role', fn ($q) => $q->where('name', Role::CUSTOMER))->count(),
+            'all'             => (int) $countsByRoleId->sum(),
+            'staff_only'      => $adminCount + $warehouseCount + $salesCount,
+            'admin'           => $adminCount,
+            'warehouse_staff' => $warehouseCount,
+            'sales_staff'     => $salesCount,
+            'customer'        => $customerCount,
         ];
 
         return view('admin.staff.index', compact(

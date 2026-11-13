@@ -14,14 +14,17 @@ class ResetPasswordOtpMail extends Mailable
 
     public function __construct(
         public string $otp,
-        public string $userName = 'Quý khách'
+        public string $userName = 'Quý khách',
+        public string $purpose = 'reset_password'
     ) {}
 
     public function envelope(): Envelope
     {
-        return new Envelope(
-            subject: '[Shop Handmade] Mã xác thực OTP khôi phục mật khẩu',
-        );
+        $subject = $this->purpose === 'register'
+            ? '[Shop Handmade] Mã xác thực OTP đăng ký tài khoản'
+            : '[Shop Handmade] Mã xác thực OTP khôi phục mật khẩu';
+
+        return new Envelope(subject: $subject);
     }
 
     public function content(): Content

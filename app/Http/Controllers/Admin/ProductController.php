@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\Product;
+use App\Services\AdminNotificationService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -40,21 +41,23 @@ class ProductController extends Controller
         }
 
         match ($stockStatus) {
-            'active' => $query->where('stock_quantity', '>', 5),
-            'low'    => $query->whereBetween('stock_quantity', [1, 5]),
+            'active' => $query->whereColumn('stock_quantity', '>', 'min_stock_threshold'),
+            'low'    => $query->where('stock_quantity', '>', 0)
+                              ->whereColumn('stock_quantity', '<=', 'min_stock_threshold'),
             'out'    => $query->where('stock_quantity', '<=', 0),
             default  => null,
         };
 
         match ($sort) {
-            'best_selling' => $query->orderByDesc('sold')->latest('id'),
-            'price_asc'    => $query->orderBy('price')->latest('id'),
-            'price_desc'   => $query->orderByDesc('price')->latest('id'),
-            default        => $query->latest('id'),
+            'oldest'       => $query->orderBy('created_at')->orderBy('id'),
+            'best_selling' => $query->orderByDesc('sold')->orderByDesc('id'),
+            'price_asc'    => $query->orderBy('price')->orderByDesc('id'),
+            'price_desc'   => $query->orderByDesc('price')->orderByDesc('id'),
+            default        => $query->orderByDesc('created_at')->orderByDesc('id'),
         };
 
         $products = $query->paginate(10)->withQueryString();
-        $categories = Category::all();
+        $categories = Category::cachedAll();
 
         return view('admin.products.index', compact('products', 'categories'));
     }
@@ -64,7 +67,7 @@ class ProductController extends Controller
      */
     public function create(): View
     {
-        $categories = Category::all();
+        $categories = Category::cachedAll();
         return view('admin.products.create', compact('categories'));
     }
 
@@ -77,6 +80,7 @@ class ProductController extends Controller
             'price'                => 'required|numeric|min:0',
             'old_price'            => 'nullable|numeric|min:0',
             'stock_quantity'       => 'required|integer|min:0',
+            'min_stock_threshold'  => 'nullable|integer|min:0|max:10000',
             'description'          => 'nullable|string',
             'instruction_preserve' => 'nullable|string',
             'is_featured'          => 'nullable|boolean',
@@ -89,6 +93,9 @@ class ProductController extends Controller
         $validated['rating'] = 5.0;
         $validated['sold'] = 0;
         $validated['is_featured'] = $request->boolean('is_featured');
+        $validated['min_stock_threshold'] = $request->filled('min_stock_threshold')
+            ? (int) $validated['min_stock_threshold']
+            : AdminNotificationService::DEFAULT_MIN_STOCK_THRESHOLD;
 
         // Xử lý upload ảnh đại diện chính
         if ($request->hasFile('image')) {
@@ -106,7 +113,8 @@ class ProductController extends Controller
             $validated['gallery'] = $galleryPaths;
         }
 
-        Product::create($validated);
+        $product = Product::create($validated);
+        app(AdminNotificationService::class)->syncProductStockAlert($product);
 
         return redirect()->route('admin.products.index')
             ->with('success', 'Thêm sản phẩm thành công!');
@@ -126,7 +134,7 @@ class ProductController extends Controller
      */
     public function edit(Product $product): View
     {
-        $categories = Category::all();
+        $categories = Category::cachedAll();
         return view('admin.products.edit', compact('product', 'categories'));
     }
 
@@ -142,6 +150,7 @@ class ProductController extends Controller
             'price'                => 'required|numeric|min:0',
             'old_price'            => 'nullable|numeric|min:0',
             'stock_quantity'       => 'required|integer|min:0',
+            'min_stock_threshold'  => 'nullable|integer|min:0|max:10000',
             'description'          => 'nullable|string',
             'instruction_preserve' => 'nullable|string',
             'is_featured'          => 'nullable|boolean',
@@ -156,6 +165,11 @@ class ProductController extends Controller
         }
 
         $validated['is_featured'] = $request->boolean('is_featured');
+        if ($request->filled('min_stock_threshold')) {
+            $validated['min_stock_threshold'] = (int) $validated['min_stock_threshold'];
+        } else {
+            $validated['min_stock_threshold'] = $product->effectiveMinStockThreshold();
+        }
 
         // Xử lý upload ảnh đại diện mới (nếu có chọn file mới)
         if ($request->hasFile('image')) {
@@ -176,6 +190,7 @@ class ProductController extends Controller
         }
 
         $product->update($validated);
+        app(AdminNotificationService::class)->syncProductStockAlert($product->fresh());
 
         return redirect()->route('admin.products.index')
             ->with('success', 'Cập nhật sản phẩm "' . $product->name . '" thành công!');
@@ -183,7 +198,10 @@ class ProductController extends Controller
 
     public function destroy(Product $product): RedirectResponse
     {
+        $productId = $product->id;
         $product->delete();
+        app(AdminNotificationService::class)->resolveAlertsForDeletedProduct($productId);
+
         return redirect()->route('admin.products.index')
             ->with('success', 'Đã xóa sản phẩm thành công!');
     }

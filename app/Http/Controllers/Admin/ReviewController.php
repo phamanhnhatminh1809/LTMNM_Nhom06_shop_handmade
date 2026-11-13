@@ -7,6 +7,7 @@ use App\Models\Product;
 use App\Models\Review;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
@@ -33,23 +34,30 @@ class ReviewController extends Controller
             ->paginate(15)
             ->withQueryString();
 
-        // Danh sách sản phẩm để hiển thị trong bộ lọc
-        $products = Product::select('id', 'name', 'code')
-            ->orderBy('name')
-            ->get();
+        // Cache ngắn danh sách sản phẩm trong dropdown lọc (tự xóa cache khi Product thay đổi)
+        $products = Cache::remember('admin_review_filter_products', 300, function () {
+            return Product::select('id', 'name', 'code')
+                ->orderBy('name')
+                ->get();
+        });
 
-        // Thống kê số lượng đánh giá theo từng mức sao (có áp dụng bộ lọc sản phẩm nếu đang chọn 1 sản phẩm)
-        $baseCountQuery = Review::query()->filterProduct($productId);
+        // Gộp thành 1 query GROUP BY rating thay vì 6 query COUNT(*)
+        $countsByRating = Review::query()
+            ->filterProduct($productId)
+            ->selectRaw('rating, COUNT(*) as aggregate')
+            ->groupBy('rating')
+            ->pluck('aggregate', 'rating');
+
         $ratingCounts = [
-            'all' => (clone $baseCountQuery)->count(),
-            5     => (clone $baseCountQuery)->where('rating', 5)->count(),
-            4     => (clone $baseCountQuery)->where('rating', 4)->count(),
-            3     => (clone $baseCountQuery)->where('rating', 3)->count(),
-            2     => (clone $baseCountQuery)->where('rating', 2)->count(),
-            1     => (clone $baseCountQuery)->where('rating', 1)->count(),
+            'all' => (int) $countsByRating->sum(),
+            5     => (int) ($countsByRating[5] ?? 0),
+            4     => (int) ($countsByRating[4] ?? 0),
+            3     => (int) ($countsByRating[3] ?? 0),
+            2     => (int) ($countsByRating[2] ?? 0),
+            1     => (int) ($countsByRating[1] ?? 0),
         ];
 
-        $selectedProduct = $productId ? Product::find($productId) : null;
+        $selectedProduct = $productId ? $products->firstWhere('id', $productId) : null;
 
         return view('admin.reviews.index', compact(
             'reviews',
@@ -69,12 +77,8 @@ class ReviewController extends Controller
     {
         $product = $review->product;
 
-        DB::transaction(function () use ($review, $product) {
+        DB::transaction(function () use ($review) {
             $review->delete();
-
-            if ($product) {
-                $product->recalculateRating();
-            }
         });
 
         return redirect()->back()

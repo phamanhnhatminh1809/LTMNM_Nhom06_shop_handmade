@@ -56,7 +56,7 @@ class ReviewController extends Controller
             return back()->with('error', $msg);
         }
 
-        // 4. Lưu đánh giá và cập nhật điểm rating trung bình của sản phẩm
+        // 4. Lưu đánh giá (Model event Review::booted sẽ tự tính lại rating của sản phẩm)
         DB::transaction(function () use ($orderItem, $validated) {
             Review::create([
                 'user_id'       => Auth::id(),
@@ -65,10 +65,6 @@ class ReviewController extends Controller
                 'rating'        => (int) $validated['rating'],
                 'comment'       => $validated['comment'] ?? null,
             ]);
-
-            if ($orderItem->product) {
-                $orderItem->product->recalculateRating();
-            }
         });
 
         $successMsg = 'Đánh giá sản phẩm thành công! Cảm ơn phản hồi của bạn.';

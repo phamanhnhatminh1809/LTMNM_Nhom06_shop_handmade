@@ -28,11 +28,19 @@ class CustomerController extends Controller
             ->paginate(15)
             ->withQueryString();
 
-        // Đếm badge cho 2 tab trạng thái
+        // Gộp thành 1 query thống kê trạng thái khách hàng
+        $customerSummary = User::customers()
+            ->selectRaw("
+                COUNT(*) as total_all,
+                COALESCE(SUM(CASE WHEN is_active = 1 THEN 1 ELSE 0 END), 0) as active_count,
+                COALESCE(SUM(CASE WHEN is_active = 0 THEN 1 ELSE 0 END), 0) as locked_count
+            ")
+            ->first();
+
         $statusCounts = [
-            'all'    => User::customers()->count(),
-            'active' => User::customers()->where('is_active', true)->count(),
-            'locked' => User::customers()->where('is_active', false)->count(),
+            'all'    => (int) ($customerSummary->total_all ?? 0),
+            'active' => (int) ($customerSummary->active_count ?? 0),
+            'locked' => (int) ($customerSummary->locked_count ?? 0),
         ];
 
         return view('admin.customers.index', compact('customers', 'keyword', 'status', 'statusCounts'));

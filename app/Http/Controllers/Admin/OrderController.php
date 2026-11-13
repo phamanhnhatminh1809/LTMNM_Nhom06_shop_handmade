@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Order;
+use App\Services\PayosService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -27,13 +28,18 @@ class OrderController extends Controller
 
         $orders = $query->paginate(15)->withQueryString();
 
-        // Đếm số lượng theo từng trạng thái để hiển thị badge tab
+        // Gộp thành 1 query GROUP BY thay vì 5 query COUNT(*) rời rạc
+        $countsByStatus = Order::query()
+            ->selectRaw('status, COUNT(*) as aggregate')
+            ->groupBy('status')
+            ->pluck('aggregate', 'status');
+
         $statusCounts = [
-            'all'       => Order::count(),
-            'pending'   => Order::where('status', 'pending')->count(),
-            'shipping'  => Order::where('status', 'shipping')->count(),
-            'completed' => Order::where('status', 'completed')->count(),
-            'cancelled' => Order::where('status', 'cancelled')->count(),
+            'all'       => (int) $countsByStatus->sum(),
+            'pending'   => (int) ($countsByStatus['pending'] ?? 0),
+            'shipping'  => (int) ($countsByStatus['shipping'] ?? 0),
+            'completed' => (int) ($countsByStatus['completed'] ?? 0),
+            'cancelled' => (int) ($countsByStatus['cancelled'] ?? 0),
         ];
 
         return view('admin.orders.index', compact('orders', 'status', 'statusCounts'));
@@ -76,7 +82,23 @@ class OrderController extends Controller
                 ->with('error', 'Không thể chuyển trạng thái đơn hàng từ "' . $oldStatus . '" sang "' . $newStatus . '".');
         }
 
-        $order->update(['status' => $newStatus]);
+        if ($newStatus === 'cancelled') {
+            if ($order->payment_gateway === 'payos' && $order->payment_reference && !$order->isPaid()) {
+                app(PayosService::class)->cancelPaymentLink($order->payment_reference, 'Cửa hàng hủy đơn hàng');
+            }
+
+            $order->cancelAndRestoreInventory(
+                $order->payment_method === 'qr' ? Order::PAYMENT_STATUS_CANCELLED : null
+            );
+        } else {
+            $updates = ['status' => $newStatus];
+            if ($newStatus === 'completed' && $order->payment_method === 'cod' && !$order->isPaid()) {
+                $updates['payment_status'] = Order::PAYMENT_STATUS_PAID;
+                $updates['paid_at'] = now();
+            }
+
+            $order->update($updates);
+        }
 
         $statusLabels = [
             'pending'   => 'Chờ xác nhận',

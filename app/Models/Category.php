@@ -2,8 +2,10 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Cache;
 
 class Category extends Model
 {
@@ -55,9 +57,22 @@ class Category extends Model
         return $iconMap[$rawIcon] ?? $iconMap[$this->slug] ?? 'bi-tag';
     }
 
+    /**
+     * Lấy danh sách toàn bộ danh mục có cache dùng chung giữa các view & controller.
+     */
+    public static function cachedAll(): Collection
+    {
+        return Cache::remember('global_categories', 3600, fn () => static::all());
+    }
+
     protected static function booted(): void
     {
-        static::saved(fn () => \Illuminate\Support\Facades\Cache::forget('global_categories'));
-        static::deleted(fn () => \Illuminate\Support\Facades\Cache::forget('global_categories'));
+        $clearCaches = static function (): void {
+            Cache::forget('global_categories');
+            Cache::forget('admin_dashboard_stats');
+        };
+
+        static::saved($clearCaches);
+        static::deleted($clearCaches);
     }
 }

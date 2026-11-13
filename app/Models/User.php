@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Cache;
 
 class User extends Authenticatable
 {
@@ -58,11 +59,32 @@ class User extends Authenticatable
     }
 
     /**
+     * Lấy tên role từ relation đã nạp hoặc từ cache ánh xạ role_id để tránh query lặp lại.
+     */
+    public function resolveRoleName(): ?string
+    {
+        if ($this->relationLoaded('role')) {
+            return $this->role?->name;
+        }
+
+        if (!$this->role_id) {
+            return null;
+        }
+
+        $roleMap = Role::cachedMap();
+        if (isset($roleMap[$this->role_id])) {
+            return $roleMap[$this->role_id];
+        }
+
+        return $this->role?->name;
+    }
+
+    /**
      * Kiểm tra tài khoản là Quản trị viên (toàn quyền).
      */
     public function isAdmin(): bool
     {
-        return $this->role && $this->role->name === Role::ADMIN;
+        return $this->resolveRoleName() === Role::ADMIN;
     }
 
     /**
@@ -70,7 +92,7 @@ class User extends Authenticatable
      */
     public function isWarehouseStaff(): bool
     {
-        return $this->role && $this->role->name === Role::WAREHOUSE_STAFF;
+        return $this->resolveRoleName() === Role::WAREHOUSE_STAFF;
     }
 
     /**
@@ -78,7 +100,7 @@ class User extends Authenticatable
      */
     public function isSalesStaff(): bool
     {
-        return $this->role && $this->role->name === Role::SALES_STAFF;
+        return $this->resolveRoleName() === Role::SALES_STAFF;
     }
 
     /**
@@ -86,7 +108,7 @@ class User extends Authenticatable
      */
     public function isStaff(): bool
     {
-        return $this->role && in_array($this->role->name, [
+        return in_array($this->resolveRoleName(), [
             Role::WAREHOUSE_STAFF,
             Role::SALES_STAFF,
         ], true);
@@ -97,7 +119,7 @@ class User extends Authenticatable
      */
     public function isStaffOrAdmin(): bool
     {
-        return $this->role && in_array($this->role->name, [
+        return in_array($this->resolveRoleName(), [
             Role::ADMIN,
             Role::WAREHOUSE_STAFF,
             Role::SALES_STAFF,
@@ -125,7 +147,7 @@ class User extends Authenticatable
      */
     public function hasAnyRole(array $roles): bool
     {
-        return $this->role && in_array($this->role->name, $roles, true);
+        return in_array($this->resolveRoleName(), $roles, true);
     }
 
     /**
@@ -174,5 +196,13 @@ class User extends Authenticatable
             'locked' => $query->where('is_active', false),
             default  => $query,
         };
+    }
+
+    protected static function booted(): void
+    {
+        $clearDashboardCache = static fn () => Cache::forget('admin_dashboard_stats');
+
+        static::saved($clearDashboardCache);
+        static::deleted($clearDashboardCache);
     }
 }

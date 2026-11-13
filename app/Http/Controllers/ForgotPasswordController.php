@@ -59,29 +59,22 @@ class ForgotPasswordController extends Controller
 
         // Gửi email chứa mã OTP
         try {
-            Mail::to($email)->send(new ResetPasswordOtpMail($otp, $user->full_name));
+            Mail::to($email)->send(new ResetPasswordOtpMail($otp, $user->full_name ?: 'Quý khách', 'reset_password'));
         } catch (\Throwable $e) {
-            try {
-                Log::error('Lỗi khi gửi email OTP: ' . $e->getMessage(), [
-                    'email' => $email,
-                    'otp' => $otp,
-                ]);
-            } catch (\Throwable $logEx) {
-                // Không để lỗi ghi log làm sập luồng gửi OTP
-            }
-
-            // Nếu chưa thiết lập thông số Mail Server, hệ thống vẫn lưu OTP và thông báo hướng dẫn
-            return response()->json([
-                'success' => true,
-                'message' => 'Mã OTP đã được tạo (Mail server đang ở chế độ log). Vui lòng kiểm tra email hoặc file log hệ thống.',
-                'dev_otp' => app()->environment('local') ? $otp : null,
+            Log::error('Lỗi khi gửi email OTP khôi phục mật khẩu: ' . $e->getMessage(), [
+                'email' => $email,
             ]);
+            PasswordResetOtp::where('email', $email)->delete();
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Không thể gửi email OTP qua SMTP lúc này. Vui lòng kiểm tra cấu hình MAIL_* trong .env hoặc thử lại sau.',
+            ], 503);
         }
 
         return response()->json([
             'success' => true,
-            'message' => 'Mã xác thực OTP đã được gửi đến email của bạn. Vui lòng kiểm tra hộp thư!',
-            'dev_otp' => app()->environment('local') ? $otp : null,
+            'message' => 'Mã xác thực OTP đã được gửi đến email của bạn. Vui lòng kiểm tra hộp thư (kể cả mục Thư rác/Spam)!',
         ]);
     }
 
