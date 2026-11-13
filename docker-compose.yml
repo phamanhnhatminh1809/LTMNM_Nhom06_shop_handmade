@@ -11,6 +11,7 @@ services:
       - "8000:8000"                      # Laravel App: http://localhost:8000
     volumes:
       - .:/var/www/html
+      - vendor_data:/var/www/html/vendor
     environment:
       DB_CONNECTION: mysql
       DB_HOST: db
@@ -18,10 +19,16 @@ services:
       DB_DATABASE: ltmnm_shop_handmade
       DB_USERNAME: root
       DB_PASSWORD: root
+      CACHE_STORE: redis
+      SESSION_DRIVER: redis
+      REDIS_CLIENT: phpredis
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
       PHP_CLI_SERVER_WORKERS: 4
     command: php artisan serve --host=0.0.0.0 --port=8000
     depends_on:
       - db
+      - redis
     networks:
       - app_network
     stdin_open: true
@@ -38,15 +45,36 @@ services:
       - "8080:80"                      # Truy cập web qua Apache: http://localhost:8080
     volumes:
       - .:/var/www/html
+      - vendor_data:/var/www/html/vendor
     environment:
+      APP_DEBUG: "false"
+      LOG_LEVEL: warning
       DB_CONNECTION: mysql
       DB_HOST: db
       DB_PORT: 3306
       DB_DATABASE: ltmnm_shop_handmade
       DB_USERNAME: root
       DB_PASSWORD: root
+      CACHE_STORE: redis
+      SESSION_DRIVER: redis
+      REDIS_CLIENT: phpredis
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      APP_CONFIG_CACHE: /tmp/laravel-cache/config.php
+      APP_ROUTES_CACHE: /tmp/laravel-cache/routes-v7.php
+      APP_EVENTS_CACHE: /tmp/laravel-cache/events.php
+      VIEW_COMPILED_PATH: /tmp/laravel-views
     depends_on:
       - db
+      - redis
+    networks:
+      - app_network
+
+  # Redis Service: Lưu Session & Cache trên RAM
+  redis:
+    image: redis:7-alpine
+    container_name: ltmnm_shop_handmade_redis
+    restart: no
     networks:
       - app_network
 
@@ -67,6 +95,7 @@ services:
 
 volumes:
   db_data:
+  vendor_data:
 
 networks:
   app_network:

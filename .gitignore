@@ -17,3 +17,6 @@ npm-debug.log
 pam.env
 yarn-error.log
 /private_docs
+/docs/AI_Result
+/.agents
+/reviews
