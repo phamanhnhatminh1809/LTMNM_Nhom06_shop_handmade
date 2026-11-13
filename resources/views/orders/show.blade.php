@@ -77,12 +77,12 @@
             $st = $statusMap[$order->status] ?? ['label' => $order->status, 'bg' => '#f3f4f6', 'color' => '#6b7280'];
         @endphp
 
-        <div style="display: flex; align-items: center; gap: 12px;">
+        <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
             <span style="display: inline-block; padding: 6px 16px; border-radius: 20px; font-size: 13px; font-weight: 700; background: {{ $st['bg'] }}; color: {{ $st['color'] }};">
                 {{ $st['label'] }}
             </span>
 
-            @if($order->status === 'pending')
+            @if($order->status === 'pending' && !$order->isPaid())
                 <!-- Nút kích hoạt Modal Hủy đơn -->
                 <button type="button" onclick="showCancelOrderModal()" 
                         style="padding: 6px 16px; border: 1px solid #ef4444; background: #fff; color: #ef4444; border-radius: 20px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 6px;">
@@ -95,7 +95,59 @@
                     @csrf
                 </form>
             @endif
+
+            @if(in_array($order->status, ['completed', 'cancelled']))
+                <form action="{{ route('orders.reorder', $order->id) }}" method="POST" style="margin: 0;">
+                    @csrf
+                    <button type="submit"
+                            style="padding: 6px 16px; border: 1px solid #10b981; background: #ecfdf5; color: #059669; border-radius: 20px; font-size: 13px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
+                        <i class="bi bi-arrow-repeat"></i>
+                        <span>Mua lại đơn này</span>
+                    </button>
+                </form>
+            @endif
         </div>
+    </div>
+
+    <!-- Thanh tiến trình trạng thái đơn hàng -->
+    <div style="background: var(--color-surface, #ffffff); border-radius: 16px; padding: 20px 24px; border: 1px solid var(--color-outline-variant, #f0eae1); box-shadow: 0 4px 16px rgba(0,0,0,0.02); margin-bottom: 24px;">
+        @if($order->status === 'cancelled')
+            <div style="display: flex; align-items: center; gap: 12px; color: #dc2626; font-weight: 700; font-size: 14px;">
+                <i class="bi bi-x-octagon-fill" style="font-size: 22px;"></i>
+                <span>Đơn hàng này đã bị hủy. Bạn có thể bấm "Mua lại đơn này" để đặt lại các sản phẩm còn hàng.</span>
+            </div>
+        @else
+            @php
+                $steps = [
+                    ['key' => 'pending',   'label' => 'Chờ xác nhận', 'icon' => 'bi-clipboard-check'],
+                    ['key' => 'shipping',  'label' => 'Đang giao hàng', 'icon' => 'bi-truck'],
+                    ['key' => 'completed', 'label' => 'Hoàn thành', 'icon' => 'bi-patch-check-fill'],
+                ];
+                $currentIndex = match ($order->status) {
+                    'shipping'  => 1,
+                    'completed' => 2,
+                    default     => 0,
+                };
+            @endphp
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; text-align: center;">
+                @foreach($steps as $idx => $step)
+                    @php
+                        $isDone = $idx < $currentIndex || ($order->status === 'completed' && $idx === $currentIndex);
+                        $isActive = $idx === $currentIndex && $order->status !== 'completed';
+                        $circleBg = $isDone ? '#10b981' : ($isActive ? 'var(--color-primary, #792a16)' : '#e5e7eb');
+                        $circleColor = ($isDone || $isActive) ? '#ffffff' : '#6b7280';
+                    @endphp
+                    <div style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
+                        <div style="width: 38px; height: 38px; border-radius: 50%; background: {{ $circleBg }}; color: {{ $circleColor }}; display: flex; align-items: center; justify-content: center; font-size: 17px;">
+                            <i class="bi {{ $step['icon'] }}"></i>
+                        </div>
+                        <span style="font-size: 13px; font-weight: {{ ($isDone || $isActive) ? '700' : '500' }}; color: {{ ($isDone || $isActive) ? 'var(--color-on-surface)' : '#6b7280' }};">
+                            {{ $step['label'] }}
+                        </span>
+                    </div>
+                @endforeach
+            </div>
+        @endif
     </div>
 
     <!-- Thông báo Flash -->
@@ -108,6 +160,12 @@
     @if(session('error'))
         <div style="background: #fef2f2; border-left: 4px solid #ef4444; color: #991b1b; padding: 14px 18px; border-radius: 8px; font-size: 14px; margin-bottom: 20px;">
             {{ session('error') }}
+        </div>
+    @endif
+
+    @if(session('warning'))
+        <div style="background: #fffbeb; border-left: 4px solid #d97706; color: #92400e; padding: 14px 18px; border-radius: 8px; font-size: 14px; margin-bottom: 20px;">
+            {{ session('warning') }}
         </div>
     @endif
 
@@ -263,34 +321,69 @@
                     <div><strong>Địa chỉ:</strong> {{ $order->shipping_address }}</div>
                     <div style="margin-top: 8px; padding-top: 8px; border-top: 1px dashed var(--color-outline-variant, #f0eae1);">
                         <strong>Phương thức thanh toán:</strong><br>
-                        <span>
-                            @if($order->payment_method === 'qr')
-                                Chuyển khoản qua mã QR (VietQR)
+                        <span>{{ $order->paymentMethodLabel() }}</span>
+                        <div style="margin-top: 4px;">
+                            @if($order->isPaid())
+                                <span style="display: inline-block; padding: 2px 10px; border-radius: 10px; font-size: 12px; font-weight: 700; background: #d1fae5; color: #065f46;">
+                                    <i class="bi bi-patch-check-fill"></i> {{ $order->paymentStatusLabel() }}
+                                    @if($order->paid_at) ({{ $order->paid_at->format('d/m/Y H:i') }}) @endif
+                                </span>
+                            @elseif($order->payment_method === 'qr')
+                                <span style="display: inline-block; padding: 2px 10px; border-radius: 10px; font-size: 12px; font-weight: 700; background: #eef2ff; color: #4338ca;">
+                                    <i class="bi bi-clock-history"></i> {{ $order->paymentStatusLabel() }}
+                                </span>
                             @else
-                                Thanh toán khi nhận hàng (COD)
+                                <span style="font-size: 12px; color: var(--color-on-surface-variant);">
+                                    ({{ $order->paymentStatusLabel() }})
+                                </span>
                             @endif
-                        </span>
+                        </div>
+
+                        @if($order->payment_method === 'qr' && $order->payment_gateway === 'payos' && !$order->isPaid() && $order->status === 'pending')
+                            <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 10px;">
+                                @if($order->checkout_url)
+                                    <a href="{{ $order->checkout_url }}"
+                                       style="padding: 8px 12px; border-radius: 8px; background: #4338ca; color: #fff; text-decoration: none; font-size: 12.5px; font-weight: 700; text-align: center;">
+                                        <i class="bi bi-qr-code-scan"></i> Thanh toán ngay qua PayOS
+                                    </a>
+                                @endif
+                                <form action="{{ route('checkout.payos.verify', $order->id) }}" method="POST" style="margin: 0;">
+                                    @csrf
+                                    <button type="submit"
+                                            style="width: 100%; padding: 7px 12px; border-radius: 8px; border: 1px solid #4338ca; background: #fff; color: #4338ca; font-size: 12.5px; font-weight: 700; cursor: pointer;">
+                                        <i class="bi bi-arrow-clockwise"></i> Kiểm tra đã thanh toán
+                                    </button>
+                                </form>
+                            </div>
+                        @endif
                     </div>
                 </div>
             </div>
 
-            <!-- Thẻ 2: Tóm tắt thanh toán (ĐÃ SỬA LOGIC) -->
+            <!-- Thẻ 2: Tóm tắt thanh toán -->
+            @php
+                $subtotalCalc = max(0, ($order->total_amount ?? 0) - ($order->shipping_fee ?? 0) + ($order->discount_amount ?? 0));
+            @endphp
             <div style="background: var(--color-surface, #ffffff); border-radius: 16px; padding: 22px; border: 1px solid var(--color-outline-variant, #f0eae1); box-shadow: 0 4px 16px rgba(0,0,0,0.03);">
                 <h3 style="font-size: 16px; font-weight: 700; color: var(--color-on-surface); margin: 0 0 14px; border-bottom: 1px solid var(--color-outline-variant, #f0eae1); padding-bottom: 8px;">
                     Tổng kết thanh toán
                 </h3>
                 <div style="font-size: 13px; display: flex; flex-direction: column; gap: 10px;">
-                    <!-- Tạm tính = Tổng tiền - Phí ship -->
                     <div style="display: flex; justify-content: space-between; color: var(--color-on-surface-variant);">
                         <span>Tạm tính tiền hàng:</span>
                         <strong style="color: var(--color-on-surface);">
-                            {{ number_format($order->total_amount - $order->shipping_fee, 0, ',', '.') }}đ
+                            {{ number_format($subtotalCalc, 0, ',', '.') }}đ
                         </strong>
                     </div>
-                    <!-- Phí ship -->
+                    @if(($order->discount_amount ?? 0) > 0)
+                        <div style="display: flex; justify-content: space-between; color: #059669;">
+                            <span>Giảm giá (đơn cũ):</span>
+                            <strong>-{{ number_format($order->discount_amount, 0, ',', '.') }}đ</strong>
+                        </div>
+                    @endif
                     <div style="display: flex; justify-content: space-between; color: var(--color-on-surface-variant);">
                         <span>Phí giao hàng:</span>
-                        @if($order->shipping_fee > 0)
+                        @if(($order->shipping_fee ?? 0) > 0)
                             <strong style="color: var(--color-on-surface);">{{ number_format($order->shipping_fee, 0, ',', '.') }}đ</strong>
                         @else
                             <span style="color: #10b981; font-weight: 600;">Miễn phí</span>

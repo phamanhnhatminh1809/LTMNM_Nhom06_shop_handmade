@@ -86,8 +86,8 @@
                     </div>
                 </div>
 
-                <!-- Giá bán, Giá cũ & Tồn kho -->
-                <div class="modal-form-row-2" style="grid-template-columns: 1fr 1fr 1fr;">
+                <!-- Giá bán, Giá cũ, Tồn kho & Ngưỡng cảnh báo -->
+                <div class="modal-form-row-2" style="grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));">
                     <div class="modal-form-group">
                         <label class="modal-label" for="productPriceInput">
                             Giá bán (VNĐ) <span class="required-star">*</span>
@@ -104,7 +104,7 @@
                     </div>
                     <div class="modal-form-group">
                         <label class="modal-label" for="productOldPriceInput">
-                            Giá cũ (VNĐ)
+                            Giá gốc (VNĐ)
                         </label>
                         <input type="number"
                                id="productOldPriceInput"
@@ -127,6 +127,19 @@
                                placeholder="20"
                                value="{{ old('stock_quantity', 20) }}"
                                required>
+                    </div>
+                    <div class="modal-form-group">
+                        <label class="modal-label" for="productMinThresholdInput">
+                            Ngưỡng tối thiểu
+                        </label>
+                        <input type="number"
+                               id="productMinThresholdInput"
+                               name="min_stock_threshold"
+                               class="modal-input"
+                               min="0"
+                               max="10000"
+                               placeholder="5"
+                               value="{{ old('min_stock_threshold', 5) }}">
                     </div>
                 </div>
 

@@ -55,6 +55,11 @@
 
         <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
             @if($order->status === 'pending')
+                @if($order->payment_method === 'qr' && !$order->isPaid())
+                    <span style="font-size: 12px; font-weight: 700; color: #92400e; background: #fef3c7; padding: 6px 12px; border-radius: 8px; border: 1px solid #fde68a;">
+                        <i class="bi bi-exclamation-circle"></i> Đơn QR chưa ghi nhận PAID từ PayOS
+                    </span>
+                @endif
                 <form action="{{ route('admin.orders.updateStatus', $order) }}"
                       method="POST"
                       onsubmit="return confirm('Duyệt đơn hàng #{{ $order->code }} và chuyển sang trạng thái Đang giao?')">
@@ -214,9 +219,29 @@
                     @endforeach
                 </tbody>
                 <tfoot>
+                    @if(($order->shipping_fee ?? 0) > 0)
+                        <tr style="background-color: #fffdfa;">
+                            <td colspan="4" style="text-align: right; font-weight: 600; font-size: 13px; padding: 10px 16px; color: var(--color-outline);">
+                                Phí vận chuyển:
+                            </td>
+                            <td style="text-align: right; font-weight: 700; font-size: 13.5px; padding: 10px 16px;">
+                                {{ number_format($order->shipping_fee, 0, ',', '.') }}đ
+                            </td>
+                        </tr>
+                    @endif
+                    @if(($order->discount_amount ?? 0) > 0)
+                        <tr style="background-color: #fffdfa;">
+                            <td colspan="4" style="text-align: right; font-weight: 600; font-size: 13px; padding: 10px 16px; color: #059669;">
+                                Giảm giá (đơn cũ):
+                            </td>
+                            <td style="text-align: right; font-weight: 700; font-size: 13.5px; padding: 10px 16px; color: #059669;">
+                                -{{ number_format($order->discount_amount, 0, ',', '.') }}đ
+                            </td>
+                        </tr>
+                    @endif
                     <tr style="background-color: #fff8f6;">
                         <td colspan="4" style="text-align: right; font-weight: 800; font-size: 14px; padding: 16px;">
-                            Tổng cộng thanh toán (COD):
+                            Tổng cộng thanh toán ({{ $order->paymentMethodLabel() }}):
                         </td>
                         <td style="text-align: right; font-weight: 800; font-size: 16px; color: var(--color-primary); padding: 16px;">
                             {{ number_format($order->total_amount, 0, ',', '.') }}đ
@@ -254,8 +279,37 @@
                     </div>
                     <div class="info-kv-row">
                         <span class="info-kv-label">Phương thức TT</span>
-                        <span class="info-kv-value">Thanh toán khi nhận hàng (COD)</span>
+                        <span class="info-kv-value">{{ $order->paymentMethodLabel() }}</span>
                     </div>
+                    <div class="info-kv-row">
+                        <span class="info-kv-label">Trạng thái TT</span>
+                        <span class="info-kv-value">
+                            @if($order->isPaid())
+                                <span style="display: inline-block; padding: 2px 9px; border-radius: 999px; font-size: 11.5px; font-weight: 700; background: #dcfce7; color: #166534;">
+                                    {{ $order->paymentStatusLabel() }}
+                                </span>
+                                @if($order->paid_at)
+                                    <div style="font-size: 11px; color: var(--color-outline); margin-top: 2px;">
+                                        {{ $order->paid_at->format('H:i d/m/Y') }}
+                                    </div>
+                                @endif
+                            @elseif($order->payment_status === \App\Models\Order::PAYMENT_STATUS_CANCELLED)
+                                <span style="display: inline-block; padding: 2px 9px; border-radius: 999px; font-size: 11.5px; font-weight: 700; background: #fee2e2; color: #991b1b;">
+                                    {{ $order->paymentStatusLabel() }}
+                                </span>
+                            @else
+                                <span style="display: inline-block; padding: 2px 9px; border-radius: 999px; font-size: 11.5px; font-weight: 700; background: #fef3c7; color: #92400e;">
+                                    {{ $order->paymentStatusLabel() }}
+                                </span>
+                            @endif
+                        </span>
+                    </div>
+                    @if($order->payment_reference)
+                        <div class="info-kv-row">
+                            <span class="info-kv-label">Mã GD PayOS</span>
+                            <span class="info-kv-value"><span class="mono-code">{{ $order->payment_reference }}</span></span>
+                        </div>
+                    @endif
                 </div>
             </div>
         </div>

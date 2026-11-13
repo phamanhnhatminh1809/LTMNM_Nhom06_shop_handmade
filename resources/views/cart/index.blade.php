@@ -42,6 +42,17 @@
     }
     .btn-cancel:hover { background: #f3f4f6; }
     .btn-confirm:hover { background: #dc2626; }
+    .cart-layout-grid {
+        display: grid;
+        grid-template-columns: 1fr 340px;
+        gap: 30px;
+        align-items: start;
+    }
+    @media (max-width: 860px) {
+        .cart-layout-grid {
+            grid-template-columns: 1fr;
+        }
+    }
 </style>
 @endpush
 
@@ -94,8 +105,16 @@
             </a>
         </div>
     @else
+        @php
+            $freeThreshold = (float) config('shop.shipping.free_threshold', 300000);
+            $defaultShipFee = (float) config('shop.shipping.default_fee', 30000);
+            $subtotal = (float) $cart->total_amount;
+            $shippingFee = $subtotal >= $freeThreshold ? 0 : $defaultShipFee;
+            $estimatedTotal = $subtotal + $shippingFee;
+            $amountNeededForFreeShip = max(0, $freeThreshold - $subtotal);
+        @endphp
         <!-- Bố cục 2 cột: Bảng sản phẩm & Tóm tắt đơn hàng -->
-        <div style="display: grid; grid-template-columns: 1fr 340px; gap: 30px; align-items: start;">
+        <div class="cart-layout-grid">
             
             <!-- Cột trái: Danh sách sản phẩm -->
             <div style="background: var(--color-surface, #ffffff); border-radius: 16px; padding: 24px; border: 1px solid var(--color-outline-variant, #f0eae1); box-shadow: 0 4px 16px rgba(0,0,0,0.03);">
@@ -134,7 +153,7 @@
                                                 <span style="font-size: 12px; color: var(--color-on-surface-variant); display: block;">
                                                     Mã: {{ $item->product_code }}
                                                 </span>
-                                                @if($item->product && $item->product->stock_quantity < 5)
+                                                @if($item->product && $item->product->stock_quantity <= $item->product->effectiveMinStockThreshold())
                                                     <span style="font-size: 11px; color: #d97706; font-weight: 600; display: block; margin-top: 2px;">
                                                         Chỉ còn {{ $item->product->stock_quantity }} sản phẩm
                                                     </span>
@@ -150,19 +169,20 @@
 
                                     <!-- Cột số lượng -->
                                     <td style="padding: 16px 10px; text-align: center;">
+                                        @php $maxStock = (int) ($item->product->stock_quantity ?? 999); @endphp
                                         <form action="{{ route('cart.update', $item->id) }}" method="POST" style="display: inline-flex; align-items: center; border: 1px solid #d1d5db; border-radius: 6px; overflow: hidden;">
                                             @csrf
                                             @method('PUT')
                                             <button type="button" 
-                                                    onclick="const inp = this.nextElementSibling; if(parseInt(inp.value) > 1) { inp.value = parseInt(inp.value) - 1; this.form.submit(); }"
+                                                    onclick="const inp = this.nextElementSibling; const current = parseInt(inp.value, 10) || 1; if (current > 1) { inp.value = current - 1; this.form.submit(); }"
                                                     style="background: #f9fafb; border: none; padding: 6px 10px; cursor: pointer; font-size: 14px; font-weight: 700; color: #4b5563;">
                                                 -
                                             </button>
-                                            <input type="number" name="quantity" value="{{ $item->quantity }}" min="1" max="{{ $item->product->stock_quantity ?? 999 }}" 
+                                            <input type="number" name="quantity" value="{{ $item->quantity }}" min="1" max="{{ $maxStock }}" 
                                                    onchange="this.form.submit();"
                                                    style="width: 44px; text-align: center; border: none; font-size: 14px; font-weight: 600; padding: 6px 0; -moz-appearance: textfield;">
                                             <button type="button" 
-                                                    onclick="const inp = this.previousElementSibling; inp.value = parseInt(inp.value) + 1; this.form.submit();"
+                                                    onclick="const inp = this.previousElementSibling; const current = parseInt(inp.value, 10) || 1; const max = parseInt(inp.max, 10) || 999; if (current >= max) { if (window.showShopToast) window.showShopToast('Đã đạt tối đa tồn kho (' + max + ' sản phẩm).', 'warning'); return; } inp.value = current + 1; this.form.submit();"
                                                     style="background: #f9fafb; border: none; padding: 6px 10px; cursor: pointer; font-size: 14px; font-weight: 700; color: #4b5563;">
                                                 +
                                             </button>
@@ -182,12 +202,10 @@
                                             @method('DELETE')
                                         </form>
                                         <!-- Nút kích hoạt Modal -->
-                                        <button type="button" onclick="showDeleteModal({{ $item->id }})" 
-                                                style="background: none; border: none; color: #9ca3af; cursor: pointer; font-size: 13px; padding: 4px 8px; border-radius: 4px; transition: color 0.2s; display: inline-flex; align-items: center; gap: 4px;"
-                                                onmouseover="this.style.color='#ef4444'" onmouseout="this.style.color='#9ca3af'">
-                                            <i class="bi bi-trash3"></i>
-                                            <span>Xóa</span>
-                                        </button>
+                                        <x-table-action type="delete"
+                                                        label="Xóa khỏi giỏ hàng"
+                                                        tooltip-align="end"
+                                                        onclick="showDeleteModal({{ $item->id }})" />
                                     </td>
                                 </tr>
                             @endforeach
@@ -228,15 +246,26 @@
                     </div>
                     <div style="display: flex; justify-content: space-between; color: var(--color-on-surface-variant);">
                         <span>Phí vận chuyển:</span>
-                        <span style="color: #10b981; font-weight: 600;">Miễn phí</span>
+                        @if($shippingFee == 0)
+                            <span style="color: #10b981; font-weight: 600;">Miễn phí</span>
+                        @else
+                            <span style="font-weight: 600; color: var(--color-on-surface);">{{ number_format($shippingFee, 0, ',', '.') }}đ</span>
+                        @endif
                     </div>
+
+                    @if($amountNeededForFreeShip > 0)
+                        <div style="background: #fffbeb; border: 1px solid #fde68a; border-radius: 8px; padding: 8px 10px; font-size: 12px; color: #92400e;">
+                            <i class="bi bi-truck"></i>
+                            Mua thêm <strong>{{ number_format($amountNeededForFreeShip, 0, ',', '.') }}đ</strong> để được <strong>miễn phí vận chuyển</strong> (từ {{ number_format($freeThreshold, 0, ',', '.') }}đ).
+                        </div>
+                    @endif
 
                     <hr style="border: none; border-top: 1px solid var(--color-outline-variant, #f0eae1); margin: 6px 0;">
 
                     <div style="display: flex; justify-content: space-between; align-items: baseline;">
-                        <span style="font-weight: 700; font-size: 16px; color: var(--color-on-surface);">Tổng thanh toán:</span>
+                        <span style="font-weight: 700; font-size: 16px; color: var(--color-on-surface);">Tổng dự kiến:</span>
                         <strong style="font-size: 20px; font-weight: 800; color: var(--color-primary, #e76f51);">
-                            {{ number_format($cart->total_amount, 0, ',', '.') }}đ
+                            {{ number_format($estimatedTotal, 0, ',', '.') }}đ
                         </strong>
                     </div>
                 </div>
@@ -252,11 +281,11 @@
                 <div style="background: #f9fafb; border-radius: 8px; padding: 12px; font-size: 12px; color: var(--color-on-surface-variant); line-height: 1.6;">
                     <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 4px;">
                         <i class="bi bi-truck" style="color: var(--color-primary);"></i>
-                        <span>Hỗ trợ thanh toán trực tiếp khi nhận hàng (COD).</span>
+                        <span>Miễn phí vận chuyển cho đơn từ {{ number_format($freeThreshold, 0, ',', '.') }}đ.</span>
                     </div>
                     <div style="display: flex; align-items: center; gap: 6px;">
                         <i class="bi bi-shield-check" style="color: #10b981;"></i>
-                        <span>Kiểm tra hàng trước khi thanh toán.</span>
+                        <span>Hỗ trợ COD và chuyển khoản VietQR.</span>
                     </div>
                 </div>
             </div>

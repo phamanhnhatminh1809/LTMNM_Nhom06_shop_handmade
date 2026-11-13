@@ -12,10 +12,7 @@
         <span>Quản lý đơn hàng</span>
     </div>
     <div class="top-bar-right">
-        <button class="btn-icon-bell" title="Thông báo hệ thống">
-            <i class="bi bi-bell"></i>
-            <span class="notification-dot"></span>
-        </button>
+        @include('admin.partials.notification-bell')
     </div>
 </div>
 
@@ -208,12 +205,11 @@
                             </span>
                         </td>
                         <td style="text-align: center;">
-                            <div style="display: inline-flex; align-items: center; gap: 6px; flex-wrap: nowrap;">
-                                <a href="{{ route('admin.orders.show', $order) }}"
-                                   class="btn-action-view"
-                                   title="Xem chi tiết đơn hàng">
-                                    <i class="bi bi-eye"></i>
-                                </a>
+                            <x-table-actions>
+                                <x-table-action type="view"
+                                                :href="route('admin.orders.show', $order)"
+                                                label="Xem chi tiết đơn hàng"
+                                                :tooltip-align="in_array($order->status, ['completed', 'cancelled']) ? 'end' : 'auto'" />
 
                                 @if($order->status === 'pending')
                                     <form action="{{ route('admin.orders.updateStatus', $order) }}"
@@ -231,13 +227,16 @@
 
                                     <form action="{{ route('admin.orders.updateStatus', $order) }}"
                                           method="POST"
-                                          style="display: inline;"
+                                          class="table-action-form"
                                           onsubmit="return confirm('Xác nhận hủy đơn hàng #{{ $order->code }}?')">
                                         @csrf
                                         @method('PATCH')
                                         <input type="hidden" name="status" value="cancelled">
-                                        <button type="submit" class="btn-action-view danger" title="Hủy đơn hàng">
-                                            <i class="bi bi-x-lg"></i>
+                                        <button type="submit"
+                                                class="table-action-btn is-danger is-tooltip-end"
+                                                data-tooltip="Hủy đơn hàng"
+                                                aria-label="Hủy đơn hàng">
+                                            <i class="bi bi-x-lg" aria-hidden="true"></i>
                                         </button>
                                     </form>
                                 @elseif($order->status === 'shipping')
@@ -254,7 +253,7 @@
                                         </button>
                                     </form>
                                 @endif
-                            </div>
+                            </x-table-actions>
                         </td>
                     </tr>
                 @empty
@@ -276,14 +275,13 @@
 
 @push('scripts')
 <script>
-document.addEventListener('DOMContentLoaded', () => {
+window.AdminApp.mount(() => {
     const searchInput = document.getElementById('orderQuickSearch');
-    const rows = document.querySelectorAll('#ordersDataTable tbody .order-row');
 
     if (searchInput) {
         searchInput.addEventListener('input', function () {
             const q = this.value.toLowerCase().trim();
-            rows.forEach(row => {
+            document.querySelectorAll('#ordersDataTable tbody .order-row').forEach(row => {
                 row.style.display = row.textContent.toLowerCase().includes(q) ? '' : 'none';
             });
         });

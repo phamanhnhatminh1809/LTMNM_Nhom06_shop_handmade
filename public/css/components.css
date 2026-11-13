@@ -17,7 +17,7 @@
     border-radius: var(--radius);
     border: 1.5px solid transparent;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
     text-align: center;
     white-space: nowrap;
     user-select: none;
@@ -290,7 +290,7 @@
     border-radius: var(--radius-sm);
     font-size: var(--font-size-body-sm);
     color: var(--color-on-surface-variant);
-    transition: all 0.15s;
+    transition: background-color 0.15s ease, color 0.15s ease;
 }
 .filter-list li a:hover {
     background: var(--color-surface-container-low);
@@ -777,3 +777,264 @@
         grid-template-columns: 1fr !important;
     }
 }
+
+/* Component dùng chung cho nút thao tác dạng icon trong bảng (Storefront) */
+.table-actions-group {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--table-action-gap, 6px);
+    flex-wrap: nowrap;
+}
+
+.table-action-form {
+    display: inline-flex;
+    margin: 0;
+}
+
+.table-action-btn {
+    position: relative;
+    width: var(--table-action-size, 36px);
+    height: var(--table-action-size, 36px);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--table-action-radius, 10px);
+    border: 1px solid var(--table-action-border, rgba(220, 193, 186, 0.55));
+    background-color: var(--table-action-bg, rgba(121, 42, 22, 0.045));
+    color: var(--table-action-color, #55423e);
+    font-size: var(--table-action-icon-size, 17px);
+    line-height: 1;
+    cursor: pointer;
+    text-decoration: none;
+    flex-shrink: 0;
+    transition: background-color 0.16s ease, border-color 0.16s ease, color 0.16s ease, transform 0.16s ease, box-shadow 0.16s ease;
+}
+
+.table-action-btn i {
+    pointer-events: none;
+    line-height: 1;
+}
+
+.table-action-btn:hover,
+.table-action-btn:focus-visible {
+    color: var(--table-action-hover-color, #ffffff);
+    transform: translateY(-1px);
+    outline: none;
+}
+
+.table-action-btn.is-view:hover,
+.table-action-btn.is-view:focus-visible {
+    background-color: var(--table-action-view-hover-bg, #792a16);
+    border-color: var(--table-action-view-hover-bg, #792a16);
+    box-shadow: 0 4px 10px rgba(121, 42, 22, 0.24);
+}
+
+.table-action-btn.is-danger:hover,
+.table-action-btn.is-danger:focus-visible {
+    background-color: var(--table-action-danger-hover-bg, #ba1a1a);
+    border-color: var(--table-action-danger-hover-bg, #ba1a1a);
+    box-shadow: 0 4px 10px rgba(186, 26, 26, 0.24);
+}
+
+.table-action-btn[data-tooltip]::before {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: calc(100% + 9px);
+    left: 50%;
+    transform: translate(-50%, 4px);
+    padding: 6px 11px;
+    border-radius: var(--table-action-tooltip-radius, 8px);
+    background-color: var(--table-action-tooltip-bg, #1f1512);
+    color: var(--table-action-tooltip-color, #ffffff);
+    font-family: var(--font-family-base, 'Nunito Sans', sans-serif);
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1.25;
+    white-space: nowrap;
+    box-shadow: var(--table-action-tooltip-shadow, 0 6px 16px rgba(31, 21, 18, 0.24));
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    z-index: 60;
+    transition: opacity 0.14s ease, transform 0.14s ease, visibility 0.14s ease;
+}
+
+.table-action-btn[data-tooltip]::after {
+    content: '';
+    position: absolute;
+    bottom: calc(100% + 4px);
+    left: 50%;
+    transform: translate(-50%, 4px);
+    border-width: 5px 5px 0 5px;
+    border-style: solid;
+    border-color: var(--table-action-tooltip-bg, #1f1512) transparent transparent transparent;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    z-index: 60;
+    transition: opacity 0.14s ease, transform 0.14s ease, visibility 0.14s ease;
+}
+
+.table-action-btn[data-tooltip]:hover::before,
+.table-action-btn[data-tooltip]:hover::after,
+.table-action-btn[data-tooltip]:focus-visible::before,
+.table-action-btn[data-tooltip]:focus-visible::after {
+    opacity: 1;
+    visibility: visible;
+    transform: translate(-50%, 0);
+}
+
+.table-action-btn.is-tooltip-end[data-tooltip]::before,
+.table-actions-group > .table-action-btn:last-child:not(.is-tooltip-center)[data-tooltip]::before,
+.table-actions-group > .table-action-form:last-child .table-action-btn:not(.is-tooltip-center)[data-tooltip]::before {
+    left: auto;
+    right: 0;
+    transform: translate(0, 4px);
+}
+
+.table-action-btn.is-tooltip-end[data-tooltip]:hover::before,
+.table-action-btn.is-tooltip-end[data-tooltip]:focus-visible::before,
+.table-actions-group > .table-action-btn:last-child:not(.is-tooltip-center)[data-tooltip]:hover::before,
+.table-actions-group > .table-action-btn:last-child:not(.is-tooltip-center)[data-tooltip]:focus-visible::before,
+.table-actions-group > .table-action-form:last-child .table-action-btn:not(.is-tooltip-center)[data-tooltip]:hover::before,
+.table-actions-group > .table-action-form:last-child .table-action-btn:not(.is-tooltip-center)[data-tooltip]:focus-visible::before {
+    transform: translate(0, 0);
+}
+
+/* ============================================
+   PRODUCT CARD QUICK ADD & HEADER CART BUMP
+   ============================================ */
+.product-card__quick-cart {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 3;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    border: 1px solid #ebdcd7;
+    background: rgba(255, 255, 255, 0.96);
+    color: var(--color-primary, #792a16);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(31, 21, 18, 0.12);
+    transition: transform 0.18s ease, background-color 0.18s ease, color 0.18s ease, border-color 0.18s ease;
+}
+
+.product-card__quick-cart:hover:not(:disabled) {
+    background: var(--color-primary, #792a16);
+    color: #ffffff;
+    border-color: var(--color-primary, #792a16);
+    transform: translateY(-2px) scale(1.04);
+}
+
+.product-card__quick-cart:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    color: #6b7280;
+    background: #f3f4f6;
+}
+
+.product-card__quick-cart.is-loading {
+    pointer-events: none;
+    opacity: 0.75;
+}
+
+@keyframes cartBump {
+    0% { transform: scale(1); }
+    40% { transform: scale(1.16); }
+    100% { transform: scale(1); }
+}
+
+.cart-icon.is-bumping {
+    animation: cartBump 0.35s ease;
+}
+
+/* ============================================
+   SHOP TOAST NOTIFICATION
+   ============================================ */
+.shop-toast-container {
+    position: fixed;
+    top: 84px;
+    right: 20px;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-width: 360px;
+    width: calc(100vw - 32px);
+    pointer-events: none;
+}
+
+.shop-toast {
+    pointer-events: auto;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 13px 14px;
+    border-radius: 12px;
+    background: #ffffff;
+    color: #1f2937;
+    border: 1px solid #e5e7eb;
+    border-left: 4px solid var(--color-primary, #792a16);
+    box-shadow: 0 12px 28px rgba(17, 24, 39, 0.14);
+    font-size: 13.5px;
+    line-height: 1.45;
+    opacity: 0;
+    transform: translateX(18px);
+    transition: opacity 0.22s ease, transform 0.22s ease;
+}
+
+.shop-toast.is-visible {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.shop-toast.is-success { border-left-color: #10b981; }
+.shop-toast.is-warning { border-left-color: #f59e0b; }
+.shop-toast.is-error   { border-left-color: #ef4444; }
+
+.shop-toast__icon {
+    font-size: 18px;
+    line-height: 1;
+    margin-top: 1px;
+    flex-shrink: 0;
+}
+
+.shop-toast.is-success .shop-toast__icon { color: #10b981; }
+.shop-toast.is-warning .shop-toast__icon { color: #f59e0b; }
+.shop-toast.is-error   .shop-toast__icon { color: #ef4444; }
+
+.shop-toast__body {
+    flex: 1;
+    min-width: 0;
+}
+
+.shop-toast__link {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-top: 5px;
+    font-size: 12.5px;
+    font-weight: 700;
+    color: var(--color-primary, #792a16);
+    text-decoration: none;
+}
+
+.shop-toast__link:hover { text-decoration: underline; }
+
+.shop-toast__close {
+    background: none;
+    border: none;
+    color: #9ca3af;
+    font-size: 16px;
+    cursor: pointer;
+    padding: 0 2px;
+    line-height: 1;
+}
+
+.shop-toast__close:hover { color: #374151; }

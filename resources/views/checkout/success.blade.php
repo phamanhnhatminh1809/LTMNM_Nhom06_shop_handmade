@@ -43,7 +43,22 @@
 <div class="container" style="padding-top: 36px; padding-bottom: 60px; max-width: 760px;">
     <!-- Thông báo thành công -->
     <div style="background: var(--color-surface, #ffffff); border-radius: 16px; padding: 36px; border: 1px solid var(--color-outline-variant, #f0eae1); box-shadow: 0 4px 20px rgba(0,0,0,0.03); text-align: center;">
-        
+        @if(session('warning'))
+            <div style="background: #fffbeb; border-left: 4px solid #d97706; color: #92400e; padding: 12px 16px; border-radius: 8px; font-size: 13.5px; text-align: left; margin-bottom: 20px;">
+                {{ session('warning') }}
+            </div>
+        @endif
+        @if(session('error'))
+            <div style="background: #fef2f2; border-left: 4px solid #ef4444; color: #991b1b; padding: 12px 16px; border-radius: 8px; font-size: 13.5px; text-align: left; margin-bottom: 20px;">
+                {{ session('error') }}
+            </div>
+        @endif
+        @if(session('success'))
+            <div style="background: #ecfdf5; border-left: 4px solid #10b981; color: #065f46; padding: 12px 16px; border-radius: 8px; font-size: 13.5px; text-align: left; margin-bottom: 20px;">
+                {{ session('success') }}
+            </div>
+        @endif
+
         <div style="width: 64px; height: 64px; border-radius: 50%; background: #ecfdf5; color: #059669; display: flex; align-items: center; justify-content: center; font-size: 32px; margin: 0 auto 16px;">
             <i class="bi bi-check-circle-fill"></i>
         </div>
@@ -69,16 +84,42 @@
                 <div><strong>Người nhận:</strong> {{ $order->shipping_name }}</div>
                 <div><strong>Số điện thoại:</strong> {{ $order->shipping_phone }}</div>
                 <div><strong>Địa chỉ:</strong> {{ $order->shipping_address }}</div>
-                <div><strong>Phương thức thanh toán:</strong> 
-                    @if($order->payment_method === 'qr')
-                        Chuyển khoản qua mã QR (VietQR)
+                <div><strong>Phương thức thanh toán:</strong> {{ $order->paymentMethodLabel() }}</div>
+                <div>
+                    <strong>Trạng thái thanh toán:</strong>
+                    @if($order->isPaid())
+                        <span style="display: inline-block; padding: 2px 10px; border-radius: 10px; font-size: 12px; font-weight: 700; background: #d1fae5; color: #065f46;">
+                            <i class="bi bi-patch-check-fill"></i> {{ $order->paymentStatusLabel() }}
+                            @if($order->paid_at) ({{ $order->paid_at->format('d/m/Y H:i') }}) @endif
+                        </span>
+                    @elseif($order->payment_method === 'qr')
+                        <span style="display: inline-block; padding: 2px 10px; border-radius: 10px; font-size: 12px; font-weight: 700; background: #eef2ff; color: #4338ca;">
+                            <i class="bi bi-clock-history"></i> {{ $order->paymentStatusLabel() }}
+                        </span>
                     @else
-                        Thanh toán khi nhận hàng (COD)
+                        <span>{{ $order->paymentStatusLabel() }}</span>
                     @endif
                 </div>
+                @if($order->payment_method === 'qr' && $order->payment_gateway === 'payos' && !$order->isPaid() && $order->status === 'pending')
+                    <div style="display: flex; gap: 10px; flex-wrap: wrap; margin: 10px 0 6px;">
+                        @if($order->checkout_url)
+                            <a href="{{ $order->checkout_url }}"
+                               style="padding: 8px 14px; border-radius: 8px; background: #4338ca; color: #fff; text-decoration: none; font-size: 12.5px; font-weight: 700; display: inline-flex; align-items: center; gap: 6px;">
+                                <i class="bi bi-qr-code-scan"></i> Mở cổng thanh toán PayOS
+                            </a>
+                        @endif
+                        <form action="{{ route('checkout.payos.verify', $order->id) }}" method="POST" style="margin: 0;">
+                            @csrf
+                            <button type="submit"
+                                    style="padding: 8px 14px; border-radius: 8px; border: 1px solid #4338ca; background: #fff; color: #4338ca; font-size: 12.5px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
+                                <i class="bi bi-arrow-clockwise"></i> Kiểm tra đã thanh toán
+                            </button>
+                        </form>
+                    </div>
+                @endif
                 <div><strong>Trạng thái đơn hàng:</strong> 
                     <span style="display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 12px; font-weight: 600; background: #fef3c7; color: #d97706;">
-                        Chờ xác nhận
+                        {{ match($order->status) { 'shipping' => 'Đang giao hàng', 'completed' => 'Hoàn thành', 'cancelled' => 'Đã hủy', default => 'Chờ xác nhận' } }}
                     </span>
                 </div>
             </div>
@@ -176,18 +217,31 @@
                 <i class="bi bi-bag"></i>
                 <span>Tiếp tục mua hàng</span>
             </a>
-            <a href="{{ route('profile.show') }}" 
-               style="padding: 12px 24px; border-radius: 8px; font-size: 14px; font-weight: 600; text-decoration: none; border: 1px solid #d1d5db; color: #374151; background: #fff; display: inline-flex; align-items: center; gap: 8px;">
-                <i class="bi bi-person"></i>
-                <span>Quản lý tài khoản</span>
-            </a>
-            @if($order->status === 'pending')
-                <button type="button" onclick="showCancelModal()" 
-                        style="padding: 12px 24px; border-radius: 8px; font-size: 14px; font-weight: 600; border: 1px solid #ef4444; color: #ef4444; background: #fff; cursor: pointer; display: inline-flex; align-items: center; gap: 8px;">
-                    <i class="bi bi-x-circle"></i>
-                    <span>Hủy đơn hàng</span>
-                </button>
-            @endif
+            @auth
+                <a href="{{ route('orders.show', $order->id) }}"
+                   style="padding: 12px 24px; border-radius: 8px; font-size: 14px; font-weight: 600; text-decoration: none; border: 1px solid var(--color-primary, #e76f51); color: var(--color-primary, #e76f51); background: #fffaf7; display: inline-flex; align-items: center; gap: 8px;">
+                    <i class="bi bi-truck"></i>
+                    <span>Theo dõi đơn hàng</span>
+                </a>
+                <a href="{{ route('profile.show') }}" 
+                   style="padding: 12px 24px; border-radius: 8px; font-size: 14px; font-weight: 600; text-decoration: none; border: 1px solid #d1d5db; color: #374151; background: #fff; display: inline-flex; align-items: center; gap: 8px;">
+                    <i class="bi bi-person"></i>
+                    <span>Quản lý tài khoản</span>
+                </a>
+                @if($order->status === 'pending' && !$order->isPaid())
+                    <button type="button" onclick="showCancelModal()" 
+                            style="padding: 12px 24px; border-radius: 8px; font-size: 14px; font-weight: 600; border: 1px solid #ef4444; color: #ef4444; background: #fff; cursor: pointer; display: inline-flex; align-items: center; gap: 8px;">
+                        <i class="bi bi-x-circle"></i>
+                        <span>Hủy đơn hàng</span>
+                    </button>
+                @endif
+            @else
+                <a href="{{ route('login') }}"
+                   style="padding: 12px 24px; border-radius: 8px; font-size: 14px; font-weight: 600; text-decoration: none; border: 1px solid #d1d5db; color: #374151; background: #fff; display: inline-flex; align-items: center; gap: 8px;">
+                    <i class="bi bi-box-arrow-in-right"></i>
+                    <span>Đăng nhập để theo dõi đơn</span>
+                </a>
+            @endauth
         </div>
 
     </div>

@@ -289,6 +289,8 @@
                                 Gửi mã OTP
                             </button>
                         </div>
+                        <div id="register-otp-feedback" style="display: none; margin-top: 8px; padding: 8px 12px; border-radius: 6px; font-size: 12.5px; align-items: center; gap: 6px;"></div>
+                        <span class="client-feedback-error" id="error-register-otp" style="display: none;"></span>
                         @error('otp')
                             <span style="color: #ef4444; font-size: 12px; margin-top: 4px; display: block;">{{ $message }}</span>
                         @enderror

@@ -3,11 +3,6 @@
 @section('title', $product->name)
 
 @php
-    $discount = 0;
-    if (!empty($product->old_price) && $product->old_price > $product->price) {
-        $discount = round((1 - $product->price / $product->old_price) * 100);
-    }
-
     // Xử lý ảnh chính an toàn
     $mainImg = $product->image ?? '';
     $mainImgUrl = (str_starts_with($mainImg, 'http') || str_starts_with($mainImg, '//'))
@@ -27,6 +22,8 @@
     if (empty($gallery)) {
         $gallery = [$mainImg];
     }
+
+    $hasReviews = $product->hasReviews();
 @endphp
 
 @push('styles')
@@ -109,12 +106,6 @@
                          src="{{ $mainImgUrl }}"
                          alt="{{ $product->name }}"
                          onerror="this.onerror=null; this.src='{{ asset('assets/images/placeholder.svg') }}';">
-
-                    @if ($discount > 0)
-                    <span class="badge badge--sale badge--lg" style="position: absolute; top: 12px; left: 12px; z-index: 2;">
-                        -{{ $discount }}%
-                    </span>
-                    @endif
                 </div>
 
                 <div class="gallery-thumbs">
@@ -128,12 +119,7 @@
                     <img src="{{ $thumbUrl }}"
                          alt="thumb {{ $i + 1 }}"
                          class="thumb {{ $i === 0 ? 'active' : '' }}"
-                         onerror="this.onerror=null; this.src='{{ asset('assets/images/placeholder.svg') }}';"
-                         onclick="
-                            document.getElementById('mainImage').src = this.src;
-                            document.querySelectorAll('.thumb').forEach(t => t.classList.remove('active'));
-                            this.classList.add('active');
-                         ">
+                         onerror="this.onerror=null; this.src='{{ asset('assets/images/placeholder.svg') }}';">
                     @endforeach
                 </div>
             </div>
@@ -144,16 +130,17 @@
                 <h1 style="font-size: 28px; font-weight: 800; margin: 8px 0 16px; color: #2c2c2c;">{{ $product->name }}</h1>
 
                 <div class="product-info__rating" style="display: flex; align-items: center; gap: 6px; font-size: 14px; color: var(--color-on-surface-variant); margin-bottom: 20px;">
-                    <x-star-rating :rating="$product->rating" size="16" />
-                    <span>{{ $product->rating }}/5 · Đã bán {{ $product->sold }} · Còn {{ $product->stock_quantity }} sản phẩm</span>
+                    @if($hasReviews)
+                        <x-star-rating :rating="$product->rating" size="16" />
+                        <span>{{ number_format($product->rating, 1) }}/5 ({{ $product->reviews->count() }} đánh giá) · Đã bán {{ $product->sold }} · Còn {{ $product->stock_quantity }} sản phẩm</span>
+                    @else
+                        <i class="bi bi-star" style="color: #cbd5e1; font-size: 15px;"></i>
+                        <span>Chưa có đánh giá · Đã bán {{ $product->sold }} · Còn {{ $product->stock_quantity }} sản phẩm</span>
+                    @endif
                 </div>
 
                 <div class="product-info__price" style="margin-bottom: 24px; display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap;">
                     <span class="price price--lg" style="font-size: 28px; font-weight: 800; color: #c0392b;">{{ number_format($product->price, 0, ',', '.') }}đ</span>
-                    @if (!empty($product->old_price) && $product->old_price > $product->price)
-                    <span class="price-old" style="font-size: 16px; color: #999; text-decoration: line-through;">{{ number_format($product->old_price, 0, ',', '.') }}đ</span>
-                    <span class="discount" style="background: #fef2f2; color: #c0392b; padding: 4px 10px; border-radius: 6px; font-size: 13px; font-weight: 600;">Tiết kiệm {{ number_format($product->old_price - $product->price, 0, ',', '.') }}đ</span>
-                    @endif
                 </div>
 
                 <p class="product-info__desc" style="font-size: 15px; line-height: 1.6; color: #444; margin-bottom: 24px;">{!! nl2br(e($product->description)) !!}</p>
@@ -177,7 +164,11 @@
                 @endif
 
                 @if($product->stock_quantity > 0)
-                <form action="{{ route('cart.store') }}" method="POST" style="margin-bottom: 24px; padding: 20px; background: #fdfaf7; border: 1px solid #f0eae1; border-radius: 12px;">
+                <form action="{{ route('cart.store') }}"
+                      method="POST"
+                      data-ajax-cart-form
+                      data-product-name="{{ $product->name }}"
+                      style="margin-bottom: 24px; padding: 20px; background: #fdfaf7; border: 1px solid #f0eae1; border-radius: 12px;">
                     @csrf
                     <input type="hidden" name="product_id" value="{{ $product->id }}">
 
@@ -185,13 +176,15 @@
                         <span style="font-size: 15px; font-weight: 600; color: #333;">Số lượng:</span>
                         <div class="qty" style="display: inline-flex; border: 1px solid #d1d5db; border-radius: 8px; overflow: hidden; background: #fff;">
                             <button type="button"
-                                onclick="const input = this.nextElementSibling; if(parseInt(input.value) > 1) input.value = parseInt(input.value) - 1;"
-                                style="border: none; background: #fff; padding: 8px 16px; cursor: pointer; font-weight: 700; font-size: 16px; color: #555; border-right: 1px solid #d1d5db;">−</button>
+                                    data-qty-action="minus"
+                                    aria-label="Giảm số lượng"
+                                    style="border: none; background: #fff; padding: 8px 16px; cursor: pointer; font-weight: 700; font-size: 16px; color: #555; border-right: 1px solid #d1d5db;">−</button>
                             <input type="number" name="quantity" value="1" min="1" max="{{ $product->stock_quantity }}"
                                 style="width: 60px; text-align: center; border: none; font-weight: 600; font-size: 15px; outline: none;">
                             <button type="button"
-                                onclick="const input = this.previousElementSibling; if(parseInt(input.value) < {{ $product->stock_quantity }}) input.value = parseInt(input.value) + 1;"
-                                style="border: none; background: #fff; padding: 8px 16px; cursor: pointer; font-weight: 700; font-size: 16px; color: #555; border-left: 1px solid #d1d5db;">+</button>
+                                    data-qty-action="plus"
+                                    aria-label="Tăng số lượng"
+                                    style="border: none; background: #fff; padding: 8px 16px; cursor: pointer; font-weight: 700; font-size: 16px; color: #555; border-left: 1px solid #d1d5db;">+</button>
                         </div>
                         <span style="font-size: 13px; color: #888;">(Còn {{ $product->stock_quantity }} sản phẩm)</span>
                     </div>

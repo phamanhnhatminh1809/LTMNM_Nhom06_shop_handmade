@@ -14,10 +14,7 @@
         <span>Quản lý nhân viên</span>
     </div>
     <div class="top-bar-right">
-        <button class="btn-icon-bell" title="Thông báo hệ thống">
-            <i class="bi bi-bell"></i>
-            <span class="notification-dot"></span>
-        </button>
+        @include('admin.partials.notification-bell')
     </div>
 </div>
 
@@ -229,24 +226,21 @@
                             @endif
                         </td>
                         <td style="text-align: center;">
-                            <div style="display: inline-flex; align-items: center; gap: 6px;">
-                                <a href="{{ route('admin.staff.edit', $u) }}"
-                                   class="btn-action-view"
-                                   title="Chỉnh sửa chi tiết và phân quyền">
-                                    <i class="bi bi-pencil"></i>
-                                </a>
+                            <x-table-actions>
+                                <x-table-action type="edit"
+                                                :href="route('admin.staff.edit', $u)"
+                                                label="Chỉnh sửa và phân quyền"
+                                                :tooltip-align="$isCurrentUser ? 'end' : 'auto'" />
 
                                 @if(!$isCurrentUser)
-                                    <button type="button"
-                                            class="btn-action-view danger"
-                                            title="Xóa tài khoản nhân viên"
-                                            onclick="openDeleteStaffModal({{ $u->id }}, '{{ addslashes($u->full_name) }}', '{{ route('admin.staff.destroy', $u) }}')">
-                                        <i class="bi bi-trash3"></i>
-                                    </button>
+                                    <x-table-action type="delete"
+                                                    label="Xóa tài khoản nhân viên"
+                                                    tooltip-align="end"
+                                                    onclick="openDeleteStaffModal({{ $u->id }}, {{ json_encode($u->full_name, JSON_UNESCAPED_UNICODE) }}, '{{ route('admin.staff.destroy', $u) }}')" />
                                 @else
-                                    <span style="font-size: 12px; color: var(--color-outline); width: 28px; text-align: center;">—</span>
+                                    <span style="font-size: 12px; color: var(--color-outline); width: var(--table-action-size); text-align: center;">—</span>
                                 @endif
-                            </div>
+                            </x-table-actions>
                         </td>
                     </tr>
                 @empty
@@ -295,7 +289,7 @@
 
 @push('scripts')
 <script>
-    function openDeleteStaffModal(id, name, deleteUrl) {
+    window.openDeleteStaffModal = function(id, name, deleteUrl) {
         const modal = document.getElementById('deleteStaffModal');
         const form = document.getElementById('deleteStaffForm');
         const msg = document.getElementById('deleteStaffMessage');
@@ -303,18 +297,20 @@
         form.action = deleteUrl;
         msg.innerHTML = 'Bạn có chắc chắn muốn xóa tài khoản <strong>«' + name + '»</strong>? Hành động này không thể hoàn tác.';
         modal.classList.add('active');
-    }
+    };
 
-    function closeDeleteStaffModal() {
+    window.closeDeleteStaffModal = function() {
         const modal = document.getElementById('deleteStaffModal');
-        modal.classList.remove('active');
-    }
+        modal?.classList.remove('active');
+    };
 
-    // Đóng khi click ngoài modal box
-    document.getElementById('deleteStaffModal')?.addEventListener('click', function(e) {
-        if (e.target === this) {
-            closeDeleteStaffModal();
-        }
+    window.AdminApp.mount(() => {
+        // Đóng khi click ngoài modal box
+        document.getElementById('deleteStaffModal')?.addEventListener('click', function(e) {
+            if (e.target === this) {
+                window.closeDeleteStaffModal();
+            }
+        });
     });
 </script>
 @endpush

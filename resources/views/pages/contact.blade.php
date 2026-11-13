@@ -24,7 +24,7 @@
                 </div>
                 <div>
                     <h3 style="font-size: 15px; font-weight: 700; margin: 0 0 4px; color: var(--color-on-surface);">Địa chỉ cửa hàng</h3>
-                    <p style="margin: 0; font-size: 14px; color: var(--color-on-surface-variant);">123 Nguyễn Văn Cừ, Quận 5, TP. Hồ Chí Minh</p>
+                    <p style="margin: 0; font-size: 14px; color: var(--color-on-surface-variant);">{{ config('shop.contact.address') }}</p>
                 </div>
             </div>
 
@@ -34,7 +34,7 @@
                 </div>
                 <div>
                     <h3 style="font-size: 15px; font-weight: 700; margin: 0 0 4px; color: var(--color-on-surface);">Hotline tư vấn</h3>
-                    <p style="margin: 0; font-size: 14px; color: var(--color-on-surface-variant);">0123 456 789 (8h00 - 21h00 hàng ngày)</p>
+                    <p style="margin: 0; font-size: 14px; color: var(--color-on-surface-variant);">{{ config('shop.contact.phone') }} ({{ config('shop.contact.hours') }})</p>
                 </div>
             </div>
 
@@ -44,17 +44,17 @@
                 </div>
                 <div>
                     <h3 style="font-size: 15px; font-weight: 700; margin: 0 0 4px; color: var(--color-on-surface);">Email hỗ trợ</h3>
-                    <p style="margin: 0; font-size: 14px; color: var(--color-on-surface-variant);">hello@shophandmade.vn</p>
+                    <p style="margin: 0; font-size: 14px; color: var(--color-on-surface-variant);">{{ config('shop.contact.email') }}</p>
                 </div>
             </div>
 
             <div style="background: #ffffff; padding: 24px; border-radius: 14px; border: 1px solid var(--color-outline-variant, #f0eae1); box-shadow: 0 4px 16px rgba(0,0,0,0.02); display: flex; gap: 16px; align-items: flex-start;">
                 <div style="width: 44px; height: 44px; border-radius: 10px; background: #faf7f5; color: var(--color-primary); display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0;">
-                    <i class="bi bi-chat-dots-fill"></i>
+                    <i class="bi bi-clock-fill"></i>
                 </div>
                 <div>
-                    <h3 style="font-size: 15px; font-weight: 700; margin: 0 0 4px; color: var(--color-on-surface);">Zalo Official</h3>
-                    <p style="margin: 0; font-size: 14px; color: var(--color-on-surface-variant);">0123 456 789</p>
+                    <h3 style="font-size: 15px; font-weight: 700; margin: 0 0 4px; color: var(--color-on-surface);">Giờ mở cửa</h3>
+                    <p style="margin: 0; font-size: 14px; color: var(--color-on-surface-variant);">{{ config('shop.contact.hours') }}</p>
                 </div>
             </div>
         </div>

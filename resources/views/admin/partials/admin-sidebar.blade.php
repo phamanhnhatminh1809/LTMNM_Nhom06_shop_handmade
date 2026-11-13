@@ -1,7 +1,7 @@
 @php
     $currentMenu = $activeMenu ?? 'dashboard';
     $authUser = Auth::user();
-    $roleShortLabel = match ($authUser?->role?->name) {
+    $roleShortLabel = match ($authUser?->resolveRoleName()) {
         'admin'           => 'Quản trị viên',
         'warehouse_staff' => 'Nhân viên kho',
         'sales_staff'     => 'Nhân viên bán hàng',

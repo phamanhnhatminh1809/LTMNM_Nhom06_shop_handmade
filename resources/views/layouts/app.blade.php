@@ -47,9 +47,33 @@
     </style>
 
     @stack('styles')
+    <script type="speculationrules">
+        {
+            "prefetch": [
+                {
+                    "where": {
+                        "and": [
+                            { "href_matches": "/*" },
+                            { "not": { "href_matches": "/logout*" } },
+                            { "not": { "href_matches": "/admin*" } },
+                            { "not": { "selector_matches": "[data-no-prefetch], [target='_blank']" } }
+                        ]
+                    },
+                    "eagerness": "moderate"
+                }
+            ]
+        }
+    </script>
 </head>
-<body>
+<body data-cart-store-url="{{ route('cart.store') }}" data-cart-index-url="{{ route('cart.index') }}">
     @include('partials.header')
+
+    <div id="shopToastContainer"
+         class="shop-toast-container"
+         aria-live="polite"
+         aria-atomic="true"
+         @if(session('success')) data-flash-success="{{ session('success') }}" @endif
+         @if(session('error')) data-flash-error="{{ session('error') }}" @endif></div>
 
     <main class="main-content">
         @yield('content')
@@ -57,7 +81,7 @@
 
     @include('partials.footer')
 
-    <script src="{{ asset('js/main.js') }}"></script>
+    <script src="{{ asset('js/main.js') }}?v={{ filemtime(public_path('js/main.js')) }}"></script>
     @stack('scripts')
 </body>
 </html>

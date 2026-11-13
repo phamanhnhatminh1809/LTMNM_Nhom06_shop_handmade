@@ -1,6 +1,19 @@
-document.addEventListener('DOMContentLoaded', () => {
-    const chartData = window.dashboardChartData || {};
+window.AdminApp.registerModule('dashboard', ({ signal }) => {
     const revenueCtx = document.getElementById('revenueChart');
+    const categoryCtx = document.getElementById('categoryDonutChart');
+    if (!revenueCtx && !categoryCtx) return;
+    if (typeof window.Chart === 'undefined') return;
+
+    if (revenueCtx) {
+        const prevRevChart = window.Chart.getChart(revenueCtx);
+        if (prevRevChart) prevRevChart.destroy();
+    }
+    if (categoryCtx) {
+        const prevCatChart = window.Chart.getChart(categoryCtx);
+        if (prevCatChart) prevCatChart.destroy();
+    }
+
+    const chartData = window.dashboardChartData || {};
     const revenueSubLabel = document.getElementById('revenueChartSubLabel');
     let revenueChartInstance = null;
 
@@ -101,7 +114,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Biểu đồ tròn Tỷ trọng theo danh mục
-    const categoryCtx = document.getElementById('categoryDonutChart');
     let categoryChartInstance = null;
     if (categoryCtx) {
         const palette = ['#792a16', '#c49b4d', '#49624e', '#98412b', '#72594f', '#89726d'];
@@ -219,7 +231,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         document.addEventListener('click', () => {
             dateFilterContainer.classList.remove('show');
-        });
+        }, { signal });
 
         presetButtons.forEach(btn => {
             btn.addEventListener('click', function () {

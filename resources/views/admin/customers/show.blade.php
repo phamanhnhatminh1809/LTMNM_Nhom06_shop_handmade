@@ -201,9 +201,9 @@
                                 </span>
                             </td>
                             <td style="text-align: center;">
-                                <a href="{{ route('admin.orders.show', $order) }}" class="btn-action-view" title="Xem đơn hàng">
-                                    <i class="bi bi-eye"></i>
-                                </a>
+                                <x-table-actions>
+                                    <x-table-action type="view" :href="route('admin.orders.show', $order)" label="Xem chi tiết đơn hàng" tooltip-align="end" />
+                                </x-table-actions>
                             </td>
                         </tr>
                     @empty

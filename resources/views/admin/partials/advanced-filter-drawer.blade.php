@@ -1,14 +1,23 @@
 @php
     $currentSort = request('sort', 'newest');
     $sortLabels = [
-        'newest'       => 'Mới cập nhật',
+        'newest'       => 'Mới nhất',
+        'oldest'       => 'Cũ nhất',
         'best_selling' => 'Bán chạy nhất',
         'price_asc'    => 'Giá tăng dần',
         'price_desc'   => 'Giá giảm dần',
     ];
-    $currentSortLabel = $sortLabels[$currentSort] ?? 'Mới cập nhật';
+    if (!array_key_exists($currentSort, $sortLabels)) {
+        $currentSort = 'newest';
+    }
+    $currentSortLabel = $sortLabels[$currentSort];
     $currentStockStatus = request('stock_status', '');
     $currentCategory = request('category', '');
+    $drawerActiveCount = 0;
+    if ($currentCategory !== '') { $drawerActiveCount++; }
+    if (request()->filled('min_price') || request()->filled('max_price')) { $drawerActiveCount++; }
+    if ($currentStockStatus !== '') { $drawerActiveCount++; }
+    if ($currentSort !== 'newest') { $drawerActiveCount++; }
 @endphp
 <!-- Lớp phủ Backdrop và Drawer Bộ Lọc Nâng Cao -->
 <div class="filter-drawer-overlay" id="advancedFilterDrawerOverlay">
@@ -23,6 +32,9 @@
             <h3 class="drawer-title">
                 <i class="bi bi-sliders"></i>
                 <span>Bộ lọc nâng cao</span>
+                @if($drawerActiveCount > 0)
+                    <span class="filter-active-badge">{{ $drawerActiveCount }}</span>
+                @endif
             </h3>
             <button type="button" class="btn-close-drawer" id="btnCloseFilterDrawer" title="Đóng bộ lọc">
                 <i class="bi bi-x-lg"></i>
@@ -78,11 +90,11 @@
                     </label>
                     <label class="drawer-radio-label">
                         <input type="radio" name="stock_status" value="active" {{ $currentStockStatus === 'active' ? 'checked' : '' }}>
-                        <span>Còn hàng nhiều (&gt; 5)</span>
+                        <span>Còn hàng nhiều (&gt; ngưỡng)</span>
                     </label>
                     <label class="drawer-radio-label">
                         <input type="radio" name="stock_status" value="low" {{ $currentStockStatus === 'low' ? 'checked' : '' }}>
-                        <span>Sắp hết hàng (1 – 5)</span>
+                        <span>Sắp hết hàng (1 – ngưỡng)</span>
                     </label>
                     <label class="drawer-radio-label">
                         <input type="radio" name="stock_status" value="out" {{ $currentStockStatus === 'out' ? 'checked' : '' }}>
@@ -102,10 +114,12 @@
                         <i class="bi bi-chevron-down" style="font-size: 11px;"></i>
                     </button>
                     <div class="drawer-custom-select-menu" id="drawerSortDropdownMenu">
-                        <div class="drawer-select-item {{ $currentSort === 'newest' ? 'active' : '' }}" data-sort="newest">Mới cập nhật</div>
-                        <div class="drawer-select-item {{ $currentSort === 'best_selling' ? 'active' : '' }}" data-sort="best_selling">Bán chạy nhất</div>
-                        <div class="drawer-select-item {{ $currentSort === 'price_asc' ? 'active' : '' }}" data-sort="price_asc">Giá tăng dần</div>
-                        <div class="drawer-select-item {{ $currentSort === 'price_desc' ? 'active' : '' }}" data-sort="price_desc">Giá giảm dần</div>
+                        @foreach($sortLabels as $sortKey => $sortLabel)
+                            <div class="drawer-select-item {{ $currentSort === $sortKey ? 'active' : '' }}" data-sort="{{ $sortKey }}">
+                                <span>{{ $sortLabel }}</span>
+                                <i class="bi bi-check2 drawer-select-check"></i>
+                            </div>
+                        @endforeach
                     </div>
                 </div>
             </div>

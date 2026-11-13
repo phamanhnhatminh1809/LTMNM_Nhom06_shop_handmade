@@ -136,4 +136,23 @@
     --admin-tab-header-title-size: 17px;
     --admin-tab-header-title-weight: 800;
     --admin-tab-header-shadow: 0 2px 8px rgba(121, 42, 22, 0.04);
+
+    /* ===== TABLE ACTION ICON BUTTONS (BIẾN DÙNG CHUNG) ===== */
+    --table-action-size: 36px;
+    --table-action-radius: 10px;
+    --table-action-gap: 6px;
+    --table-action-icon-size: 17px;
+    --table-action-color: #55423e;
+    --table-action-bg: rgba(121, 42, 22, 0.045);
+    --table-action-border: rgba(220, 193, 186, 0.55);
+    --table-action-hover-color: #ffffff;
+    --table-action-view-hover-bg: var(--color-primary);
+    --table-action-store-hover-bg: #324a37;
+    --table-action-edit-hover-bg: #a96d1e;
+    --table-action-success-hover-bg: #2f6b3e;
+    --table-action-danger-hover-bg: #ba1a1a;
+    --table-action-tooltip-bg: #1f1512;
+    --table-action-tooltip-color: #ffffff;
+    --table-action-tooltip-radius: 8px;
+    --table-action-tooltip-shadow: 0 6px 16px rgba(31, 21, 18, 0.24);
 }

@@ -16,10 +16,7 @@
         <span>Tổng quan hệ thống</span>
     </div>
     <div class="top-bar-right">
-        <button class="btn-icon-bell" title="Thông báo hệ thống">
-            <i class="bi bi-bell"></i>
-            <span class="notification-dot"></span>
-        </button>
+        @include('admin.partials.notification-bell')
     </div>
 </div>
 
@@ -275,9 +272,9 @@
                             @endif
                         </td>
                         <td style="text-align: center;">
-                            <a href="{{ route('admin.products.show', $topProd) }}" class="btn-action-view" title="Xem chi tiết sản phẩm">
-                                <i class="bi bi-eye"></i>
-                            </a>
+                            <x-table-actions>
+                                <x-table-action type="view" :href="route('admin.products.show', $topProd)" label="Xem chi tiết sản phẩm" tooltip-align="end" />
+                            </x-table-actions>
                         </td>
                     </tr>
                 @empty
@@ -355,9 +352,9 @@
                             @endif
                         </td>
                         <td style="text-align: center;">
-                            <a href="{{ route('admin.orders.show', $order) }}" class="btn-action-view" title="Xem chi tiết đơn">
-                                <i class="bi bi-eye"></i>
-                            </a>
+                            <x-table-actions>
+                                <x-table-action type="view" :href="route('admin.orders.show', $order)" label="Xem chi tiết đơn hàng" tooltip-align="end" />
+                            </x-table-actions>
                         </td>
                     </tr>
                 @empty
@@ -372,7 +369,7 @@
 @endsection
 
 @push('scripts')
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" defer></script>
 <script>
     window.dashboardChartData = {
         revenueWeek: @json($revenueWeekChart ?? null),
@@ -380,5 +377,5 @@
         categoryShare: @json($categoryShareChart ?? null)
     };
 </script>
-<script src="{{ asset('js/admin/dashboard.js') }}"></script>
+<script src="{{ asset('js/admin/dashboard.js') }}?v={{ filemtime(public_path('js/admin/dashboard.js')) }}" defer></script>
 @endpush

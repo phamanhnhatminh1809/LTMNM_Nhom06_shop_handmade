@@ -78,17 +78,31 @@
         </div>
 
         <!-- Bên phải: Giỏ hàng -->
-        <div style="display: flex; align-items: center; gap: 16px; flex-shrink: 0;">
-            <a href="{{ route('cart.index') }}" class="cart-icon" style="color: var(--color-on-surface, #251914); text-decoration: none; position: relative; display: inline-flex; align-items: center; justify-content: center; width: 42px; height: 42px; border-radius: 50%; background: #faf7f5; border: 1px solid #ebdcd7; transition: all 0.2s;"
+        @php
+            $headerCartCount = \App\Models\Cart::getActiveCart(false)?->total_quantity ?? 0;
+        @endphp
+        <div style="display: flex; align-items: center; gap: 12px; flex-shrink: 0;">
+            @auth
+                <a href="{{ route('orders.index') }}"
+                   style="color: var(--color-on-surface, #251914); text-decoration: none; font-size: 13.5px; font-weight: 700; display: inline-flex; align-items: center; gap: 6px; padding: 8px 12px; border-radius: 999px; background: #faf7f5; border: 1px solid #ebdcd7; transition: all 0.2s;"
+                   onmouseover="this.style.backgroundColor='#fff5f2'; this.style.borderColor='var(--color-primary)';"
+                   onmouseout="this.style.backgroundColor='#faf7f5'; this.style.borderColor='#ebdcd7';">
+                    <i class="bi bi-receipt" style="color: var(--color-primary, #792a16);"></i>
+                    <span>Đơn mua</span>
+                </a>
+            @endauth
+            <a href="{{ route('cart.index') }}"
+               id="headerCartBtn"
+               class="cart-icon"
+               aria-label="Giỏ hàng ({{ $headerCartCount }} sản phẩm)"
+               style="color: var(--color-on-surface, #251914); text-decoration: none; position: relative; display: inline-flex; align-items: center; justify-content: center; width: 42px; height: 42px; border-radius: 50%; background: #faf7f5; border: 1px solid #ebdcd7; transition: all 0.2s;"
                onmouseover="this.style.backgroundColor='#fff5f2'; this.style.borderColor='var(--color-primary)';"
                onmouseout="this.style.backgroundColor='#faf7f5'; this.style.borderColor='#ebdcd7';">
                 <i class="bi bi-bag" style="font-size: 19px; color: var(--color-primary, #792a16);"></i>
-                <span class="cart-count" style="position: absolute; top: -3px; right: -3px; background-color: var(--color-primary, #792a16); color: white; font-size: 11px; font-weight: 700; min-width: 18px; height: 18px; border-radius: 10px; display: inline-flex; align-items: center; justify-content: center; padding: 0 4px; border: 2px solid #ffffff;">
-                    @auth
-                        {{ \App\Models\Cart::where('user_id', Auth::id())->first()?->total_quantity ?? 0 }}
-                    @else
-                        0
-                    @endauth
+                <span id="headerCartCount"
+                      class="cart-count"
+                      style="position: absolute; top: -4px; right: -4px; background-color: var(--color-primary, #792a16); color: white; font-size: 11px; font-weight: 700; min-width: 19px; height: 19px; border-radius: 10px; display: {{ $headerCartCount > 0 ? 'inline-flex' : 'none' }}; align-items: center; justify-content: center; padding: 0 5px; border: 2px solid #ffffff;">
+                    {{ $headerCartCount }}
                 </span>
             </a>
         </div>
@@ -112,7 +126,7 @@
                     Tất cả sản phẩm
                 </a>
             </li>
-            @foreach(\App\Models\Category::all() as $cat)
+            @foreach(($categories ?? \App\Models\Category::cachedAll()) as $cat)
                 <li>
                     <a href="{{ route('products.index', ['category' => $cat->slug]) }}" 
                        style="color: {{ request('category') === $cat->slug ? 'var(--color-primary, #792a16)' : 'var(--color-on-surface, #251914)' }}; text-decoration: none; display: block; padding: 13px 4px; border-bottom: 2px solid {{ request('category') === $cat->slug ? 'var(--color-primary, #792a16)' : 'transparent' }}; white-space: nowrap;">

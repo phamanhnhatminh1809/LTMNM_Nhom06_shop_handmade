@@ -42,8 +42,8 @@
         <div class="metric-value">
             {{ number_format($product->price, 0, ',', '.') }}đ
             @if(!empty($product->old_price))
-                <span style="font-size: 13px; color: var(--color-outline); text-decoration: line-through; font-weight: 600; margin-left: 6px;">
-                    {{ number_format($product->old_price, 0, ',', '.') }}đ
+                <span style="font-size: 13px; color: var(--color-outline); font-weight: 600; margin-left: 8px;">
+                    (Giá gốc: {{ number_format($product->old_price, 0, ',', '.') }}đ)
                 </span>
             @endif
         </div>
@@ -53,13 +53,13 @@
         <div class="metric-icon-box">
             <i class="bi bi-boxes"></i>
         </div>
-        <div class="metric-label">Số lượng tồn kho</div>
+        <div class="metric-label">Số lượng tồn kho (Ngưỡng: {{ $product->effectiveMinStockThreshold() }})</div>
         <div class="metric-value">
             {{ $product->stock_quantity }}
-            @if($product->stock_quantity <= 2)
-                <span class="stock-tag danger" style="font-size: 11px; vertical-align: middle; margin-left: 6px;">Sắp hết</span>
-            @elseif($product->stock_quantity <= 5)
-                <span class="stock-tag warning" style="font-size: 11px; vertical-align: middle; margin-left: 6px;">Thấp</span>
+            @if($product->stock_quantity <= 0)
+                <span class="stock-tag danger" style="font-size: 11px; vertical-align: middle; margin-left: 6px;">Hết hàng</span>
+            @elseif($product->stock_quantity <= $product->effectiveMinStockThreshold())
+                <span class="stock-tag warning" style="font-size: 11px; vertical-align: middle; margin-left: 6px;">Dưới ngưỡng</span>
             @endif
         </div>
     </div>
@@ -217,5 +217,5 @@
 @endsection
 
 @push('scripts')
-<script src="{{ asset('js/admin/products.js') }}"></script>
+<script src="{{ asset('js/admin/products.js') }}?v={{ filemtime(public_path('js/admin/products.js')) }}"></script>
 @endpush

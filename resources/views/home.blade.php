@@ -6,7 +6,11 @@
 <div class="banner-slider">
     @foreach ($banners as $i => $b)
         <div class="banner-slide {{ $i === 0 ? 'banner-slide--active' : '' }}">
-            <img src="{{ $b['image'] }}" alt="{{ $b['title'] }}" onerror="this.onerror=null; this.src='{{ asset('assets/images/banner-placeholder.svg') }}';">
+            <img src="{{ $b['image'] }}"
+                 alt="{{ $b['title'] }}"
+                 decoding="async"
+                 @if($i === 0) fetchpriority="high" @else loading="lazy" @endif
+                 onerror="this.onerror=null; this.src='{{ asset('assets/images/banner-placeholder.svg') }}';">
             <div class="banner-slide__content">
                 <h2>{{ $b['title'] }}</h2>
                 <p>{{ $b['subtitle'] }}</p>
@@ -121,7 +125,7 @@
                     <i class="bi bi-truck"></i>
                 </div>
                 <h3>Miễn phí vận chuyển</h3>
-                <p>Áp dụng cho đơn từ 300.000đ toàn quốc</p>
+                <p>Áp dụng cho đơn từ {{ number_format(config('shop.shipping.free_threshold', 300000), 0, ',', '.') }}đ toàn quốc</p>
             </div>
             <div class="feature">
                 <div class="feature__icon-wrapper">

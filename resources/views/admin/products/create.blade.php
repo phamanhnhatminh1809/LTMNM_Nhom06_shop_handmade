@@ -101,7 +101,7 @@
                         </div>
                     </div>
 
-                    <div class="modal-form-row-2" style="grid-template-columns: 1fr 1fr 1fr; margin-bottom: 16px;">
+                    <div class="modal-form-row-2" style="grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); margin-bottom: 16px;">
                         <div class="modal-form-group">
                             <label class="modal-label" for="price">
                                 Giá bán (VNĐ) <span class="required-star">*</span>
@@ -122,7 +122,7 @@
 
                         <div class="modal-form-group">
                             <label class="modal-label" for="old_price">
-                                Giá gốc / Giá cũ (VNĐ)
+                                Giá gốc (VNĐ)
                             </label>
                             <input type="number"
                                    id="old_price"
@@ -149,6 +149,23 @@
                                    min="0"
                                    required>
                             @error('stock_quantity')
+                                <div class="form-error-text">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <div class="modal-form-group">
+                            <label class="modal-label" for="min_stock_threshold">
+                                Ngưỡng cảnh báo tối thiểu
+                            </label>
+                            <input type="number"
+                                   id="min_stock_threshold"
+                                   name="min_stock_threshold"
+                                   class="modal-input"
+                                   value="{{ old('min_stock_threshold', 5) }}"
+                                   min="0"
+                                   max="10000"
+                                   placeholder="5">
+                            @error('min_stock_threshold')
                                 <div class="form-error-text">{{ $message }}</div>
                             @enderror
                         </div>
@@ -282,7 +299,7 @@
 
 @push('scripts')
 <script>
-document.addEventListener('DOMContentLoaded', () => {
+window.AdminApp.mount(() => {
     const imageInput = document.getElementById('imageInput');
     const mainPreviewWrap = document.getElementById('mainImagePreviewWrap');
     const mainPreviewImg = document.getElementById('mainImagePreview');

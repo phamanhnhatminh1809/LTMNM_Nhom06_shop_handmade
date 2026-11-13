@@ -99,16 +99,19 @@
                     </div>
 
                     {{-- KHUNG ĐỊA CHỈ CŨ --}}
-                    @if($user->address)
+                    @if($user && $user->address)
                         <div id="oldAddressBox" style="margin-bottom: 16px; padding: 12px; background: #f9fafb; border: 1px dashed #d1d5db; border-radius: 8px;">
                             <div style="font-size: 13px; color: #666; margin-bottom: 8px;">Địa chỉ đã lưu trong tài khoản:</div>
                             <div style="font-weight: 600; color: #333; margin-bottom: 10px;">{{ $user->address }}</div>
                             <div style="display: flex; gap: 8px;">
-                                <button type="button" onclick="useOldAddress('{{ addslashes($user->address) }}')" 
+                                <button type="button"
+                                        id="btnUseOldAddress"
+                                        data-address="{{ $user->address }}"
                                         style="padding: 6px 12px; background: #10b981; color: #fff; border: none; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer;">
                                     Sử dụng địa chỉ này
                                 </button>
-                                <button type="button" onclick="resetAddress()" 
+                                <button type="button"
+                                        id="btnResetAddress"
                                         style="padding: 6px 12px; background: #fff; color: #374151; border: 1px solid #d1d5db; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer;">
                                     Nhập địa chỉ mới
                                 </button>
@@ -118,20 +121,25 @@
 
                     {{-- KHUNG ĐỊA CHỈ MỚI --}}
                     <div id="newAddressBox">
-                        <div class="form-group">
-                            <label class="form-label">Tỉnh / Thành phố <span class="required">*</span></label>
-                            <select id="province" class="address-select" required>
-                                <option value="">-- Chọn Tỉnh/Thành phố --</option>
-                            </select>
+                        <div id="provinceSelectGroup">
+                            <div class="form-group">
+                                <label class="form-label">Tỉnh / Thành phố <span class="required">*</span></label>
+                                <select id="province" class="address-select" required>
+                                    <option value="">-- Chọn Tỉnh/Thành phố --</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Phường / Xã / Đặc khu <span class="required">*</span></label>
+                                <select id="ward" class="address-select" required disabled>
+                                    <option value="">-- Chọn Phường/Xã --</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div id="manualAddressNotice" style="display: none; margin-bottom: 10px; padding: 10px 12px; background: #fffbeb; border: 1px solid #fde68a; border-radius: 8px; font-size: 12.5px; color: #92400e;">
+                            Không thể tải danh sách Tỉnh/Thành tự động. Vui lòng nhập đầy đủ địa chỉ giao hàng của bạn bên dưới.
                         </div>
                         <div class="form-group">
-                            <label class="form-label">Phường / Xã / Đặc khu <span class="required">*</span></label>
-                            <select id="ward" class="address-select" required disabled>
-                                <option value="">-- Chọn Phường/Xã --</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Số nhà, tên đường <span class="required">*</span></label>
+                            <label class="form-label" id="streetLabel">Số nhà, tên đường <span class="required">*</span></label>
                             <input type="text" id="street" required placeholder="Ví dụ: 123 Nguyễn Trãi" class="form-input">
                         </div>
                     </div>
@@ -140,12 +148,13 @@
                     <div id="usingOldAddressMsg" style="display: none; padding: 12px; background: #ecfdf5; border: 1px solid #10b981; border-radius: 8px; margin-bottom: 16px;">
                         <div style="color: #065f46; font-weight: 600; font-size: 14px; display: flex; align-items: center; gap: 6px;">
                             <i class="bi bi-check-circle-fill" style="color: #10b981;"></i>
-                            <span>Đang sử dụng địa chỉ cũ của bạn</span>
+                            <span>Đang sử dụng địa chỉ đã chọn</span>
                         </div>
                         <div style="color: #666; font-size: 13px; margin-top: 4px;" id="oldAddressText"></div>
-                        <button type="button" onclick="changeToNewAddress()" style="margin-top: 8px; background: none; border: none; color: #ef4444; font-size: 12px; text-decoration: underline; cursor: pointer;">Thay đổi địa chỉ khác</button>
+                        <button type="button" id="btnChangeNewAddress" style="margin-top: 8px; background: none; border: none; color: #ef4444; font-size: 12px; text-decoration: underline; cursor: pointer;">Thay đổi địa chỉ khác</button>
                     </div>
 
+                    <div id="shippingAddressClientError" style="display: none; padding: 10px 12px; background: #fef2f2; border-left: 3px solid #ef4444; color: #991b1b; border-radius: 6px; font-size: 13px; margin-bottom: 8px;"></div>
                     <input type="hidden" name="shipping_address" id="full_address" value="{{ old('shipping_address') }}">
                     @error('shipping_address')<span class="form-error">{{ $message }}</span>@enderror
                 </section>
@@ -154,7 +163,7 @@
                 <section class="checkout-card">
                     <h2 class="checkout-card__title">2. Phương thức thanh toán</h2>
                     <label class="payment-option">
-                        <input type="radio" name="payment_method" value="cod" checked onchange="toggleQrModal()">
+                        <input type="radio" name="payment_method" value="cod" {{ old('payment_method', 'cod') === 'cod' ? 'checked' : '' }}>
                         <div class="payment-option__body">
                             <span class="payment-option__title" style="display: flex; align-items: center; gap: 8px;">
                                 <i class="bi bi-cash-coin" style="color: var(--color-primary); font-size: 18px;"></i>
@@ -163,14 +172,20 @@
                             <span class="payment-option__desc">Bạn thanh toán bằng tiền mặt trực tiếp cho nhân viên vận chuyển.</span>
                         </div>
                     </label>
-                    <label class="payment-option">
-                        <input type="radio" name="payment_method" value="qr" onchange="toggleQrModal()">
+                    <label class="payment-option" style="{{ $isPayosConfigured ? '' : 'opacity: 0.78;' }}">
+                        <input type="radio" name="payment_method" value="qr" {{ old('payment_method') === 'qr' ? 'checked' : '' }}>
                         <div class="payment-option__body">
                             <span class="payment-option__title" style="display: flex; align-items: center; gap: 8px;">
-                                <i class="bi bi-qr-code" style="color: var(--color-primary); font-size: 18px;"></i>
-                                Chuyển khoản qua mã QR (VietQR)
+                                <i class="bi bi-qr-code-scan" style="color: var(--color-primary); font-size: 18px;"></i>
+                                Thanh toán qua mã QR (PayOS VietQR)
                             </span>
-                            <span class="payment-option__desc">Quét mã QR bằng App Ngân hàng để thanh toán.</span>
+                            <span class="payment-option__desc">
+                                @if($isPayosConfigured)
+                                    Chuyển sang cổng PayOS để quét mã QR ngân hàng (hỗ trợ mọi app ngân hàng &amp; ví VietQR) và tự động xác nhận thanh toán.
+                                @else
+                                    Chưa cấu hình PayOS trong <code>.env</code> (<code>PAYOS_CLIENT_ID</code>, <code>PAYOS_API_KEY</code>, <code>PAYOS_CHECKSUM_KEY</code>). Vui lòng điền key hoặc chọn COD.
+                                @endif
+                            </span>
                         </div>
                     </label>
                 </section>
@@ -195,17 +210,14 @@
                     @endforeach
                 </div>
 
+                @php
+                    $finalOrderTotal = max(0, (float) $cart->total_amount + ($shippingFee ?? 0));
+                @endphp
                 <div class="checkout-totals">
                     <div class="checkout-total-row">
                         <span>Tạm tính tiền hàng:</span>
                         <strong>{{ number_format($cart->total_amount, 0, ',', '.') }}đ</strong>
                     </div>
-                    @if($discountAmount > 0)
-                        <div class="checkout-total-row" style="color: #10b981;">
-                            <span>Giảm giá ({{ $couponData['code'] }}):</span>
-                            <strong>-{{ number_format($discountAmount, 0, ',', '.') }}đ</strong>
-                        </div>
-                    @endif
                     <div class="checkout-total-row">
                         <span>Phí vận chuyển:</span>
                         @if(isset($shippingFee) && $shippingFee > 0)
@@ -215,18 +227,18 @@
                         @endif
                     </div>
                     <div style="font-size: 12px; color: #666; margin-top: -6px; margin-bottom: 12px; font-style: italic;">
-                        @if($cart->total_amount < 450000)
-                            Mua thêm <strong style="color: #c0392b;">{{ number_format(450000 - $cart->total_amount, 0, ',', '.') }}đ</strong> để được <strong>Miễn phí vận chuyển</strong>!
+                        @if($cart->total_amount < $freeThreshold)
+                            Mua thêm <strong style="color: #c0392b;">{{ number_format($freeThreshold - $cart->total_amount, 0, ',', '.') }}đ</strong> để được <strong>Miễn phí vận chuyển</strong>!
                         @else
                             <span style="color: #10b981; font-weight: 600; display: inline-flex; align-items: center; gap: 4px;">
-                                <i class="bi bi-patch-check-fill"></i> Bạn đã được Miễn phí vận chuyển!
+                                <i class="bi bi-patch-check-fill"></i> Bạn đã được Miễn phí vận chuyển (đơn từ {{ number_format($freeThreshold, 0, ',', '.') }}đ)!
                             </span>
                         @endif
                     </div>
                     <hr class="checkout-divider">
                     <div class="checkout-total-row checkout-total-row--final">
                         <span>Tổng thanh toán:</span>
-                        <strong>{{ number_format(max(0, $cart->total_amount - $discountAmount + ($shippingFee ?? 0)), 0, ',', '.') }}đ</strong>
+                        <strong>{{ number_format($finalOrderTotal, 0, ',', '.') }}đ</strong>
                     </div>
                 </div>
 
@@ -237,41 +249,30 @@
     </form>
 </div>
 
-<!-- MODAL XÁC NHẬN ĐẶT HÀNG (Dành cho COD) -->
+<!-- MODAL XÁC NHẬN ĐẶT HÀNG -->
 <div class="modal-overlay" id="checkoutModal">
     <div class="modal-box">
-        <div class="modal-icon"><i class="bi bi-bag-check-fill"></i></div>
-        <h3 class="modal-title">Xác nhận đặt hàng</h3>
-        <p class="modal-desc">Bạn có chắc chắn muốn đặt đơn hàng này không?</p>
+        <div class="modal-icon" id="checkoutModalIcon"><i class="bi bi-bag-check-fill"></i></div>
+        <h3 class="modal-title" id="checkoutModalTitle">Xác nhận đặt hàng</h3>
+        <p class="modal-desc" id="checkoutModalDesc">Bạn có chắc chắn muốn đặt đơn hàng này không?</p>
         <div class="modal-actions">
-            <button class="btn-cancel-modal" onclick="closeCheckoutModal()">Kiểm tra lại</button>
-            <button class="btn-confirm-modal" onclick="submitCheckout()">Đồng ý đặt hàng</button>
+            <button type="button" class="btn-cancel-modal" onclick="closeCheckoutModal()">Kiểm tra lại</button>
+            <button type="button" class="btn-confirm-modal" id="checkoutModalConfirmBtn" onclick="submitCheckout()">Đồng ý đặt hàng</button>
         </div>
     </div>
 </div>
 
-<!-- MODAL HIỂN THỊ MÃ QR VÀ LOADING -->
-<div class="modal-overlay" id="qrModal">
+<!-- MODAL THÔNG BÁO THIẾU CẤU HÌNH PAYOS -->
+<div class="modal-overlay" id="payosMissingModal">
     <div class="modal-box">
-        <div id="qrContentBox">
-            <div class="modal-icon" style="background: #e0e7ff; color: #4338ca;"><i class="bi bi-qr-code-scan"></i></div>
-            <h3 class="modal-title">Quét mã để thanh toán</h3>
-            <p class="modal-desc">Mở App ngân hàng và quét mã bên dưới.</p>
-            <img id="qrImage" src="" alt="Mã QR Thanh Toán">
-            <div style="background: #f9fafb; padding: 12px; border-radius: 8px; font-size: 13px; text-align: left; margin-bottom: 20px; border: 1px solid #eee;">
-                <div style="margin-bottom: 4px;"><strong>Ngân hàng:</strong> Vietcombank</div>
-                <div style="margin-bottom: 4px;"><strong>Số tiền:</strong> <span id="qrAmount" style="color: #c0392b; font-weight: bold; font-size: 15px;"></span></div>
-                <div><strong>Nội dung CK:</strong> <span id="qrContent" style="font-weight: bold; color: #4338ca;"></span></div>
-            </div>
-            <div class="modal-actions">
-                <button type="button" class="btn-cancel-modal" onclick="closeQrModal()">Hủy</button>
-                <button type="button" class="btn-confirm-modal" style="background: #4338ca;" onclick="simulateBankTransfer()">Tôi đã chuyển khoản</button>
-            </div>
+        <div class="modal-icon" style="background: #eef2ff; color: #4338ca;"><i class="bi bi-qr-code-scan"></i></div>
+        <h3 class="modal-title">PayOS chưa sẵn sàng</h3>
+        <div style="background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; padding: 14px; text-align: left; font-size: 13px; color: #991b1b; margin-bottom: 18px;">
+            <strong>Chưa cấu hình cổng thanh toán PayOS!</strong><br>
+            Vui lòng điền đủ <code>PAYOS_CLIENT_ID</code>, <code>PAYOS_API_KEY</code> và <code>PAYOS_CHECKSUM_KEY</code> vào file <code>.env</code> (xem <code>HUONG_DAN_CAU_HINH_ENV_DICH_VU_THU_3.md</code>).
         </div>
-        <div id="loadingBox" style="display: none; padding: 20px 0;">
-            <div class="loading-spinner"></div>
-            <h3 style="color: #4338ca; font-weight: 700; margin-bottom: 8px;">Đang kiểm tra giao dịch...</h3>
-            <p style="font-size: 13px; color: #666;">Vui lòng đợi trong giây lát.</p>
+        <div class="modal-actions">
+            <button type="button" class="btn-confirm-modal" onclick="closePayosMissingModal()">Chuyển sang COD</button>
         </div>
     </div>
 </div>
@@ -280,24 +281,57 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.2/axios.min.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // --- 1. XỬ LÝ ĐỊA CHỈ 2 CẤP ---
         const provinceSelect = document.getElementById('province');
         const wardSelect = document.getElementById('ward');
         const streetInput = document.getElementById('street');
         const fullAddressInput = document.getElementById('full_address');
-        
+        const provinceSelectGroup = document.getElementById('provinceSelectGroup');
+        const manualAddressNotice = document.getElementById('manualAddressNotice');
+        const streetLabel = document.getElementById('streetLabel');
+
         const newAddressBox = document.getElementById('newAddressBox');
         const oldAddressBox = document.getElementById('oldAddressBox');
         const usingOldAddressMsg = document.getElementById('usingOldAddressMsg');
         const oldAddressText = document.getElementById('oldAddressText');
+        const addrErrorBox = document.getElementById('shippingAddressClientError');
 
+        const btnUseOldAddress = document.getElementById('btnUseOldAddress');
+        const btnResetAddress = document.getElementById('btnResetAddress');
+        const btnChangeNewAddress = document.getElementById('btnChangeNewAddress');
+
+        let isManualFallback = false;
         const API_URL = 'https://provinces.open-api.vn/api/v2';
 
-        axios.get(`${API_URL}/p/`).then(res => {
-            res.data.forEach(province => {
-                provinceSelect.innerHTML += `<option value="${province.code}" data-name="${province.name}">${province.name}</option>`;
+        function enableManualAddressFallback() {
+            isManualFallback = true;
+            if (provinceSelectGroup) provinceSelectGroup.style.display = 'none';
+            if (manualAddressNotice) manualAddressNotice.style.display = 'block';
+            if (streetLabel) streetLabel.innerHTML = 'Địa chỉ nhận hàng đầy đủ <span class="required">*</span>';
+            if (streetInput) streetInput.placeholder = 'Ví dụ: 123 Nguyễn Trãi, Phường Bến Thành, TP.HCM';
+            if (provinceSelect) provinceSelect.removeAttribute('required');
+            if (wardSelect) wardSelect.removeAttribute('required');
+            updateFullAddress();
+        }
+
+        function appendOption(selectEl, value, text) {
+            const opt = document.createElement('option');
+            opt.value = value;
+            opt.textContent = text;
+            opt.setAttribute('data-name', text);
+            selectEl.appendChild(opt);
+        }
+
+        axios.get(`${API_URL}/p/`, { timeout: 6000 })
+            .then(res => {
+                if (Array.isArray(res.data)) {
+                    res.data.forEach(province => appendOption(provinceSelect, province.code, province.name));
+                } else {
+                    enableManualAddressFallback();
+                }
+            })
+            .catch(() => {
+                enableManualAddressFallback();
             });
-        });
 
         provinceSelect.addEventListener('change', function() {
             wardSelect.innerHTML = '<option value="">-- Chọn Phường/Xã --</option>';
@@ -305,12 +339,14 @@
             updateFullAddress();
             if (this.value) {
                 wardSelect.disabled = false;
-                axios.get(`${API_URL}/p/${this.value}?depth=2`).then(res => {
-                    let wards = res.data.wards || [];
-                    wards.forEach(ward => {
-                        wardSelect.innerHTML += `<option value="${ward.code}" data-name="${ward.name}">${ward.name}</option>`;
+                axios.get(`${API_URL}/p/${this.value}?depth=2`, { timeout: 6000 })
+                    .then(res => {
+                        const wards = res.data.wards || [];
+                        wards.forEach(ward => appendOption(wardSelect, ward.code, ward.name));
+                    })
+                    .catch(() => {
+                        enableManualAddressFallback();
                     });
-                });
             }
         });
 
@@ -318,32 +354,51 @@
         streetInput.addEventListener('input', updateFullAddress);
 
         function updateFullAddress() {
+            if (isManualFallback) {
+                fullAddressInput.value = streetInput.value.trim();
+                return;
+            }
             const street = streetInput.value.trim();
             const wardName = wardSelect.options[wardSelect.selectedIndex]?.getAttribute('data-name') || '';
             const provinceName = provinceSelect.options[provinceSelect.selectedIndex]?.getAttribute('data-name') || '';
-            let parts = [];
+            const parts = [];
             if (street) parts.push(street);
             if (wardName) parts.push(wardName);
             if (provinceName) parts.push(provinceName);
             fullAddressInput.value = parts.join(', ');
         }
 
-        // --- HÀM XỬ LÝ ĐỊA CHỈ CŨ ---
+        function clearAddressClientError() {
+            if (addrErrorBox) {
+                addrErrorBox.style.display = 'none';
+                addrErrorBox.textContent = '';
+            }
+        }
+
+        function showAddressClientError(msg) {
+            if (addrErrorBox) {
+                addrErrorBox.textContent = msg;
+                addrErrorBox.style.display = 'block';
+                addrErrorBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+            if (window.showShopToast) window.showShopToast(msg, 'warning');
+        }
+
         window.useOldAddress = function(oldAddress) {
+            clearAddressClientError();
             fullAddressInput.value = oldAddress;
-            
             newAddressBox.style.display = 'none';
             if (oldAddressBox) oldAddressBox.style.display = 'none';
             usingOldAddressMsg.style.display = 'block';
-            oldAddressText.innerText = oldAddress;
+            oldAddressText.textContent = oldAddress;
 
-            // Xóa required để không bị trình duyệt chặn
             provinceSelect.removeAttribute('required');
             wardSelect.removeAttribute('required');
             streetInput.removeAttribute('required');
         };
 
         window.changeToNewAddress = function() {
+            clearAddressClientError();
             fullAddressInput.value = '';
             newAddressBox.style.display = 'block';
             if (oldAddressBox) oldAddressBox.style.display = 'block';
@@ -353,40 +408,89 @@
             wardSelect.disabled = true;
             streetInput.value = '';
 
-            // Thêm lại required
-            provinceSelect.setAttribute('required', 'required');
-            wardSelect.setAttribute('required', 'required');
-            streetInput.setAttribute('required', 'required');
-        };
-
-        window.resetAddress = function() {
-            fullAddressInput.value = '';
-            provinceSelect.value = '';
-            wardSelect.innerHTML = '<option value="">-- Chọn Phường/Xã --</option>';
-            wardSelect.disabled = true;
-            streetInput.value = '';
-            newAddressBox.style.display = 'block';
-            usingOldAddressMsg.style.display = 'none';
-
-            provinceSelect.setAttribute('required', 'required');
-            wardSelect.setAttribute('required', 'required');
-            streetInput.setAttribute('required', 'required');
-        };
-
-        // --- 2. XỬ LÝ MODAL XÁC NHẬN (DÀNH CHO COD) ---
-        window.showCheckoutModal = function() {
-            if (!fullAddressInput.value) {
-                updateFullAddress();
-                if (!provinceSelect.value || !wardSelect.value || !streetInput.value) {
-                    alert('Vui lòng chọn đầy đủ thông tin địa chỉ giao hàng hoặc dùng địa chỉ cũ.');
-                    return;
-                }
+            if (!isManualFallback) {
+                provinceSelect.setAttribute('required', 'required');
+                wardSelect.setAttribute('required', 'required');
             }
+            streetInput.setAttribute('required', 'required');
+        };
+
+        if (btnUseOldAddress) {
+            btnUseOldAddress.addEventListener('click', () => {
+                useOldAddress(btnUseOldAddress.getAttribute('data-address') || '');
+            });
+        }
+        if (btnResetAddress) btnResetAddress.addEventListener('click', window.changeToNewAddress);
+        if (btnChangeNewAddress) btnChangeNewAddress.addEventListener('click', window.changeToNewAddress);
+
+        // Khôi phục địa chỉ vừa nhập nếu submit trước bị lỗi validate
+        if (fullAddressInput.value && fullAddressInput.value.trim() !== '') {
+            useOldAddress(fullAddressInput.value.trim());
+        }
+
+        function validateShippingFields() {
+            clearAddressClientError();
+            if (!fullAddressInput.value || fullAddressInput.value.trim() === '') {
+                updateFullAddress();
+            }
+            const missingSelect = !isManualFallback && newAddressBox.style.display !== 'none'
+                && (!provinceSelect.value || !wardSelect.value || !streetInput.value.trim());
+            const missingManual = isManualFallback && newAddressBox.style.display !== 'none'
+                && !streetInput.value.trim();
+
+            if (!fullAddressInput.value.trim() || missingSelect || missingManual) {
+                showAddressClientError('Vui lòng nhập đầy đủ thông tin địa chỉ giao hàng hoặc chọn địa chỉ đã lưu.');
+                return false;
+            }
+
             const form = document.getElementById('checkoutForm');
             if (!form.checkValidity()) {
                 form.reportValidity();
+                return false;
+            }
+            return true;
+        }
+
+        // --- XỬ LÝ ĐẶT HÀNG COD & PAYOS QR ---
+        const isPayosConfigured = @json($isPayosConfigured);
+        const modalTitleEl = document.getElementById('checkoutModalTitle');
+        const modalDescEl = document.getElementById('checkoutModalDesc');
+        const modalIconEl = document.getElementById('checkoutModalIcon');
+        const modalConfirmBtn = document.getElementById('checkoutModalConfirmBtn');
+
+        function getSelectedPaymentMethod() {
+            return document.querySelector('input[name="payment_method"]:checked')?.value || 'cod';
+        }
+
+        function configureCheckoutModalForMethod(method) {
+            if (!modalTitleEl || !modalDescEl || !modalIconEl || !modalConfirmBtn) return;
+            if (method === 'qr') {
+                modalIconEl.style.background = '#eef2ff';
+                modalIconEl.style.color = '#4338ca';
+                modalIconEl.innerHTML = '<i class="bi bi-qr-code-scan"></i>';
+                modalTitleEl.textContent = 'Thanh toán QR qua PayOS';
+                modalDescEl.textContent = 'Đơn hàng sẽ được tạo và chuyển hướng sang cổng thanh toán PayOS để bạn quét mã VietQR. Bạn có muốn tiếp tục?';
+                modalConfirmBtn.style.background = '#4338ca';
+                modalConfirmBtn.textContent = 'Tiếp tục tới PayOS';
+            } else {
+                modalIconEl.style.background = '';
+                modalIconEl.style.color = '';
+                modalIconEl.innerHTML = '<i class="bi bi-bag-check-fill"></i>';
+                modalTitleEl.textContent = 'Xác nhận đặt hàng';
+                modalDescEl.textContent = 'Bạn có chắc chắn muốn đặt đơn hàng này không?';
+                modalConfirmBtn.style.background = '';
+                modalConfirmBtn.textContent = 'Đồng ý đặt hàng';
+            }
+        }
+
+        window.showCheckoutModal = function() {
+            if (!validateShippingFields()) return;
+            const method = getSelectedPaymentMethod();
+            if (method === 'qr' && !isPayosConfigured) {
+                document.getElementById('payosMissingModal')?.classList.add('active');
                 return;
             }
+            configureCheckoutModalForMethod(method);
             document.getElementById('checkoutModal').classList.add('active');
         };
 
@@ -394,56 +498,35 @@
             document.getElementById('checkoutModal').classList.remove('active');
         };
 
+        window.closePayosMissingModal = function() {
+            const codRadio = document.querySelector('input[name="payment_method"][value="cod"]');
+            if (codRadio) codRadio.checked = true;
+            document.getElementById('payosMissingModal')?.classList.remove('active');
+        };
+
         window.submitCheckout = function() {
             const btn = document.getElementById('placeOrderBtn');
-            if (btn) { btn.disabled = true; btn.textContent = 'Đang xử lý...'; }
+            const isQr = getSelectedPaymentMethod() === 'qr';
+            if (modalConfirmBtn) {
+                modalConfirmBtn.disabled = true;
+                modalConfirmBtn.textContent = isQr ? 'Đang kết nối PayOS...' : 'Đang xử lý...';
+            }
+            if (btn) {
+                btn.disabled = true;
+                btn.textContent = isQr ? 'Đang kết nối PayOS...' : 'Đang xử lý...';
+            }
             document.getElementById('checkoutForm').submit();
         };
 
-        // --- 3. XỬ LÝ THANH TOÁN QR ---
-        const bankInfo = {
-            bankId: '970436',
-            accountNo: '0123456789',
-            accountName: 'PHAM ANH NHAT MINH'
-        };
-
-        window.toggleQrModal = function() {
-            const isQr = document.querySelector('input[name="payment_method"]:checked').value === 'qr';
-            if (isQr) {
-                generateQR();
-                document.getElementById('qrModal').classList.add('active');
-            } else {
-                document.getElementById('qrModal').classList.remove('active');
-            }
-        };
-
-        function generateQR() {
-            const totalAmount = {{ max(0, $cart->total_amount - $discountAmount + ($shippingFee ?? 0)) }};
-            const content = 'THANHTOAN ' + Math.random().toString(36).substring(2, 7).toUpperCase();
-            const qrUrl = `https://img.vietqr.io/image/${bankInfo.bankId}-${bankInfo.accountNo}-compact2.png?amount=${totalAmount}&addInfo=${encodeURIComponent(content)}&accountName=${encodeURIComponent(bankInfo.accountName)}`;
-            
-            document.getElementById('qrImage').src = qrUrl;
-            document.getElementById('qrAmount').innerText = new Intl.NumberFormat('vi-VN').format(totalAmount) + 'đ';
-            document.getElementById('qrContent').innerText = content;
-        }
-
-        window.closeQrModal = function() {
-            document.querySelector('input[value="cod"]').checked = true;
-            document.getElementById('qrModal').classList.remove('active');
-            document.getElementById('qrContentBox').style.display = 'block';
-            document.getElementById('loadingBox').style.display = 'none';
-        };
-
-        window.simulateBankTransfer = function() {
-            document.getElementById('qrContentBox').style.display = 'none';
-            document.getElementById('loadingBox').style.display = 'block';
-            setTimeout(() => {
-                const form = document.getElementById('checkoutForm');
-                const btn = document.getElementById('placeOrderBtn');
-                if (btn) { btn.disabled = true; }
-                form.submit();
-            }, 2000);
-        };
+        document.querySelectorAll('input[name="payment_method"]').forEach(radio => {
+            radio.addEventListener('change', () => {
+                if (getSelectedPaymentMethod() === 'qr' && !isPayosConfigured) {
+                    document.getElementById('payosMissingModal')?.classList.add('active');
+                } else {
+                    document.getElementById('payosMissingModal')?.classList.remove('active');
+                }
+            });
+        });
     });
 </script>
 @endpush

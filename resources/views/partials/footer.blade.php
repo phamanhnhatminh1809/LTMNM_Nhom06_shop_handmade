@@ -21,29 +21,24 @@
         <div class="footer-col">
             <h4>Hỗ trợ</h4>
             <ul>
-                <li><a href="#">Chính sách đổi trả</a></li>
-                <li><a href="#">Hướng dẫn mua hàng</a></li>
-                <li><a href="#">Câu hỏi thường gặp</a></li>
-                <li><a href="#">Chính sách bảo mật</a></li>
+                <li><a href="{{ route('about') }}">Chính sách đổi trả (7 ngày)</a></li>
+                <li><a href="{{ route('products.index') }}">Hướng dẫn chọn &amp; mua hàng</a></li>
+                <li><a href="{{ route('cart.index') }}">Chính sách vận chuyển (Free từ {{ number_format(config('shop.shipping.free_threshold', 300000), 0, ',', '.') }}đ)</a></li>
+                <li><a href="{{ route('contact') }}">Tư vấn &amp; đặt làm riêng</a></li>
             </ul>
         </div>
 
         <div class="footer-col">
             <h4>Liên hệ</h4>
             <p style="display: flex; align-items: center; gap: 8px;">
-                <i class="bi bi-geo-alt"></i> 123 Nguyễn Văn Cừ, Q.5, TP.HCM
+                <i class="bi bi-geo-alt"></i> {{ config('shop.contact.address') }}
             </p>
             <p style="display: flex; align-items: center; gap: 8px;">
-                <i class="bi bi-telephone"></i> 0123 456 789
+                <i class="bi bi-telephone"></i> {{ config('shop.contact.phone') }}
             </p>
             <p style="display: flex; align-items: center; gap: 8px;">
-                <i class="bi bi-envelope"></i> hello@shophandmade.vn
+                <i class="bi bi-envelope"></i> {{ config('shop.contact.email') }}
             </p>
-            <div class="socials" style="margin-top: 12px;">
-                <a href="#" aria-label="Facebook" title="Facebook"><i class="bi bi-facebook"></i></a>
-                <a href="#" aria-label="Instagram" title="Instagram"><i class="bi bi-instagram"></i></a>
-                <a href="#" aria-label="TikTok" title="TikTok"><i class="bi bi-tiktok"></i></a>
-            </div>
         </div>
     </div>
 

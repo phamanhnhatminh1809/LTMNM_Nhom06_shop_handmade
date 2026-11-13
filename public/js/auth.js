@@ -281,7 +281,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     otpDigits.forEach(d => d.value = '');
                     switchStep(2);
                     startResendCountdown();
-                    if (data.dev_otp) alert('Mã OTP test của bạn là: ' + data.dev_otp);
+                    showModalAlert(data.message || 'Mã xác thực OTP đã được gửi đến email của bạn.', 'success');
                 } else {
                     showModalAlert(data.message || 'Không thể gửi mã OTP.');
                 }
@@ -322,9 +322,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
                 const data = await response.json();
                 if (response.ok && data.success) {
-                    showModalAlert('Mã OTP mới đã được gửi!', 'success');
+                    showModalAlert(data.message || 'Mã OTP mới đã được gửi đến email của bạn!', 'success');
                     startResendCountdown(60);
-                    if (data.dev_otp) alert('Mã OTP mới: ' + data.dev_otp);
                 } else {
                     showModalAlert(data.message || 'Gửi lại mã thất bại!');
                     btnResendOtp.disabled = false;
@@ -395,8 +394,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const newPwd = newPwdEl ? newPwdEl.value : '';
             const confirmNewPwd = confirmNewPwdEl ? confirmNewPwdEl.value : '';
 
-            if (newPwd.length < 8) {
-                showModalAlert('Mật khẩu mới phải từ 8 ký tự.');
+            if (newPwd.length < 8 || !/[^a-zA-Z0-9]/.test(newPwd)) {
+                showModalAlert('Mật khẩu mới phải từ 8 ký tự trở lên và chứa ít nhất 1 ký tự đặc biệt.');
                 return;
             }
             if (newPwd !== confirmNewPwd) {
@@ -444,58 +443,219 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-       // ==========================================
-    // 4. XỬ LÝ GỬI OTP ĐĂNG KÝ
+    // ==========================================
+    // 4. XỬ LÝ GỬI OTP ĐĂNG KÝ (KHÔNG DÙNG ALERT)
     // ==========================================
     const btnSendRegOtp = document.getElementById('btn-send-reg-otp');
-    if (btnSendRegOtp) {
-        let isSendingOtp = false; // Biến cờ hiệu chống gửi trùng
+    const regOtpFeedback = document.getElementById('register-otp-feedback');
+    let regOtpCountdownTimer = null;
 
-        btnSendRegOtp.addEventListener('click', async function() {
-            if (isSendingOtp) return; // Đang gửi thì bỏ qua lệnh click
-            
+    function showRegOtpFeedback(message, type = 'success') {
+        if (!regOtpFeedback) return;
+        const isError = type === 'error';
+        regOtpFeedback.style.display = 'flex';
+        regOtpFeedback.style.background = isError ? '#fef2f2' : '#ecfdf5';
+        regOtpFeedback.style.color = isError ? '#991b1b' : '#065f46';
+        regOtpFeedback.style.border = `1px solid ${isError ? '#fecaca' : '#a7f3d0'}`;
+        regOtpFeedback.innerHTML = `<i class="bi ${isError ? 'bi-exclamation-circle-fill' : 'bi-check-circle-fill'}"></i><span>${message}</span>`;
+    }
+
+    function startRegOtpCountdown(duration = 60) {
+        if (!btnSendRegOtp) return;
+        if (regOtpCountdownTimer) {
+            clearInterval(regOtpCountdownTimer);
+            regOtpCountdownTimer = null;
+        }
+        let left = duration;
+        btnSendRegOtp.disabled = true;
+        btnSendRegOtp.textContent = `Gửi lại (${left}s)`;
+
+        regOtpCountdownTimer = setInterval(() => {
+            left -= 1;
+            if (left <= 0) {
+                clearInterval(regOtpCountdownTimer);
+                regOtpCountdownTimer = null;
+                btnSendRegOtp.disabled = false;
+                btnSendRegOtp.textContent = 'Gửi mã OTP';
+            } else {
+                btnSendRegOtp.textContent = `Gửi lại (${left}s)`;
+            }
+        }, 1000);
+    }
+
+    if (btnSendRegOtp) {
+        let isSendingOtp = false;
+
+        btnSendRegOtp.addEventListener('click', async function () {
+            if (isSendingOtp || this.disabled) return;
+
             const emailInput = document.getElementById('reg-email');
-            const email = emailInput.value.trim();
-            
-            if (!email) {
-                alert('Vui lòng nhập Email trước khi gửi OTP.');
-                emailInput.focus();
+            const fullNameInput = document.getElementById('reg-fullname');
+            const email = emailInput ? emailInput.value.trim() : '';
+            const emailCheck = checkEmailFormat(email);
+
+            if (!emailCheck.valid) {
+                showFieldError('reg-email', 'error-reg-email', emailCheck.message);
+                showRegOtpFeedback(emailCheck.message, 'error');
+                if (emailInput) emailInput.focus();
                 return;
             }
+            clearFieldError('reg-email', 'error-reg-email');
 
-            // Bắt đầu gửi: Đổi trạng thái nút và bật cờ hiệu
             isSendingOtp = true;
-            const originalText = this.innerText;
             this.disabled = true;
-            this.innerText = 'Đang gửi...';
+            this.innerHTML = '<span class="auth-spinner"></span> Đang gửi...';
 
             try {
                 const response = await fetch('/register/send-otp', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        'X-CSRF-TOKEN': getCsrfToken(),
                         'Accept': 'application/json',
                     },
-                    body: JSON.stringify({ email: email }),
+                    body: JSON.stringify({
+                        email: email,
+                        full_name: fullNameInput ? fullNameInput.value.trim() : '',
+                    }),
                 });
 
                 const data = await response.json();
 
                 if (response.ok && data.success) {
-                    // Hiện đúng 1 mã OTP duy nhất
-                    alert('Mã OTP đăng ký của bạn là: ' + (data.dev_otp ?? '(kiểm tra email)'));
+                    showRegOtpFeedback(data.message || 'Mã OTP đã được gửi đến email của bạn.', 'success');
+                    startRegOtpCountdown(60);
+                    const regOtpInput = document.getElementById('register-otp');
+                    if (regOtpInput) regOtpInput.focus();
                 } else {
-                    alert(data.message || 'Có lỗi xảy ra khi gửi OTP.');
+                    const errMsg = data.message || 'Không thể gửi mã OTP lúc này.';
+                    showRegOtpFeedback(errMsg, 'error');
+                    this.disabled = false;
+                    this.textContent = 'Gửi mã OTP';
                 }
             } catch (err) {
-                alert('Lỗi kết nối máy chủ.');
-            } finally {
-                // Xong việc: Trả lại trạng thái ban đầu cho nút
+                showRegOtpFeedback('Lỗi kết nối máy chủ. Vui lòng thử lại sau.', 'error');
                 this.disabled = false;
-                this.innerText = originalText;
+                this.textContent = 'Gửi mã OTP';
+            } finally {
                 isSendingOtp = false;
             }
+        });
+    }
+
+    // ==========================================
+    // 4B. MODAL ĐIỀU KHOẢN & CHÍNH SÁCH BẢO MẬT
+    // ==========================================
+    const modalTerms = document.getElementById('modal-terms-policy');
+    const btnOpenTerms = document.getElementById('btn-open-terms');
+    const btnOpenPrivacy = document.getElementById('btn-open-privacy');
+    const btnCloseTerms = document.getElementById('btn-close-terms');
+    const btnCloseTermsFooter = document.getElementById('btn-close-terms-footer');
+    const btnAgreeTerms = document.getElementById('btn-agree-terms');
+    const acceptTermsCheckbox = document.getElementById('accept-terms');
+
+    function openTermsModal() {
+        if (modalTerms) modalTerms.classList.add('show');
+    }
+    function closeTermsModal() {
+        if (modalTerms) modalTerms.classList.remove('show');
+    }
+
+    if (btnOpenTerms) btnOpenTerms.addEventListener('click', openTermsModal);
+    if (btnOpenPrivacy) btnOpenPrivacy.addEventListener('click', openTermsModal);
+    if (btnCloseTerms) btnCloseTerms.addEventListener('click', closeTermsModal);
+    if (btnCloseTermsFooter) btnCloseTermsFooter.addEventListener('click', closeTermsModal);
+    if (btnAgreeTerms) {
+        btnAgreeTerms.addEventListener('click', () => {
+            if (acceptTermsCheckbox) {
+                acceptTermsCheckbox.checked = true;
+                clearFieldError('accept-terms', 'error-accept-terms');
+            }
+            closeTermsModal();
+        });
+    }
+    if (modalTerms) {
+        modalTerms.addEventListener('click', (e) => {
+            if (e.target === modalTerms) closeTermsModal();
+        });
+    }
+
+    // ==========================================
+    // 4C. CLIENT-SIDE VALIDATION ĐĂNG NHẬP / ĐĂNG KÝ
+    // ==========================================
+    const loginForm = document.getElementById('login-form');
+    if (loginForm) {
+        loginForm.addEventListener('submit', (e) => {
+            let hasError = false;
+            const accountEl = document.getElementById('login-account');
+            const pwdEl = document.getElementById('login-password');
+
+            clearFieldError('login-account', 'error-login-account');
+            clearFieldError('login-password', 'error-login-password');
+
+            if (!accountEl || accountEl.value.trim() === '') {
+                showFieldError('login-account', 'error-login-account', 'Vui lòng nhập email hoặc tên tài khoản.');
+                hasError = true;
+            }
+            if (!pwdEl || pwdEl.value === '') {
+                showFieldError('login-password', 'error-login-password', 'Vui lòng nhập mật khẩu.');
+                hasError = true;
+            }
+            if (hasError) e.preventDefault();
+        });
+    }
+
+    const registerForm = document.getElementById('register-form');
+    if (registerForm) {
+        registerForm.addEventListener('submit', (e) => {
+            let hasError = false;
+            const fullName = document.getElementById('reg-fullname')?.value.trim() || '';
+            const username = document.getElementById('reg-username')?.value.trim() || '';
+            const email = document.getElementById('reg-email')?.value.trim() || '';
+            const password = document.getElementById('reg-password')?.value || '';
+            const confirmPassword = document.getElementById('reg-confirm-password')?.value || '';
+            const otp = document.getElementById('register-otp')?.value.trim() || '';
+            const accepted = acceptTermsCheckbox ? acceptTermsCheckbox.checked : true;
+
+            clearFieldError('reg-fullname', 'error-reg-fullname');
+            clearFieldError('reg-username', 'error-reg-username');
+            clearFieldError('reg-email', 'error-reg-email');
+            clearFieldError('reg-password', 'error-reg-password');
+            clearFieldError('reg-confirm-password', 'error-reg-confirm-password');
+            clearFieldError('register-otp', 'error-register-otp');
+            clearFieldError('accept-terms', 'error-accept-terms');
+
+            if (!fullName) {
+                showFieldError('reg-fullname', 'error-reg-fullname', 'Vui lòng nhập họ và tên.');
+                hasError = true;
+            }
+            if (!username) {
+                showFieldError('reg-username', 'error-reg-username', 'Vui lòng nhập tên tài khoản.');
+                hasError = true;
+            }
+            const emailCheck = checkEmailFormat(email);
+            if (!emailCheck.valid) {
+                showFieldError('reg-email', 'error-reg-email', emailCheck.message);
+                hasError = true;
+            }
+            if (password.length < 8 || !/[^a-zA-Z0-9]/.test(password)) {
+                showFieldError('reg-password', 'error-reg-password', 'Mật khẩu phải từ 8 ký tự và có ít nhất 1 ký tự đặc biệt.');
+                hasError = true;
+            }
+            if (confirmPassword !== password) {
+                showFieldError('reg-confirm-password', 'error-reg-confirm-password', 'Xác nhận mật khẩu không khớp.');
+                hasError = true;
+            }
+            if (!/^\d{6}$/.test(otp)) {
+                showFieldError('register-otp', 'error-register-otp', 'Vui lòng nhập đủ 6 chữ số OTP gửi về email.');
+                hasError = true;
+            }
+            if (!accepted) {
+                showFieldError('accept-terms', 'error-accept-terms', 'Bạn cần đồng ý với điều khoản sử dụng và chính sách bảo mật.');
+                hasError = true;
+            }
+
+            if (hasError) e.preventDefault();
         });
     }
 

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mã OTP khôi phục mật khẩu - Shop Handmade</title>
+    <title>{{ ($purpose ?? 'reset_password') === 'register' ? 'Mã OTP đăng ký tài khoản' : 'Mã OTP khôi phục mật khẩu' }} - Shop Handmade</title>
 </head>
 <body style="margin: 0; padding: 0; background-color: #f7f5f0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #2d3748;">
     <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #f7f5f0; padding: 40px 15px;">
@@ -25,7 +25,11 @@
                                 Xin chào, {{ $userName }}!
                             </h2>
                             <p style="margin: 0 0 20px; line-height: 1.6; color: #4a5568; font-size: 14px;">
-                                Chúng tôi nhận được yêu cầu khôi phục mật khẩu cho tài khoản liên kết với email này. Dưới đây là mã xác thực <strong>OTP</strong> của bạn:
+                                @if(($purpose ?? 'reset_password') === 'register')
+                                    Cảm ơn bạn đã đăng ký tài khoản thành viên tại <strong>Shop Handmade</strong>. Dưới đây là mã xác thực <strong>OTP</strong> để hoàn tất bước đăng ký:
+                                @else
+                                    Chúng tôi nhận được yêu cầu khôi phục mật khẩu cho tài khoản liên kết với email này. Dưới đây là mã xác thực <strong>OTP</strong> của bạn:
+                                @endif
                             </p>
 
                             <!-- OTP Box -->

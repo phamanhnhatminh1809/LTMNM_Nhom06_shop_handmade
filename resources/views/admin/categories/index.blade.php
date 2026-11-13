@@ -12,10 +12,7 @@
         <span>Quản lý danh mục sản phẩm</span>
     </div>
     <div class="top-bar-right">
-        <button class="btn-icon-bell" title="Thông báo hệ thống">
-            <i class="bi bi-bell"></i>
-            <span class="notification-dot"></span>
-        </button>
+        @include('admin.partials.notification-bell')
     </div>
 </div>
 
@@ -136,30 +133,20 @@
                             </span>
                         </td>
                         <td style="text-align: center;">
-                            <div style="display: inline-flex; align-items: center; gap: 6px;">
-                                <a href="{{ route('admin.products.index', ['category' => $category->slug]) }}"
-                                   class="btn-action-view"
-                                   title="Xem sản phẩm thuộc danh mục này">
-                                    <i class="bi bi-eye"></i>
-                                </a>
-                                <a href="{{ route('admin.categories.edit', $category) }}"
-                                   class="btn-action-view"
-                                   title="Chỉnh sửa danh mục">
-                                    <i class="bi bi-pencil"></i>
-                                </a>
-                                <form action="{{ route('admin.categories.destroy', $category) }}"
-                                      method="POST"
-                                      style="display: inline;"
-                                      onsubmit="return confirm('Xác nhận xóa danh mục «{{ $category->name }}»?')">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit"
-                                            class="btn-action-view danger"
-                                            title="Xóa danh mục">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
-                                </form>
-                            </div>
+                            <x-table-actions>
+                                <x-table-action type="view"
+                                                :href="route('admin.products.index', ['category' => $category->slug])"
+                                                label="Xem sản phẩm thuộc danh mục này" />
+                                <x-table-action type="edit"
+                                                :href="route('admin.categories.edit', $category)"
+                                                label="Chỉnh sửa danh mục" />
+                                <x-table-action type="delete"
+                                                :action="route('admin.categories.destroy', $category)"
+                                                method="DELETE"
+                                                :confirm="'Xác nhận xóa danh mục «' . $category->name . '»?'"
+                                                label="Xóa danh mục"
+                                                tooltip-align="end" />
+                            </x-table-actions>
                         </td>
                     </tr>
                 @empty
@@ -177,7 +164,7 @@
 
 @push('scripts')
 <script>
-document.addEventListener('DOMContentLoaded', () => {
+window.AdminApp.mount(() => {
     const searchInput = document.getElementById('categoryTableSearch');
     const rows = document.querySelectorAll('#categoriesDataTable tbody .category-row');
 

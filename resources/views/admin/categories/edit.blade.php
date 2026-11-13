@@ -237,7 +237,7 @@
 
 @push('scripts')
 <script>
-document.addEventListener('DOMContentLoaded', () => {
+window.AdminApp.mount(() => {
     const nameInput = document.getElementById('name');
     const slugPreview = document.getElementById('slugPreview');
     const iconInput = document.getElementById('icon');

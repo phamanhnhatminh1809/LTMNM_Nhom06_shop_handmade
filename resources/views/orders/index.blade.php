@@ -97,8 +97,11 @@
                             <span style="font-weight: 800; font-size: 15px; color: var(--color-on-surface); margin-right: 10px;">
                                 Đơn hàng #{{ $order->code }}
                             </span>
-                            <span style="font-size: 13px; color: var(--color-on-surface-variant);">
+                            <span style="font-size: 13px; color: var(--color-on-surface-variant); margin-right: 10px;">
                                 Ngày đặt: {{ $order->created_at->format('d/m/Y H:i') }}
+                            </span>
+                            <span style="font-size: 12px; color: #4b5563; background: #f3f4f6; padding: 3px 8px; border-radius: 6px;">
+                                {{ $order->paymentMethodLabel() }}
                             </span>
                         </div>
                         <span style="display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; background: {{ $st['bg'] }}; color: {{ $st['color'] }};">
@@ -198,16 +201,8 @@
         <h3 style="margin-bottom:15px; color:#ef4444; font-weight: 800; font-size: 20px;">Xác nhận hủy đơn</h3>
         <p id="cancelOrderCode" style="margin-bottom:20px; font-weight:bold; color: #555;"></p>
         <div style="display:flex; gap:10px; justify-content:center;">
-            <button onclick="document.getElementById('cancelModal').style.display='none'" class="btn btn--outline" style="padding: 10px 20px; flex: 1;">Đóng</button>
-            <button id="confirmCancelBtn" class="btn btn--primary" style="background:#ef4444; border-color:#ef4444; padding: 10px 20px; flex: 1;">Đồng ý hủy</button>
-        </div>
-    </div>
-</div>
-        <h3 style="margin-bottom:15px; color:#ef4444; font-weight: 800; font-size: 20px;">Xác nhận hủy đơn</h3>
-        <p id="cancelOrderCode" style="margin-bottom:20px; font-weight:bold; color: #555;"></p>
-        <div style="display:flex; gap:10px; justify-content:center;">
-            <button onclick="document.getElementById('cancelModal').style.display='none'" class="btn btn--outline" style="padding: 10px 20px; flex: 1;">Đóng</button>
-            <button id="confirmCancelBtn" class="btn btn--primary" style="background:#ef4444; border-color:#ef4444; padding: 10px 20px; flex: 1;">Đồng ý hủy</button>
+            <button type="button" onclick="document.getElementById('cancelModal').style.display='none'" class="btn btn--outline" style="padding: 10px 20px; flex: 1;">Đóng</button>
+            <button type="button" id="confirmCancelBtn" class="btn btn--primary" style="background:#ef4444; border-color:#ef4444; padding: 10px 20px; flex: 1;">Đồng ý hủy</button>
         </div>
     </div>
 </div>

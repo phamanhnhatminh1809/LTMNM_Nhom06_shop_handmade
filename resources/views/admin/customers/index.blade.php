@@ -12,10 +12,7 @@
         <span>Quản lý khách hàng</span>
     </div>
     <div class="top-bar-right">
-        <button class="btn-icon-bell" title="Thông báo hệ thống">
-            <i class="bi bi-bell"></i>
-            <span class="notification-dot"></span>
-        </button>
+        @include('admin.partials.notification-bell')
     </div>
 </div>
 
@@ -193,12 +190,10 @@
                             </span>
                         </td>
                         <td style="text-align: center;">
-                            <div style="display: inline-flex; align-items: center; gap: 6px;">
-                                <a href="{{ route('admin.customers.show', $customer) }}"
-                                   class="btn-action-view"
-                                   title="Xem chi tiết khách hàng">
-                                    <i class="bi bi-eye"></i>
-                                </a>
+                            <x-table-actions>
+                                <x-table-action type="view"
+                                                :href="route('admin.customers.show', $customer)"
+                                                label="Xem chi tiết khách hàng" />
 
                                 @if($customer->is_active)
                                     <form action="{{ route('admin.customers.lock', $customer) }}"
@@ -225,7 +220,7 @@
                                         </button>
                                     </form>
                                 @endif
-                            </div>
+                            </x-table-actions>
                         </td>
                     </tr>
                 @empty

@@ -12,10 +12,7 @@
         <span>Quản lý đánh giá sản phẩm</span>
     </div>
     <div class="top-bar-right">
-        <button class="btn-icon-bell" title="Thông báo hệ thống">
-            <i class="bi bi-bell"></i>
-            <span class="notification-dot"></span>
-        </button>
+        @include('admin.partials.notification-bell')
     </div>
 </div>
 
@@ -229,16 +226,14 @@
                             </span>
                         </td>
                         <td style="text-align: center;">
-                            <form action="{{ route('admin.reviews.destroy', $review) }}"
-                                  method="POST"
-                                  style="display: inline;"
-                                  onsubmit="return confirm('Xác nhận xóa đánh giá này? Điểm trung bình của sản phẩm sẽ được tự động tính lại.')">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="btn-action-view danger" title="Xóa đánh giá">
-                                    <i class="bi bi-trash"></i>
-                                </button>
-                            </form>
+                            <x-table-actions>
+                                <x-table-action type="delete"
+                                                :action="route('admin.reviews.destroy', $review)"
+                                                method="DELETE"
+                                                confirm="Xác nhận xóa đánh giá này? Điểm trung bình của sản phẩm sẽ được tự động tính lại."
+                                                label="Xóa đánh giá"
+                                                tooltip-align="end" />
+                            </x-table-actions>
                         </td>
                     </tr>
                 @empty

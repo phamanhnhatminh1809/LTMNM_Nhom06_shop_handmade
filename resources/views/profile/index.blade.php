@@ -16,6 +16,19 @@
         box-sizing: border-box;
     }
     .address-select:focus { border-color: var(--color-primary, #e76f51); }
+    .profile-form-grid-2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 18px;
+    }
+    @media (max-width: 850px) {
+        .profile-layout {
+            grid-template-columns: 1fr !important;
+        }
+        .profile-form-grid-2 {
+            grid-template-columns: 1fr;
+        }
+    }
 </style>
 @endpush
 
@@ -44,7 +57,7 @@
 
             <hr style="border: none; border-top: 1px solid var(--color-outline-variant, #f0eae1); margin: 16px 0;">
 
-            <div style="font-size: 13px; color: var(--color-on-surface-variant); line-height: 2;">
+            <div style="font-size: 13px; color: var(--color-on-surface-variant); line-height: 2; margin-bottom: 16px;">
                 <div style="display: flex; align-items: center; gap: 8px;">
                     <i class="bi bi-person-badge" style="color: var(--color-primary);"></i>
                     <span><strong>Tên đăng nhập:</strong> {{ $user->username }}</span>
@@ -58,6 +71,22 @@
                     <span><strong>Trạng thái:</strong> <span style="color: #10b981; font-weight: 600;">Hoạt động</span></span>
                 </div>
             </div>
+
+            <nav style="display: flex; flex-direction: column; gap: 8px; border-top: 1px solid var(--color-outline-variant, #f0eae1); padding-top: 16px;">
+                <a href="{{ route('profile.show') }}"
+                   style="display: flex; align-items: center; gap: 8px; padding: 9px 12px; border-radius: 8px; background: #fff5f2; color: var(--color-primary, #792a16); font-weight: 700; text-decoration: none; font-size: 13.5px;">
+                    <i class="bi bi-person-circle"></i>
+                    <span>Thông tin tài khoản</span>
+                </a>
+                <a href="{{ route('orders.index') }}"
+                   style="display: flex; align-items: center; justify-content: space-between; padding: 9px 12px; border-radius: 8px; background: #faf7f5; color: var(--color-on-surface); font-weight: 600; text-decoration: none; font-size: 13.5px;">
+                    <span style="display: inline-flex; align-items: center; gap: 8px;">
+                        <i class="bi bi-bag-check" style="color: var(--color-primary);"></i>
+                        <span>Đơn hàng của tôi</span>
+                    </span>
+                    <i class="bi bi-chevron-right" style="font-size: 11px; opacity: 0.6;"></i>
+                </a>
+            </nav>
         </aside>
 
         <!-- Cột phải: Form cập nhật thông tin & Đổi mật khẩu -->
@@ -97,7 +126,7 @@
                     @csrf
                     @method('PUT')
 
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 18px;">
+                    <div class="profile-form-grid-2" style="margin-bottom: 18px;">
                         <div>
                             <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: var(--color-on-surface);">
                                 Họ và tên <span style="color: #ef4444;">*</span>
@@ -115,7 +144,7 @@
                         </div>
                     </div>
 
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 18px;">
+                    <div class="profile-form-grid-2" style="margin-bottom: 18px;">
                         <div>
                             <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: var(--color-on-surface-variant);">
                                 Tên tài khoản (Không thể thay đổi)
@@ -144,7 +173,7 @@
                             </div>
                         @endif
 
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 12px;">
+                        <div id="profileProvinceSelectGroup" class="profile-form-grid-2" style="margin-bottom: 12px;">
                             <div>
                                 <select id="province" class="address-select">
                                     <option value="">-- Chọn Tỉnh/Thành phố --</option>
@@ -155,6 +184,10 @@
                                     <option value="">-- Chọn Phường/Xã --</option>
                                 </select>
                             </div>
+                        </div>
+
+                        <div id="profileManualNotice" style="display: none; margin-bottom: 8px; font-size: 12px; color: #92400e;">
+                            Không thể tải danh sách Tỉnh/Thành tự động. Bạn có thể nhập trực tiếp địa chỉ đầy đủ vào ô bên dưới.
                         </div>
 
                         <input type="text" id="street" placeholder="Số nhà, tên đường (Ví dụ: 123 Nguyễn Trãi)" 
@@ -192,12 +225,12 @@
                                style="width: 100%; padding: 10px 14px; border: 1px solid var(--color-outline, #d1d5db); border-radius: 8px; font-size: 14px; box-sizing: border-box;">
                     </div>
 
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 22px;">
+                    <div class="profile-form-grid-2" style="margin-bottom: 22px;">
                         <div>
                             <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: var(--color-on-surface);">
                                 Mật khẩu mới <span style="color: #ef4444;">*</span>
                             </label>
-                            <input type="password" name="password" required placeholder="Tối thiểu 8 ký tự" minlength="8"
+                            <input type="password" name="password" required placeholder="≥ 8 ký tự, gồm ký tự đặc biệt" minlength="8"
                                    style="width: 100%; padding: 10px 14px; border: 1px solid var(--color-outline, #d1d5db); border-radius: 8px; font-size: 14px; box-sizing: border-box;">
                         </div>
 
@@ -219,10 +252,9 @@
                 </form>
             </section>
 
-            <!-- Card 3: Tóm tắt đơn hàng gần đây -->
-            @if(isset($recentOrders) && $recentOrders->isNotEmpty())
+            <!-- Card 3: Tóm tắt đơn hàng gần đây (luôn hiển thị lối dẫn tới /orders) -->
             <section style="background: var(--color-surface, #ffffff); border-radius: 16px; padding: 28px; border: 1px solid var(--color-outline-variant, #f0eae1); box-shadow: 0 4px 16px rgba(0,0,0,0.03);">
-                <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 16px;">
+                <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 16px; flex-wrap: wrap; gap: 8px;">
                     <div>
                         <h2 style="margin: 0; font-size: 18px; font-weight: 700; color: var(--color-on-surface);">Đơn hàng gần đây</h2>
                         <p style="margin: 2px 0 0; font-size: 13px; color: var(--color-on-surface-variant);">Theo dõi trạng thái các đơn hàng bạn đã đặt</p>
@@ -233,6 +265,7 @@
                     </a>
                 </div>
 
+                @if(isset($recentOrders) && $recentOrders->isNotEmpty())
                 <div style="overflow-x: auto;">
                     <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
                         <thead>
@@ -241,7 +274,7 @@
                                 <th style="padding: 10px;">NGÀY ĐẶT</th>
                                 <th style="padding: 10px;">TỔNG TIỀN</th>
                                 <th style="padding: 10px;">TRẠNG THÁI</th>
-                                <th style="padding: 10px; text-align: right;">CHI TIẾT</th>
+                                <th style="padding: 10px; text-align: center;">CHI TIẾT</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -268,18 +301,21 @@
                                             {{ $st['label'] }}
                                         </span>
                                     </td>
-                                    <td style="padding: 12px 10px; text-align: right;">
-                                        <a href="{{ route('orders.show', $order->id) }}" style="font-size: 12px; font-weight: 600; color: var(--color-primary); text-decoration: none;">
-                                            Xem
-                                        </a>
+                                    <td style="padding: 12px 10px; text-align: center;">
+                                        <x-table-action type="view" :href="route('orders.show', $order->id)" label="Xem chi tiết đơn hàng" tooltip-align="end" />
                                     </td>
                                 </tr>
                             @endforeach
                         </tbody>
                     </table>
                 </div>
+                @else
+                    <div style="text-align: center; padding: 24px 12px; color: var(--color-on-surface-variant); font-size: 13.5px; background: #faf7f5; border-radius: 10px;">
+                        Bạn chưa có đơn hàng nào gần đây.
+                        <a href="{{ route('products.index') }}" style="color: var(--color-primary); font-weight: 700; margin-left: 4px; text-decoration: none;">Khám phá sản phẩm ngay →</a>
+                    </div>
+                @endif
             </section>
-            @endif
 
         </div>
     </div>
@@ -293,18 +329,38 @@
         const wardSelect = document.getElementById('ward');
         const streetInput = document.getElementById('street');
         const fullAddressInput = document.getElementById('full_address');
+        const provinceGroup = document.getElementById('profileProvinceSelectGroup');
+        const manualNotice = document.getElementById('profileManualNotice');
+        let isManualMode = false;
 
-        // API V2 - DỮ LIỆU SAU SÁT NHẬP
         const API_URL = 'https://provinces.open-api.vn/api/v2';
 
-        // 1. Tải Tỉnh/Thành
-        axios.get(`${API_URL}/p/`).then(res => {
-            res.data.forEach(province => {
-                provinceSelect.innerHTML += `<option value="${province.code}" data-name="${province.name}">${province.name}</option>`;
-            });
-        });
+        function appendOpt(selectEl, val, text) {
+            const opt = document.createElement('option');
+            opt.value = val;
+            opt.textContent = text;
+            opt.setAttribute('data-name', text);
+            selectEl.appendChild(opt);
+        }
 
-        // 2. Khi chọn Tỉnh -> Tải Phường/Xã
+        function enableManualAddress() {
+            isManualMode = true;
+            if (provinceGroup) provinceGroup.style.display = 'none';
+            if (manualNotice) manualNotice.style.display = 'block';
+            streetInput.placeholder = 'Nhập địa chỉ nhận hàng đầy đủ của bạn...';
+            updateFullAddress();
+        }
+
+        axios.get(`${API_URL}/p/`, { timeout: 6000 })
+            .then(res => {
+                if (Array.isArray(res.data)) {
+                    res.data.forEach(province => appendOpt(provinceSelect, province.code, province.name));
+                } else {
+                    enableManualAddress();
+                }
+            })
+            .catch(enableManualAddress);
+
         provinceSelect.addEventListener('change', function() {
             const provinceCode = this.value;
             wardSelect.innerHTML = '<option value="">-- Chọn Phường/Xã --</option>';
@@ -313,30 +369,36 @@
 
             if (provinceCode) {
                 wardSelect.disabled = false;
-                axios.get(`${API_URL}/p/${provinceCode}?depth=2`).then(res => {
-                    let wards = res.data.wards || [];
-                    wards.forEach(ward => {
-                        wardSelect.innerHTML += `<option value="${ward.code}" data-name="${ward.name}">${ward.name}</option>`;
-                    });
-                });
+                axios.get(`${API_URL}/p/${provinceCode}?depth=2`, { timeout: 6000 })
+                    .then(res => {
+                        const wards = res.data.wards || [];
+                        wards.forEach(ward => appendOpt(wardSelect, ward.code, ward.name));
+                    })
+                    .catch(enableManualAddress);
             }
         });
 
         wardSelect.addEventListener('change', updateFullAddress);
         streetInput.addEventListener('input', updateFullAddress);
 
-        // Hàm nối chuỗi địa chỉ
         function updateFullAddress() {
+            if (isManualMode) {
+                const val = streetInput.value.trim();
+                if (val) fullAddressInput.value = val;
+                return;
+            }
             const street = streetInput.value.trim();
             const wardName = wardSelect.options[wardSelect.selectedIndex]?.getAttribute('data-name') || '';
             const provinceName = provinceSelect.options[provinceSelect.selectedIndex]?.getAttribute('data-name') || '';
 
-            let parts = [];
+            const parts = [];
             if (street) parts.push(street);
             if (wardName) parts.push(wardName);
             if (provinceName) parts.push(provinceName);
 
-            fullAddressInput.value = parts.join(', ');
+            if (parts.length > 0) {
+                fullAddressInput.value = parts.join(', ');
+            }
         }
     });
 </script>

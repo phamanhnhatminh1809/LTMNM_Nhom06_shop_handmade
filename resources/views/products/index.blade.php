@@ -31,7 +31,7 @@
     .filter-link {
         display: flex; align-items: center; gap: 8px; text-decoration: none; color: #4b5563;
         padding: 8px 12px; border-radius: 8px; font-size: 13.5px;
-        transition: all 0.2s;
+        transition: background-color 0.2s ease, color 0.2s ease;
     }
     .filter-link:hover { background: #fff5f2; color: var(--color-primary, #792a16); }
     .filter-link.active { background: var(--color-primary, #792a16); color: #fff; font-weight: 700; }
@@ -48,7 +48,7 @@
     .search-bar input {
         width: 100%; padding: 10px 45px 10px 16px; border: 1px solid #ebdcd7; 
         border-radius: 20px; outline: none; font-size: 14px; background: #faf7f5;
-        transition: all 0.2s;
+        transition: border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
     }
     .search-bar input:focus {
         border-color: var(--color-primary, #792a16);
@@ -212,6 +212,7 @@
                             <option value="price_asc" {{ request('sort') == 'price_asc' ? 'selected' : '' }}>Giá tăng dần</option>
                             <option value="price_desc" {{ request('sort') == 'price_desc' ? 'selected' : '' }}>Giá giảm dần</option>
                             <option value="latest" {{ request('sort') == 'latest' ? 'selected' : '' }}>Mới nhất</option>
+                            <option value="oldest" {{ request('sort') == 'oldest' ? 'selected' : '' }}>Cũ nhất</option>
                             <option value="bestseller" {{ request('sort') == 'bestseller' ? 'selected' : '' }}>Bán chạy nhất</option>
                         </select>
                     </form>
@@ -239,10 +240,6 @@
                         {{ $products->links('pagination::bootstrap-4') }}
                     </div>
                 @endif
-            </div>
-        </div>
-    </div>
-</section>
             </div>
         </div>
     </div>
