@@ -25,9 +25,9 @@ class Role extends Model
     public static function roleLabels(): array
     {
         return [
-            self::ADMIN           => 'Quản trị viên (Toàn quyền)',
-            self::WAREHOUSE_STAFF => 'Nhân viên kho (Sản phẩm & Loại SP)',
-            self::SALES_STAFF     => 'Nhân viên bán hàng (Đơn hàng & Đánh giá)',
+            self::ADMIN           => 'Quản trị viên',
+            self::WAREHOUSE_STAFF => 'Nhân viên kho',
+            self::SALES_STAFF     => 'Nhân viên bán hàng',
             self::CUSTOMER        => 'Khách hàng',
         ];
     }

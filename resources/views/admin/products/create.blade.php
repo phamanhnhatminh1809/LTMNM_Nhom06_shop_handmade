@@ -9,7 +9,7 @@
 <div class="admin-top-bar">
     <div class="page-main-title">
         <i class="bi bi-bag-plus"></i>
-        <span>THÊM SẢN PHẨM MỚI</span>
+        <span>Thêm sản phẩm mới</span>
     </div>
     <div class="top-bar-right">
         <a href="{{ route('admin.products.index') }}" class="btn-secondary-outline">
@@ -45,7 +45,7 @@
                 <div class="admin-card-header">
                     <h3 class="admin-card-title">
                         <i class="bi bi-box-seam"></i>
-                        <span>Thông tin cơ bản & Giá bán</span>
+                        <span>Thông tin cơ bản và giá bán</span>
                     </h3>
                 </div>
                 <div class="admin-card-body">
@@ -171,7 +171,7 @@
 
                     <div class="modal-form-group">
                         <label class="modal-label" for="instruction_preserve">
-                            Hướng dẫn sử dụng & Bảo quản
+                            Hướng dẫn sử dụng và bảo quản
                         </label>
                         <textarea id="instruction_preserve"
                                   name="instruction_preserve"
@@ -199,7 +199,7 @@
                     <!-- Ảnh chính -->
                     <div class="modal-form-group" style="margin-bottom: 18px;">
                         <label class="modal-label" for="imageInput">
-                            Ảnh đại diện chính (`image`)
+                            Ảnh đại diện chính
                         </label>
                         <input type="file"
                                id="imageInput"
@@ -222,7 +222,7 @@
                     <!-- Bộ sưu tập ảnh phụ -->
                     <div class="modal-form-group">
                         <label class="modal-label" for="galleryInput">
-                            Bộ sưu tập ảnh phụ (`gallery[]` — Tối đa 5 ảnh)
+                            Bộ sưu tập ảnh phụ (Tối đa 5 ảnh)
                         </label>
                         <input type="file"
                                id="galleryInput"
@@ -261,7 +261,7 @@
                         <span>Đánh dấu là Sản phẩm nổi bật trên Trang chủ</span>
                     </label>
                     <div class="form-help-text" style="margin-top: 6px;">
-                        Sản phẩm nổi bật sẽ được gắn nhãn <strong>NỔI BẬT</strong> và ưu tiên giới thiệu tới khách hàng.
+                        Sản phẩm nổi bật sẽ được gắn nhãn <strong>Nổi bật</strong> và ưu tiên giới thiệu tới khách hàng.
                     </div>
 
                     <div class="admin-form-actions">

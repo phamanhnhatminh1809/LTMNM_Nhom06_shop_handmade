@@ -6,7 +6,7 @@
     $activeMenu = 'products';
     $mainImg = !empty($product->image)
         ? (str_starts_with($product->image, 'http') ? $product->image : asset(ltrim($product->image, '/')))
-        : asset('images/logo.png');
+        : asset('assets/images/placeholder.svg');
 @endphp
 
 @section('content')
@@ -14,7 +14,7 @@
 <div class="admin-top-bar">
     <div class="page-main-title">
         <i class="bi bi-box-seam"></i>
-        <span>CHI TIẾT SẢN PHẨM</span>
+        <span>Chi tiết sản phẩm</span>
     </div>
     <div class="top-bar-right" style="display: flex; align-items: center; gap: 10px;">
         <a href="{{ route('products.show', $product->id) }}" target="_blank" class="btn-secondary-outline">
@@ -57,9 +57,9 @@
         <div class="metric-value">
             {{ $product->stock_quantity }}
             @if($product->stock_quantity <= 2)
-                <span class="stock-tag danger" style="font-size: 11px; vertical-align: middle; margin-left: 6px;">SẮP HẾT</span>
+                <span class="stock-tag danger" style="font-size: 11px; vertical-align: middle; margin-left: 6px;">Sắp hết</span>
             @elseif($product->stock_quantity <= 5)
-                <span class="stock-tag warning" style="font-size: 11px; vertical-align: middle; margin-left: 6px;">THẤP</span>
+                <span class="stock-tag warning" style="font-size: 11px; vertical-align: middle; margin-left: 6px;">Thấp</span>
             @endif
         </div>
     </div>
@@ -106,7 +106,7 @@
 
                 <div>
                     <h4 style="font-size: 13px; font-weight: 800; color: var(--color-outline); text-transform: uppercase; margin-bottom: 8px;">
-                        Hướng dẫn sử dụng & Bảo quản
+                        Hướng dẫn sử dụng và bảo quản
                     </h4>
                     <div style="font-size: 14px; line-height: 1.7; color: var(--color-on-surface-variant); white-space: pre-line; background: #fff8f6; padding: 14px 16px; border-radius: 10px; border: 1px solid #f2e2dc;">
                         {{ $product->instruction_preserve ?: 'Chưa có hướng dẫn bảo quản riêng.' }}
@@ -119,7 +119,7 @@
             <div class="admin-card-header">
                 <h3 class="admin-card-title">
                     <i class="bi bi-sliders"></i>
-                    <span>Thông số định danh & Quản trị</span>
+                    <span>Thông số định danh và quản trị</span>
                 </h3>
             </div>
             <div class="admin-card-body">
@@ -178,11 +178,6 @@
                 </h3>
             </div>
             <div class="admin-card-body">
-                @php
-                    $mainImg = !empty($product->image)
-                        ? (str_starts_with($product->image, 'http') ? $product->image : asset(ltrim($product->image, '/')))
-                        : asset('assets/images/placeholder.svg');
-                @endphp
                 <div style="margin-bottom: 14px;">
                     <img id="detailMainImage"
                          src="{{ $mainImg }}"

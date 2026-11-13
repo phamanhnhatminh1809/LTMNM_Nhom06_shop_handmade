@@ -9,7 +9,7 @@
 <div class="admin-top-bar">
     <div class="page-main-title">
         <i class="bi bi-tags"></i>
-        <span>THÊM DANH MỤC MỚI</span>
+        <span>Thêm danh mục mới</span>
     </div>
     <div class="top-bar-right">
         <a href="{{ route('admin.categories.index') }}" class="btn-secondary-outline">

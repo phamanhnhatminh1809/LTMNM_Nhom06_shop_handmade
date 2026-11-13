@@ -16,6 +16,10 @@ class ProductController extends Controller
     {
         $keyword = trim($request->input('q', ''));
         $categorySlug = trim($request->input('category', ''));
+        $minPrice = $request->input('min_price');
+        $maxPrice = $request->input('max_price');
+        $stockStatus = trim($request->input('stock_status', ''));
+        $sort = trim($request->input('sort', 'newest'));
 
         $query = Product::with('category');
 
@@ -27,7 +31,29 @@ class ProductController extends Controller
             $query->filterCategory($categorySlug);
         }
 
-        $products = $query->latest('id')->paginate(10)->withQueryString();
+        if ($minPrice !== null && $minPrice !== '' && is_numeric($minPrice) && (float) $minPrice >= 0) {
+            $query->where('price', '>=', (float) $minPrice);
+        }
+
+        if ($maxPrice !== null && $maxPrice !== '' && is_numeric($maxPrice) && (float) $maxPrice >= 0) {
+            $query->where('price', '<=', (float) $maxPrice);
+        }
+
+        match ($stockStatus) {
+            'active' => $query->where('stock_quantity', '>', 5),
+            'low'    => $query->whereBetween('stock_quantity', [1, 5]),
+            'out'    => $query->where('stock_quantity', '<=', 0),
+            default  => null,
+        };
+
+        match ($sort) {
+            'best_selling' => $query->orderByDesc('sold')->latest('id'),
+            'price_asc'    => $query->orderBy('price')->latest('id'),
+            'price_desc'   => $query->orderByDesc('price')->latest('id'),
+            default        => $query->latest('id'),
+        };
+
+        $products = $query->paginate(10)->withQueryString();
         $categories = Category::all();
 
         return view('admin.products.index', compact('products', 'categories'));

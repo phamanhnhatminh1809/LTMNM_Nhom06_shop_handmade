@@ -32,7 +32,7 @@
                        id="categoryNameInput"
                        name="name"
                        class="modal-input"
-                       placeholder="Ví dụ: Nến thơm & Tinh dầu thủ công"
+                       placeholder="Ví dụ: Nến thơm và tinh dầu thủ công"
                        required>
             </div>
 

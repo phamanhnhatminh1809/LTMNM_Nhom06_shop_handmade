@@ -17,8 +17,8 @@ class HomeController extends Controller
         $banners = [
             [
                 'image' => 'https://images.unsplash.com/photo-1591561954557-26941169b49e?w=1600&h=800&fit=crop',
-                'title' => 'Đồ thủ công len xinh',
-                'subtitle' => 'Mỗi sản phẩm là một tác phẩm nhỏ được đan tay tỉ mỉ',
+                'title' => 'Đồ thủ công đan len',
+                'subtitle' => 'Sản phẩm thủ công được đan tay truyền thống',
                 'cta' => 'Khám phá ngay',
                 'link' => route('products.index'),
             ],
@@ -32,7 +32,7 @@ class HomeController extends Controller
             [
                 'image' => 'https://images.unsplash.com/photo-1627123424574-724758594e93?w=1600&h=800&fit=crop',
                 'title' => 'Móc khóa dễ thương',
-                'subtitle' => 'Làm quà tặng bạn bè, người thân cực xinh',
+                'subtitle' => 'Phù hợp làm quà tặng bạn bè và người thân',
                 'cta' => 'Xem móc khóa',
                 'link' => route('products.index', ['category' => 'moc-khoa']),
             ],

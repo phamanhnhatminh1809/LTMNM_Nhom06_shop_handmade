@@ -1,6 +1,23 @@
+@php
+    $currentSort = request('sort', 'newest');
+    $sortLabels = [
+        'newest'       => 'Mới cập nhật',
+        'best_selling' => 'Bán chạy nhất',
+        'price_asc'    => 'Giá tăng dần',
+        'price_desc'   => 'Giá giảm dần',
+    ];
+    $currentSortLabel = $sortLabels[$currentSort] ?? 'Mới cập nhật';
+    $currentStockStatus = request('stock_status', '');
+    $currentCategory = request('category', '');
+@endphp
 <!-- Lớp phủ Backdrop và Drawer Bộ Lọc Nâng Cao -->
 <div class="filter-drawer-overlay" id="advancedFilterDrawerOverlay">
-    <div class="filter-drawer">
+    <form method="GET" action="{{ route('admin.products.index') }}" class="filter-drawer" id="advancedFilterForm">
+        @if(request('q'))
+            <input type="hidden" name="q" value="{{ request('q') }}">
+        @endif
+        <input type="hidden" name="sort" id="drawerSortInput" value="{{ $currentSort }}">
+
         <!-- Header Drawer -->
         <div class="drawer-header">
             <h3 class="drawer-title">
@@ -16,20 +33,18 @@
         <div class="drawer-body">
             <!-- Nhóm danh mục sản phẩm -->
             <div class="drawer-filter-group">
-                <label class="drawer-group-label">DANH MỤC SẢN PHẨM</label>
-                <div class="drawer-checkbox-grid">
-                    <label class="drawer-check-label">
-                        <input type="checkbox" name="filter_category[]" value="Gốm sứ">
-                        <span>Gốm sứ</span>
+                <label class="drawer-group-label" style="text-transform: none;">Danh mục sản phẩm</label>
+                <div class="drawer-radio-list">
+                    <label class="drawer-radio-label">
+                        <input type="radio" name="category" value="" {{ $currentCategory === '' ? 'checked' : '' }}>
+                        <span>Tất cả danh mục</span>
                     </label>
-                    <label class="drawer-check-label">
-                        <input type="checkbox" name="filter_category[]" value="Đồ len">
-                        <span>Đồ len</span>
-                    </label>
-                    <label class="drawer-check-label">
-                        <input type="checkbox" name="filter_category[]" value="Đồ da">
-                        <span>Đồ da</span>
-                    </label>
+                    @foreach($categories ?? [] as $cat)
+                        <label class="drawer-radio-label">
+                            <input type="radio" name="category" value="{{ $cat->slug }}" {{ $currentCategory === $cat->slug ? 'checked' : '' }}>
+                            <span>{{ $cat->name }}</span>
+                        </label>
+                    @endforeach
                 </div>
             </div>
 
@@ -37,16 +52,16 @@
 
             <!-- Nhóm khoảng giá -->
             <div class="drawer-filter-group">
-                <label class="drawer-group-label">KHOẢNG GIÁ (VNĐ)</label>
+                <label class="drawer-group-label" style="text-transform: none;">Khoảng giá (VNĐ)</label>
                 <div class="drawer-price-inputs">
                     <div class="price-input-field">
                         <span>Từ</span>
-                        <input type="number" id="priceFrom" placeholder="0" min="0">
+                        <input type="number" id="priceFrom" name="min_price" value="{{ request('min_price') }}" placeholder="0" min="0" step="1000">
                     </div>
                     <span class="price-separator">-</span>
                     <div class="price-input-field">
                         <span>Đến</span>
-                        <input type="number" id="priceTo" placeholder="Trở lên" min="0">
+                        <input type="number" id="priceTo" name="max_price" value="{{ request('max_price') }}" placeholder="Trở lên" min="0" step="1000">
                     </div>
                 </div>
             </div>
@@ -55,23 +70,23 @@
 
             <!-- Nhóm trạng thái kho -->
             <div class="drawer-filter-group">
-                <label class="drawer-group-label">TRẠNG THÁI KHO</label>
+                <label class="drawer-group-label" style="text-transform: none;">Trạng thái kho</label>
                 <div class="drawer-radio-list">
                     <label class="drawer-radio-label">
-                        <input type="radio" name="filter_stock_status" value="active" checked>
-                        <span>Đang bán</span>
+                        <input type="radio" name="stock_status" value="" {{ $currentStockStatus === '' ? 'checked' : '' }}>
+                        <span>Tất cả trạng thái</span>
                     </label>
                     <label class="drawer-radio-label">
-                        <input type="radio" name="filter_stock_status" value="low">
-                        <span>Sắp hết hàng</span>
+                        <input type="radio" name="stock_status" value="active" {{ $currentStockStatus === 'active' ? 'checked' : '' }}>
+                        <span>Còn hàng nhiều (&gt; 5)</span>
                     </label>
                     <label class="drawer-radio-label">
-                        <input type="radio" name="filter_stock_status" value="out">
-                        <span>Hết hàng</span>
+                        <input type="radio" name="stock_status" value="low" {{ $currentStockStatus === 'low' ? 'checked' : '' }}>
+                        <span>Sắp hết hàng (1 – 5)</span>
                     </label>
                     <label class="drawer-radio-label">
-                        <input type="radio" name="filter_stock_status" value="discontinued">
-                        <span>Ngừng kinh doanh</span>
+                        <input type="radio" name="stock_status" value="out" {{ $currentStockStatus === 'out' ? 'checked' : '' }}>
+                        <span>Hết hàng (0)</span>
                     </label>
                 </div>
             </div>
@@ -80,31 +95,31 @@
 
             <!-- Nhóm sắp xếp theo dropdown -->
             <div class="drawer-filter-group">
-                <label class="drawer-group-label">SẮP XẾP THEO</label>
+                <label class="drawer-group-label" style="text-transform: none;">Sắp xếp theo</label>
                 <div class="drawer-custom-select-wrapper" id="drawerSortDropdownWrapper">
                     <button type="button" class="drawer-custom-select-btn" id="btnDrawerSortSelect">
-                        <span id="selectedDrawerSortText">Mới cập nhật</span>
+                        <span id="selectedDrawerSortText">{{ $currentSortLabel }}</span>
                         <i class="bi bi-chevron-down" style="font-size: 11px;"></i>
                     </button>
                     <div class="drawer-custom-select-menu" id="drawerSortDropdownMenu">
-                        <div class="drawer-select-item active" data-sort="newest">Mới cập nhật</div>
-                        <div class="drawer-select-item" data-sort="best_selling">Bán chạy nhất</div>
-                        <div class="drawer-select-item" data-sort="price_asc">Giá tăng dần</div>
-                        <div class="drawer-select-item" data-sort="price_desc">Giá giảm dần</div>
+                        <div class="drawer-select-item {{ $currentSort === 'newest' ? 'active' : '' }}" data-sort="newest">Mới cập nhật</div>
+                        <div class="drawer-select-item {{ $currentSort === 'best_selling' ? 'active' : '' }}" data-sort="best_selling">Bán chạy nhất</div>
+                        <div class="drawer-select-item {{ $currentSort === 'price_asc' ? 'active' : '' }}" data-sort="price_asc">Giá tăng dần</div>
+                        <div class="drawer-select-item {{ $currentSort === 'price_desc' ? 'active' : '' }}" data-sort="price_desc">Giá giảm dần</div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Footer Drawer: Thiết lập lại & Áp dụng -->
+        <!-- Footer Drawer: Thiết lập lại và Áp dụng -->
         <div class="drawer-footer">
-            <button type="button" class="btn-drawer-reset" id="btnDrawerReset">
+            <button type="button" class="btn-drawer-reset" id="btnDrawerReset" data-reset-url="{{ route('admin.products.index') }}">
                 Thiết lập lại
             </button>
-            <button type="button" class="btn-drawer-apply" id="btnDrawerApply">
+            <button type="submit" class="btn-drawer-apply" id="btnDrawerApply">
                 <i class="bi bi-funnel"></i>
                 <span>Áp dụng</span>
             </button>
         </div>
-    </div>
+    </form>
 </div>

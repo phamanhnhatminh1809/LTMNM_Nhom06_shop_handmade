@@ -5,7 +5,7 @@
         <!-- Bên trái: Slogan -->
         <div style="display: flex; align-items: center; gap: 6px; opacity: 0.95;">
             <i class="bi bi-patch-check" style="font-size: 14px;"></i>
-            <span>100% Đồ thủ công tinh tế · Made with love in Vietnam</span>
+            <span>Sản phẩm thủ công truyền thống sản xuất tại Việt Nam</span>
         </div>
         
         <!-- Bên phải: Menu người dùng -->

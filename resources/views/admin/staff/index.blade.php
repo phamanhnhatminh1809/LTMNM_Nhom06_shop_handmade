@@ -11,7 +11,7 @@
 <div class="admin-top-bar">
     <div class="page-main-title">
         <i class="bi bi-people"></i>
-        <span>QUẢN LÝ NHÂN VIÊN</span>
+        <span>Quản lý nhân viên</span>
     </div>
     <div class="top-bar-right">
         <button class="btn-icon-bell" title="Thông báo hệ thống">
@@ -42,11 +42,10 @@
 
 <!-- Welcome Card -->
 <div class="product-welcome-card">
-    <div>
-        <h2 class="product-welcome-title" style="margin-bottom: 4px;">
-            Quản lý nhân viên
-        </h2>
-    </div>
+    <h2 class="product-welcome-title">
+        <i class="bi bi-people"></i>
+        <span>Quản lý nhân viên</span>
+    </h2>
     <a href="{{ route('admin.staff.create') }}" class="btn-add-product">
         <i class="bi bi-person-plus"></i>
         <span>Tạo tài khoản nhân viên</span>
@@ -161,7 +160,7 @@
                 <tr>
                     <th style="width: 60px;">ID</th>
                     <th>Nhân sự</th>
-                    <th>Email & SĐT</th>
+                    <th>Email và số điện thoại</th>
                     <th>Vai trò</th>
                     <th>Trạng thái</th>
                     <th style="text-align: center; width: 120px;">Thao tác</th>
@@ -233,7 +232,7 @@
                             <div style="display: inline-flex; align-items: center; gap: 6px;">
                                 <a href="{{ route('admin.staff.edit', $u) }}"
                                    class="btn-action-view"
-                                   title="Chỉnh sửa chi tiết & phân quyền">
+                                   title="Chỉnh sửa chi tiết và phân quyền">
                                     <i class="bi bi-pencil"></i>
                                 </a>
 

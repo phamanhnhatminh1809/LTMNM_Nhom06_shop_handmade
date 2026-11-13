@@ -127,26 +127,14 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Các nút xem chi tiết, Sửa, Xóa
-    const deleteButtons = document.querySelectorAll('.btn-tbl-action.delete');
-    deleteButtons.forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            const row = btn.closest('tr');
-            const productName = row ? row.querySelector('.product-item-name').textContent : 'sản phẩm này';
-            if (confirm(`Bạn có chắc chắn muốn xóa "${productName}" khỏi danh sách?`)) {
-                row.remove();
-            }
-        });
-    });
-
     // Xử lý Drawer Bộ lọc nâng cao mở, đóng, Reset mặc định, Áp dụng
-    const btnAdvancedFilter = document.getElementById('btnAdvancedFilter');
+    const btnAdvancedFilter = document.getElementById('btnOpenAdvancedFilter') || document.getElementById('btnAdvancedFilter');
     const drawerOverlay = document.getElementById('advancedFilterDrawerOverlay');
     const btnCloseFilterDrawer = document.getElementById('btnCloseFilterDrawer');
     const btnDrawerReset = document.getElementById('btnDrawerReset');
     const btnDrawerApply = document.getElementById('btnDrawerApply');
     const drawerContent = document.querySelector('.filter-drawer');
+    const drawerSortInput = document.getElementById('drawerSortInput');
 
     // Chặn nhập số âm cho Khoảng giá
     const priceFrom = document.getElementById('priceFrom');
@@ -212,6 +200,9 @@ document.addEventListener('DOMContentLoaded', () => {
             drawerSortItems.forEach(i => i.classList.remove('active'));
             this.classList.add('active');
 
+            if (drawerSortInput) {
+                drawerSortInput.value = this.getAttribute('data-sort') || 'newest';
+            }
             if (selectedDrawerSortText) {
                 selectedDrawerSortText.textContent = this.textContent.trim();
             }
@@ -227,17 +218,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Hàm Reset toàn bộ bộ lọc về trạng thái mặc định
     function resetFilterToDefault(smooth = false) {
-        const categoryChecks = document.querySelectorAll('input[name="filter_category[]"]');
-        categoryChecks.forEach(ch => {
-            ch.checked = false;
+        const categoryRadios = document.querySelectorAll('#advancedFilterForm input[name="category"]');
+        categoryRadios.forEach(r => {
+            r.checked = (r.value === '');
         });
 
         if (priceFrom) priceFrom.value = '';
         if (priceTo) priceTo.value = '';
 
-        const statusRadios = document.querySelectorAll('input[name="filter_stock_status"]');
+        const statusRadios = document.querySelectorAll('#advancedFilterForm input[name="stock_status"]');
         statusRadios.forEach(r => {
-            r.checked = (r.value === 'active');
+            r.checked = (r.value === '');
         });
 
         // Reset custom dropdown sắp xếp: mặc định "Mới cập nhật"
@@ -248,6 +239,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 item.classList.remove('active');
             }
         });
+        if (drawerSortInput) {
+            drawerSortInput.value = 'newest';
+        }
         if (selectedDrawerSortText) {
             selectedDrawerSortText.textContent = 'Mới cập nhật';
         }
@@ -266,7 +260,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function openDrawer() {
-        resetFilterToDefault(false);
+        if (drawerBody) {
+            drawerBody.scrollTop = 0;
+        }
 
         if (drawerOverlay) {
             drawerOverlay.classList.add('show');
@@ -285,7 +281,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (btnAdvancedFilter) {
-        btnAdvancedFilter.addEventListener('click', openDrawer);
+        btnAdvancedFilter.addEventListener('click', (e) => {
+            e.preventDefault();
+            openDrawer();
+        });
     }
 
     if (btnCloseFilterDrawer) {
@@ -309,15 +308,12 @@ document.addEventListener('DOMContentLoaded', () => {
     // Nút Thiết lập lại trong Drawer
     if (btnDrawerReset) {
         btnDrawerReset.addEventListener('click', () => {
+            const resetUrl = btnDrawerReset.getAttribute('data-reset-url');
+            if (resetUrl && window.location.search) {
+                window.location.href = resetUrl;
+                return;
+            }
             resetFilterToDefault(true);
-        });
-    }
-
-    // Nút Áp dụng trong Drawer: Đóng bộ lọc và áp dụng lọc
-    if (btnDrawerApply) {
-        btnDrawerApply.addEventListener('click', () => {
-            closeDrawer();
-            filterProducts();
         });
     }
 
@@ -921,7 +917,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (deleteProductSku) deleteProductSku.textContent = code;
             if (deleteProductCategory) deleteProductCategory.textContent = category;
             if (deleteProductImg) {
-                deleteProductImg.src = image || '/images/logo.png';
+                deleteProductImg.src = image || '/assets/images/placeholder.svg';
                 deleteProductImg.alt = name;
             }
             if (deleteProductForm) {

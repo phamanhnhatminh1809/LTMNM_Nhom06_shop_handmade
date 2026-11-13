@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\CustomerController as AdminCustomerController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Admin\ProductController as AdminProductController;
+use App\Http\Controllers\Admin\ProfileController as AdminProfileController;
 use App\Http\Controllers\Admin\ReviewController as AdminReviewController;
 use App\Http\Controllers\Admin\StaffController as AdminStaffController;
 use App\Http\Controllers\AuthController;
@@ -79,6 +80,11 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     // Dashboard (Admin, Nhân viên kho, Nhân viên bán hàng đều vào được khu vực quản trị)
     Route::get('/', [AdminDashboardController::class, 'index'])->name('dashboard');
     Route::get('/dashboard', [AdminDashboardController::class, 'index']);
+
+    // Hồ sơ cá nhân của Quản trị viên và Nhân viên (đổi tên, email, số điện thoại, mật khẩu)
+    Route::get('profile', [AdminProfileController::class, 'edit'])->name('profile');
+    Route::put('profile', [AdminProfileController::class, 'update'])->name('profile.update');
+    Route::put('profile/password', [AdminProfileController::class, 'changePassword'])->name('profile.password');
 
     // --- PHÂN HỆ KHO: Chỉ Admin & Nhân viên kho (warehouse_staff) ---
     Route::middleware('admin:admin,warehouse_staff')->group(function () {

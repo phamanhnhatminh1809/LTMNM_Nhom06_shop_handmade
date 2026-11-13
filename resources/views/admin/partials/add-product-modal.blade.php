@@ -138,19 +138,19 @@
                     <input type="hidden" name="description" id="productDescriptionHidden" value="{{ old('description') }}">
                     <div class="editor-container">
                         <div class="editor-toolbar">
-                            <button type="button" class="editor-btn" data-format="bold" title="In đậm (Bold)"><b>B</b></button>
-                            <button type="button" class="editor-btn" data-format="italic" title="In nghiêng (Italic)"><i>I</i></button>
-                            <button type="button" class="editor-btn" data-format="list" title="Danh sách (List)"><i class="bi bi-list-ul"></i></button>
+                            <button type="button" class="editor-btn" data-format="bold" title="In đậm"><b>B</b></button>
+                            <button type="button" class="editor-btn" data-format="italic" title="In nghiêng"><i>I</i></button>
+                            <button type="button" class="editor-btn" data-format="list" title="Danh sách"><i class="bi bi-list-ul"></i></button>
                         </div>
-                        <div id="productDescriptionInput" class="editor-content" contenteditable="true" placeholder="Nhập mô tả sản phẩm...">{{ old('description', 'Sản phẩm thủ công chế tác tỉ mỉ từ nguyên liệu tự nhiên tuyển chọn.') }}</div>
+                        <div id="productDescriptionInput" class="editor-content" contenteditable="true" placeholder="Nhập mô tả sản phẩm...">{{ old('description', 'Sản phẩm thủ công được hoàn thiện từ nguyên liệu tự nhiên.') }}</div>
                     </div>
                 </div>
 
-                <!-- Bảng Biến thể & Tồn kho -->
+                <!-- Bảng Biến thể và Tồn kho -->
                 <div class="variant-section">
                     <div class="variant-header-row">
                         <div class="variant-title-box">
-                            <span class="variant-title">Biến thể & Tồn kho</span>
+                            <span class="variant-title">Biến thể và tồn kho</span>
                             <span class="variant-subtitle">Cấu hình kích cỡ, màu sắc và giá bán</span>
                         </div>
                         <button type="button" class="btn-add-variant" id="btnAddVariant">
@@ -163,10 +163,10 @@
                         <table class="variant-table">
                             <thead>
                                 <tr>
-                                    <th>KÍCH CỠ / MÀU</th>
-                                    <th>SKU CON</th>
-                                    <th>GIÁ BÁN</th>
-                                    <th>TỒN KHO</th>
+                                    <th>Kích cỡ / Màu</th>
+                                    <th>SKU con</th>
+                                    <th>Giá bán</th>
+                                    <th>Tồn kho</th>
                                 </tr>
                             </thead>
                             <tbody id="productVariantTableBody">
@@ -187,7 +187,7 @@
                 <!-- Ảnh đại diện chính -->
                 <div class="modal-form-group">
                     <label class="modal-label" for="productMainImageInput">
-                        Ảnh đại diện chính (`image`)
+                        Ảnh đại diện chính
                     </label>
                     <input type="file"
                            id="productMainImageInput"
@@ -223,10 +223,10 @@
                     </div>
                 </div>
 
-                <!-- Hướng dẫn sử dụng & Bảo quản -->
+                <!-- Hướng dẫn sử dụng và bảo quản -->
                 <div class="modal-form-group">
                     <label class="modal-label" for="productPreserveInput">
-                        Hướng dẫn sử dụng & Bảo quản
+                        Hướng dẫn sử dụng và bảo quản
                     </label>
                     <textarea id="productPreserveInput"
                               name="instruction_preserve"

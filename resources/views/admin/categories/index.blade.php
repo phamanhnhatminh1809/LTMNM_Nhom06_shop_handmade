@@ -9,7 +9,7 @@
 <div class="admin-top-bar">
     <div class="page-main-title">
         <i class="bi bi-tags"></i>
-        <span>QUẢN LÝ DANH MỤC SẢN PHẨM</span>
+        <span>Quản lý danh mục sản phẩm</span>
     </div>
     <div class="top-bar-right">
         <button class="btn-icon-bell" title="Thông báo hệ thống">
@@ -40,11 +40,10 @@
 
 <!-- Welcome Card -->
 <div class="product-welcome-card">
-    <div>
-        <h2 class="product-welcome-title">
-            Quản lý danh mục sản phẩm
-        </h2>
-    </div>
+    <h2 class="product-welcome-title">
+        <i class="bi bi-tags"></i>
+        <span>Quản lý danh mục sản phẩm</span>
+    </h2>
     <a href="{{ route('admin.categories.create') }}" class="btn-add-product">
         <i class="bi bi-plus-lg"></i>
         <span>Thêm danh mục</span>

@@ -51,7 +51,7 @@
             </div>
             <div class="custom-date-inputs">
                 <div class="date-input-group">
-                    <label for="startDateInput">TỪ NGÀY</label>
+                    <label for="startDateInput">Từ ngày</label>
                     <div class="date-input-box">
                         <i class="bi bi-calendar-event"></i>
                         <input type="text" id="startDateInput" value="01/10/2023" placeholder="dd/mm/yyyy">
@@ -61,7 +61,7 @@
                     <i class="bi bi-arrow-right"></i>
                 </div>
                 <div class="date-input-group">
-                    <label for="endDateInput">ĐẾN NGÀY</label>
+                    <label for="endDateInput">Đến ngày</label>
                     <div class="date-input-box">
                         <i class="bi bi-calendar-check"></i>
                         <input type="text" id="endDateInput" value="31/10/2023" placeholder="dd/mm/yyyy">

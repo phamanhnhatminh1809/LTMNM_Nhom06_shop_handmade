@@ -9,7 +9,7 @@
 <div class="admin-top-bar">
     <div class="page-main-title">
         <i class="bi bi-pencil-square"></i>
-        <span>CHỈNH SỬA SẢN PHẨM</span>
+        <span>Chỉnh sửa sản phẩm</span>
     </div>
     <div class="top-bar-right">
         <a href="{{ route('admin.products.show', $product) }}" class="btn-secondary-outline">
@@ -173,7 +173,7 @@
 
                     <div class="modal-form-group">
                         <label class="modal-label" for="instruction_preserve">
-                            Hướng dẫn sử dụng & Bảo quản
+                            Hướng dẫn sử dụng và bảo quản
                         </label>
                         <textarea id="instruction_preserve"
                                   name="instruction_preserve"
@@ -228,7 +228,7 @@
 
                     <div class="modal-form-group">
                         <label class="modal-label" for="galleryInput">
-                            Bộ sưu tập ảnh phụ (`gallery[]` — Tối đa 5 ảnh)
+                            Bộ sưu tập ảnh phụ (Tối đa 5 ảnh)
                         </label>
                         @if(!empty($product->gallery) && is_array($product->gallery))
                             <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px;" id="galleryPreviewGrid">
@@ -267,7 +267,7 @@
                 <div class="admin-card-header">
                     <h3 class="admin-card-title">
                         <i class="bi bi-stars"></i>
-                        <span>Thiết lập & Lưu thay đổi</span>
+                        <span>Thiết lập và lưu thay đổi</span>
                     </h3>
                 </div>
                 <div class="admin-card-body">
@@ -278,7 +278,7 @@
                                value="1"
                                style="width: 18px; height: 18px; accent-color: var(--color-primary);"
                                {{ old('is_featured', $product->is_featured) ? 'checked' : '' }}>
-                        <span>Sản phẩm nổi bật (Featured)</span>
+                        <span>Sản phẩm nổi bật</span>
                     </label>
 
                     <div class="info-kv-list" style="margin-top: 14px; padding-top: 14px; border-top: 1px solid #f4eae6;">

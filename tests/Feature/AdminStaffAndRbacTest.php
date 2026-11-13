@@ -385,4 +385,23 @@ class AdminStaffAndRbacTest extends TestCase
         $lock->assertSessionHas('error');
         $this->assertTrue($this->admin->fresh()->is_active);
     }
+
+    /**
+     * Admin có thể đặt lại mật khẩu mới cho tài khoản nhân viên qua form cập nhật chi tiết
+     */
+    public function test_admin_can_reset_staff_password_in_update(): void
+    {
+        $response = $this->actingAs($this->admin)->put("/admin/staff/{$this->salesStaff->id}", [
+            'full_name'             => $this->salesStaff->full_name,
+            'email'                 => $this->salesStaff->email,
+            'role_id'               => $this->roleSales->id,
+            'is_active'             => '1',
+            'password'              => 'new_staff_pass123',
+            'password_confirmation' => 'new_staff_pass123',
+        ]);
+
+        $response->assertRedirect(route('admin.staff.index'));
+        $response->assertSessionHas('success');
+        $this->assertTrue(Hash::check('new_staff_pass123', $this->salesStaff->fresh()->password));
+    }
 }

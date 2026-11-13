@@ -80,7 +80,7 @@
                 @elseif (!empty($currentCategory))
                     Danh mục "<strong>{{ $currentCategory->name }}</strong>": <strong>{{ $total }}</strong> sản phẩm
                 @else
-                    Khám phá <strong>{{ $total }}</strong> sản phẩm handmade tinh tế
+                    Hiện có <strong>{{ $total }}</strong> sản phẩm thủ công
                 @endif
             </p>
         </div>

@@ -9,7 +9,7 @@
 <div class="admin-top-bar">
     <div class="page-main-title">
         <i class="bi bi-person-lines-fill"></i>
-        <span>HỒ SƠ KHÁCH HÀNG</span>
+        <span>Hồ sơ khách hàng</span>
     </div>
     <div class="top-bar-right">
         <a href="{{ route('admin.customers.index') }}" class="btn-secondary-outline">

@@ -11,7 +11,7 @@
 <div class="admin-top-bar">
     <div class="page-main-title">
         <i class="bi bi-bag"></i>
-        <span>QUẢN LÝ SẢN PHẨM</span>
+        <span>Quản lý sản phẩm</span>
     </div>
     <div class="top-bar-right">
         <a href="{{ route('admin.categories.index') }}" class="btn-secondary-outline" title="Quản lý danh mục sản phẩm">
@@ -63,10 +63,11 @@
 <!-- Welcome Card Sản Phẩm -->
 <div class="product-welcome-card">
     <h2 class="product-welcome-title">
-        Quản lý sản phẩm
+        <i class="bi bi-bag"></i>
+        <span>Quản lý sản phẩm</span>
     </h2>
     <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
-        <a href="javascript:void(0)" class="btn-secondary-outline" id="btnAddNewProduct" style="background: rgba(255,255,255,0.92);">
+        <a href="javascript:void(0)" class="btn-secondary-outline" id="btnAddNewProduct" style="background: rgba(255,255,255,0.92); padding: 8px 16px;">
             <i class="bi bi-window-plus"></i>
             <span>Thêm nhanh (Modal)</span>
         </a>
@@ -77,9 +78,14 @@
     </div>
 </div>
 
-<!-- Thanh tìm kiếm & Bộ lọc -->
+<!-- Thanh tìm kiếm và Bộ lọc -->
 <div class="product-filter-bar">
     <form method="GET" action="{{ route('admin.products.index') }}" id="adminSearchForm" style="display:contents;">
+        @foreach(['min_price', 'max_price', 'stock_status', 'sort'] as $extraFilter)
+            @if(request()->filled($extraFilter))
+                <input type="hidden" name="{{ $extraFilter }}" value="{{ request($extraFilter) }}">
+            @endif
+        @endforeach
         <div class="search-input-box">
             <i class="bi bi-search"></i>
             <input type="text" name="q" id="productSearchInput" placeholder="Tìm kiếm theo tên, SKU..." value="{{ request('q') }}">
@@ -164,7 +170,7 @@
                                         {{ $prod->name }}
                                     </a>
                                     @if($prod->is_featured)
-                                        <span class="stock-tag" style="background:#ffdad2;color:#792a16;font-size:10px;padding:2px 6px;border-radius:4px;">NỔI BẬT</span>
+                                        <span class="stock-tag" style="background:#ffdad2;color:#792a16;font-size:10px;padding:2px 6px;border-radius:4px;">Nổi bật</span>
                                     @endif
                                 </div>
                             </div>

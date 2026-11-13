@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Trang chủ - Đồ thủ công handmade tinh tế')
+@section('title', 'Trang chủ - Cửa hàng đồ thủ công')
 
 @section('content')
 <div class="banner-slider">
@@ -36,7 +36,7 @@
         <div class="section__header" style="margin-bottom: 24px;">
             <div>
                 <h2 class="section__title" style="margin: 0 0 4px;">Danh mục sản phẩm</h2>
-                <p style="margin: 0; font-size: 14px; color: var(--color-on-surface-variant, #55423e);">Khám phá các dòng sản phẩm thủ công được tạo tác tỉ mỉ</p>
+                <p style="margin: 0; font-size: 14px; color: var(--color-on-surface-variant, #55423e);">Khám phá các dòng sản phẩm thủ công đa dạng</p>
             </div>
             <a href="{{ route('products.index') }}" class="link-more" style="display: inline-flex; align-items: center; gap: 4px;">
                 <span>Xem tất cả danh mục</span>

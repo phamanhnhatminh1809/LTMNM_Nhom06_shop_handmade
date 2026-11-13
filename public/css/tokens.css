@@ -123,4 +123,17 @@
     --banner-height-sm: 280px;
     --zalo-bg: #0068ff;
     --zalo-size: 56px;
+
+    /* ===== ADMIN TAB HEADER (BIẾN DÙNG CHUNG) ===== */
+    --admin-tab-header-bg: #fcf2ee;
+    --admin-tab-header-border: #f7ded6;
+    --admin-tab-header-radius: 12px;
+    --admin-tab-header-padding-y: 12px;
+    --admin-tab-header-padding-x: 20px;
+    --admin-tab-header-min-height: 52px;
+    --admin-tab-header-margin-bottom: 16px;
+    --admin-tab-header-title-color: var(--color-primary);
+    --admin-tab-header-title-size: 17px;
+    --admin-tab-header-title-weight: 800;
+    --admin-tab-header-shadow: 0 2px 8px rgba(121, 42, 22, 0.04);
 }

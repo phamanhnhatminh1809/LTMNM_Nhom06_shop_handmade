@@ -9,7 +9,7 @@
 <div class="admin-top-bar">
     <div class="page-main-title">
         <i class="bi bi-star"></i>
-        <span>QUẢN LÝ ĐÁNH GIÁ SẢN PHẨM</span>
+        <span>Quản lý đánh giá sản phẩm</span>
     </div>
     <div class="top-bar-right">
         <button class="btn-icon-bell" title="Thông báo hệ thống">

@@ -120,7 +120,7 @@ class AdminDashboardTest extends TestCase
 
         $response = $this->actingAs($this->admin)->get('/admin/dashboard');
         $response->assertStatus(200);
-        $response->assertSee('TỔNG QUAN HỆ THỐNG');
+        $response->assertSee('Tổng quan hệ thống');
         $response->assertSee('Gấu bông len bán chạy nhất');
         $response->assertSee('Cốc gốm bán chạy nhì');
 

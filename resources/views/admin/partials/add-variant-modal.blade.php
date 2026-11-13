@@ -23,7 +23,7 @@
                     <i class="bi bi-info-circle"></i>
                     <span><strong>Sản phẩm gốc:</strong> <span id="variantBaseProductName">Bình hoa gốm men mộc nghệ nhân (CRM-FLW-088)</span></span>
                 </div>
-                <span class="badge-variant-category" id="variantBaseCategoryBadge">GỐM SỨ THỦ CÔNG</span>
+                <span class="badge-variant-category" id="variantBaseCategoryBadge">Gốm sứ thủ công</span>
             </div>
 
             <!-- Phân loại thuộc tính -->
@@ -33,10 +33,10 @@
                     <span>Phân loại thuộc tính</span>
                 </div>
 
-                <!-- Chọn kích cỡ (Size) -->
+                <!-- Chọn kích cỡ -->
                 <div class="modal-form-group">
                     <label class="modal-label">
-                        Kích cỡ (Size) <span class="required-star">*</span>
+                        Kích cỡ <span class="required-star">*</span>
                     </label>
                     <div class="size-chips-wrapper">
                         <button type="button" class="size-chip-btn" data-size="Size S">
@@ -97,11 +97,11 @@
                 </div>
             </div>
 
-            <!-- Giá bán & Tồn kho -->
+            <!-- Giá bán và tồn kho -->
             <div class="variant-section-card">
                 <div class="variant-card-title">
                     <i class="bi bi-tag"></i>
-                    <span>Giá bán & Tồn kho</span>
+                    <span>Giá bán và tồn kho</span>
                 </div>
 
                 <div class="modal-form-row-2" style="grid-template-columns: 1fr 1fr 1fr;">

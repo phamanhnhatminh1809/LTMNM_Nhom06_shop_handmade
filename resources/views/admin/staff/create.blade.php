@@ -9,7 +9,7 @@
 <div class="admin-top-bar">
     <div class="page-main-title">
         <i class="bi bi-person-plus"></i>
-        <span>THÊM TÀI KHOẢN NHÂN VIÊN & CẤP QUYỀN</span>
+        <span>Thêm tài khoản nhân viên và phân quyền</span>
     </div>
     <div class="top-bar-right">
         <a href="{{ route('admin.staff.index') }}" class="btn-secondary-outline">
@@ -67,7 +67,7 @@
 
                     <div class="modal-form-group">
                         <label class="modal-label" for="username">
-                            Tên đăng nhập (Username) <span class="required-star">*</span>
+                            Tên đăng nhập <span class="required-star">*</span>
                         </label>
                         <input type="text"
                                id="username"
@@ -86,7 +86,7 @@
                 <div class="modal-form-row-2" style="margin-bottom: 16px;">
                     <div class="modal-form-group">
                         <label class="modal-label" for="email">
-                            Địa chỉ Email <span class="required-star">*</span>
+                            Địa chỉ email <span class="required-star">*</span>
                         </label>
                         <input type="email"
                                id="email"
@@ -124,7 +124,7 @@
                     <select id="role_id" name="role_id" class="modal-input" required>
                         @foreach($staffRoles as $role)
                             <option value="{{ $role->id }}" {{ (int) old('role_id') === $role->id ? 'selected' : '' }}>
-                                {{ $role->label }} ({{ $role->name }})
+                                {{ $role->label }}
                             </option>
                         @endforeach
                     </select>
@@ -168,7 +168,7 @@
                     </a>
                     <button type="submit" class="btn-modal-save">
                         <i class="bi bi-person-check"></i>
-                        <span>Tạo nhân viên & Cấp quyền</span>
+                        <span>Tạo nhân viên và phân quyền</span>
                     </button>
                 </div>
             </form>
@@ -181,45 +181,53 @@
             <div class="admin-card-header">
                 <h3 class="admin-card-title">
                     <i class="bi bi-shield-check"></i>
-                    <span>Phạm vi quyền hạn theo chức vụ</span>
+                    <span>Quy tắc phân quyền chi tiết</span>
                 </h3>
             </div>
             <div class="admin-card-body">
-                <div style="display: flex; flex-direction: column; gap: 14px;">
-                    <div style="padding: 12px 14px; background: #fff8f6; border: 1px solid #f2dcd4; border-radius: 10px;">
-                        <div style="margin-bottom: 6px;">
-                            <span class="role-badge warehouse_staff">
-                                <i class="bi bi-box-seam"></i> Nhân viên kho (`warehouse_staff`)
+                <div style="display: flex; flex-direction: column; gap: 12px;">
+                    <!-- 1. Quản trị viên -->
+                    <div style="padding: 12px 14px; background: #fff8f6; border: 1px solid #f2dcd4; border-radius: 10px; font-size: 12.5px;">
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+                            <span class="role-badge admin" style="margin: 0;">
+                                <i class="bi bi-shield-fill-check"></i> Quản trị viên
                             </span>
+                            <span class="stock-tag" style="background: #ffdad2; color: #792a16; font-size: 10px; padding: 1px 6px;">Toàn quyền</span>
                         </div>
-                        <div style="font-size: 12.5px; color: var(--color-on-surface-variant); line-height: 1.5;">
-                            • Quản lý danh mục sản phẩm (Thêm, sửa, xóa).<br>
-                            • Quản lý sản phẩm, hình ảnh và số lượng tồn kho.<br>
-                            • Không truy cập được Đơn hàng, Khách hàng hay Phân quyền.
+                        <div style="color: var(--color-on-surface-variant); line-height: 1.5;">
+                            Toàn quyền mọi phân hệ: Bảng điều khiển, Kho hàng, Bán hàng, Khách hàng và Phân quyền nhân sự.
                         </div>
                     </div>
 
-                    <div style="padding: 12px 14px; background: #fff8f6; border: 1px solid #f2dcd4; border-radius: 10px;">
-                        <div style="margin-bottom: 6px;">
-                            <span class="role-badge sales_staff">
-                                <i class="bi bi-receipt-cutoff"></i> Nhân viên bán hàng (`sales_staff`)
+                    <!-- 2. Nhân viên kho -->
+                    <div style="padding: 12px 14px; background: #fafaf9; border: 1px solid #e7e5e4; border-radius: 10px; font-size: 12.5px;">
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+                            <span class="role-badge warehouse_staff" style="margin: 0;">
+                                <i class="bi bi-box-seam"></i> Nhân viên kho
                             </span>
+                            <span class="stock-tag" style="background: #f5f5f4; color: #57534e; font-size: 10px; padding: 1px 6px;">Phân hệ kho</span>
                         </div>
-                        <div style="font-size: 12.5px; color: var(--color-on-surface-variant); line-height: 1.5;">
-                            • Xem danh sách, duyệt đơn và cập nhật trạng thái giao hàng.<br>
-                            • Quản lý và kiểm duyệt đánh giá sản phẩm từ khách hàng.<br>
-                            • Không chỉnh sửa kho hàng hay tài khoản người dùng.
+                        <div style="color: var(--color-on-surface-variant); line-height: 1.5; margin-bottom: 4px;">
+                            <span style="color: #15803d; font-weight: 600;"><i class="bi bi-check-circle-fill"></i> Được cấp:</span> Quản lý danh mục sản phẩm, thêm, sửa, xóa sản phẩm và điều chỉnh tồn kho.
+                        </div>
+                        <div style="color: #78716c; line-height: 1.4; font-size: 11px;">
+                            <i class="bi bi-dash-circle"></i> Không truy cập đơn hàng, đánh giá, khách hàng và nhân sự.
                         </div>
                     </div>
 
-                    <div style="padding: 12px 14px; background: #fff8f6; border: 1px solid #f2dcd4; border-radius: 10px;">
-                        <div style="margin-bottom: 6px;">
-                            <span class="role-badge admin">
-                                <i class="bi bi-shield-fill-check"></i> Quản trị viên (`admin`)
+                    <!-- 3. Nhân viên bán hàng -->
+                    <div style="padding: 12px 14px; background: #fafaf9; border: 1px solid #e7e5e4; border-radius: 10px; font-size: 12.5px;">
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+                            <span class="role-badge sales_staff" style="margin: 0;">
+                                <i class="bi bi-receipt-cutoff"></i> Nhân viên bán hàng
                             </span>
+                            <span class="stock-tag" style="background: #f5f5f4; color: #57534e; font-size: 10px; padding: 1px 6px;">Phân hệ bán hàng</span>
                         </div>
-                        <div style="font-size: 12.5px; color: var(--color-on-surface-variant); line-height: 1.5;">
-                            • Toàn quyền truy cập và điều hành tất cả các phân hệ trong hệ thống.
+                        <div style="color: var(--color-on-surface-variant); line-height: 1.5; margin-bottom: 4px;">
+                            <span style="color: #15803d; font-weight: 600;"><i class="bi bi-check-circle-fill"></i> Được cấp:</span> Tiếp nhận, duyệt và chuyển trạng thái đơn hàng; kiểm duyệt và xóa đánh giá sản phẩm.
+                        </div>
+                        <div style="color: #78716c; line-height: 1.4; font-size: 11px;">
+                            <i class="bi bi-dash-circle"></i> Không can thiệp sản phẩm, kho bãi, khách hàng và nhân sự.
                         </div>
                     </div>
                 </div>

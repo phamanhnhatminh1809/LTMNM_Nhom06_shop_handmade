@@ -381,6 +381,74 @@ class AdminProductManagementTest extends TestCase
     }
 
     /**
+     * Lọc nâng cao sản phẩm theo khoảng giá, trạng thái kho và sắp xếp trên Admin
+     */
+    public function test_warehouse_staff_can_use_advanced_filters_and_sorting_on_products(): void
+    {
+        $prodActiveCheap = Product::create([
+            'code'           => 'SP-ADV-01',
+            'category_id'    => $this->categoryLen->id,
+            'name'           => 'Móc khóa len mini',
+            'slug'           => 'moc-khoa-len-mini',
+            'price'          => 80000,
+            'stock_quantity' => 15,
+            'sold'           => 5,
+        ]);
+
+        $prodLowMid = Product::create([
+            'code'           => 'SP-ADV-02',
+            'category_id'    => $this->categoryGom->id,
+            'name'           => 'Ly gốm men hỏa biến',
+            'slug'           => 'ly-gom-men-hoa-bien',
+            'price'          => 250000,
+            'stock_quantity' => 3,
+            'sold'           => 40,
+        ]);
+
+        $prodOutExpensive = Product::create([
+            'code'           => 'SP-ADV-03',
+            'category_id'    => $this->categoryGom->id,
+            'name'           => 'Bình gốm nghệ nhân lớn',
+            'slug'           => 'binh-gom-nghe-nhan-lon',
+            'price'          => 600000,
+            'stock_quantity' => 0,
+            'sold'           => 12,
+        ]);
+
+        // 1. Lọc theo khoảng giá (min_price = 100000, max_price = 300000)
+        $priceFilter = $this->actingAs($this->warehouseStaff)->get('/admin/products?min_price=100000&max_price=300000');
+        $priceFilter->assertStatus(200);
+        $priceFilter->assertSee('Ly gốm men hỏa biến');
+        $priceFilter->assertDontSee('Móc khóa len mini');
+        $priceFilter->assertDontSee('Bình gốm nghệ nhân lớn');
+
+        // 2. Lọc theo trạng thái kho: low (1 - 5) và out (0)
+        $lowFilter = $this->actingAs($this->warehouseStaff)->get('/admin/products?stock_status=low');
+        $lowFilter->assertStatus(200);
+        $lowFilter->assertSee('Ly gốm men hỏa biến');
+        $lowFilter->assertDontSee('Móc khóa len mini');
+        $lowFilter->assertDontSee('Bình gốm nghệ nhân lớn');
+
+        $outFilter = $this->actingAs($this->warehouseStaff)->get('/admin/products?stock_status=out');
+        $outFilter->assertStatus(200);
+        $outFilter->assertSee('Bình gốm nghệ nhân lớn');
+        $outFilter->assertDontSee('Ly gốm men hỏa biến');
+
+        // 3. Sắp xếp theo bán chạy nhất và giá tăng dần
+        $bestSelling = $this->actingAs($this->warehouseStaff)->get('/admin/products?sort=best_selling');
+        $bestSelling->assertStatus(200);
+        $bestSelling->assertViewHas('products', fn ($paginator) => $paginator->first()->id === $prodLowMid->id);
+
+        $priceAsc = $this->actingAs($this->warehouseStaff)->get('/admin/products?sort=price_asc');
+        $priceAsc->assertStatus(200);
+        $priceAsc->assertViewHas('products', fn ($paginator) => $paginator->first()->id === $prodActiveCheap->id);
+
+        $priceDesc = $this->actingAs($this->warehouseStaff)->get('/admin/products?sort=price_desc');
+        $priceDesc->assertStatus(200);
+        $priceDesc->assertViewHas('products', fn ($paginator) => $paginator->first()->id === $prodOutExpensive->id);
+    }
+
+    /**
      * Khách hàng (customer) và Khách vãng lai (guest) không được truy cập quản lý sản phẩm
      */
     public function test_guest_and_customer_cannot_access_admin_products(): void

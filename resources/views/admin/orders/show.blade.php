@@ -9,7 +9,7 @@
 <div class="admin-top-bar">
     <div class="page-main-title">
         <i class="bi bi-receipt"></i>
-        <span>CHI TIẾT ĐƠN HÀNG <span class="mono-code" style="margin-left: 6px; font-size: 14px;">#{{ $order->code }}</span></span>
+        <span>Chi tiết đơn hàng <span class="mono-code" style="margin-left: 6px; font-size: 14px;">#{{ $order->code }}</span></span>
     </div>
     <div class="top-bar-right">
         <a href="{{ route('admin.orders.index') }}" class="btn-secondary-outline">
@@ -63,7 +63,7 @@
                     <input type="hidden" name="status" value="shipping">
                     <button type="submit" class="btn-modal-save">
                         <i class="bi bi-truck"></i>
-                        <span>Duyệt & Giao hàng</span>
+                        <span>Duyệt và giao hàng</span>
                     </button>
                 </form>
 
@@ -216,7 +216,7 @@
                 <tfoot>
                     <tr style="background-color: #fff8f6;">
                         <td colspan="4" style="text-align: right; font-weight: 800; font-size: 14px; padding: 16px;">
-                            TỔNG CỘNG THANH TOÁN (COD):
+                            Tổng cộng thanh toán (COD):
                         </td>
                         <td style="text-align: right; font-weight: 800; font-size: 16px; color: var(--color-primary); padding: 16px;">
                             {{ number_format($order->total_amount, 0, ',', '.') }}đ

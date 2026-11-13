@@ -13,7 +13,7 @@
 <div class="admin-top-bar">
     <div class="page-main-title">
         <i class="bi bi-grid-1x2"></i>
-        <span>TỔNG QUAN HỆ THỐNG</span>
+        <span>Tổng quan hệ thống</span>
     </div>
     <div class="top-bar-right">
         <button class="btn-icon-bell" title="Thông báo hệ thống">
@@ -83,7 +83,7 @@
     </div>
 </div>
 
-<!-- Khu vực Biểu đồ & Cảnh báo tồn kho -->
+<!-- Khu vực Biểu đồ và cảnh báo tồn kho -->
 <div class="analytics-grid">
     <!-- Cột trái: Biểu đồ đường Doanh thu -->
     <div class="dashboard-card">
@@ -102,7 +102,7 @@
         </div>
     </div>
 
-    <!-- Cột phải: Biểu đồ tròn Danh mục & Sắp hết hàng -->
+    <!-- Cột phải: Biểu đồ tròn danh mục và sắp hết hàng -->
     <div class="right-column-stack">
         <!-- Tỷ trọng bán ra theo danh mục -->
         <div class="dashboard-card">
@@ -175,7 +175,7 @@
                         <div class="stock-status-right">
                             <div class="stock-ratio">{{ $item->stock_quantity }} <span style="font-weight: 500; color: #89726d;">/10</span></div>
                             <span class="stock-tag {{ $item->stock_quantity <= 2 ? 'danger' : 'warning' }}">
-                                {{ $item->stock_quantity <= 2 ? 'CẢNH BÁO' : 'THẤP' }}
+                                {{ $item->stock_quantity <= 2 ? 'Cảnh báo' : 'Thấp' }}
                             </span>
                         </div>
                     </div>
@@ -183,7 +183,7 @@
             </div>
 
             <a href="{{ route('admin.products.index') }}" class="btn-view-inventory">
-                XEM TẤT CẢ KHO <i class="bi bi-arrow-right" style="margin-left: 4px;"></i>
+                Xem tất cả kho <i class="bi bi-arrow-right" style="margin-left: 4px;"></i>
             </a>
         </div>
     </div>

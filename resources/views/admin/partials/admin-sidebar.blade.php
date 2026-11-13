@@ -38,7 +38,7 @@
             <!-- Nhóm HỆ THỐNG: Chỉ Quản trị viên (admin) -->
             @if(!$authUser || $authUser->isAdmin())
             <div class="nav-group">
-                <div class="nav-group-title">HỆ THỐNG</div>
+                <div class="nav-group-title">Hệ thống</div>
                 <ul class="nav-list">
                     <li>
                         <a href="{{ route('admin.staff.index') }}" class="nav-link {{ in_array($currentMenu, ['staff', 'permissions']) ? 'active' : '' }}" title="Nhân viên">
@@ -50,10 +50,10 @@
             </div>
             @endif
 
-            <!-- Nhóm QUẢN LÝ KHO: Admin & Nhân viên kho -->
+            <!-- Nhóm QUẢN LÝ KHO: Admin và Nhân viên kho -->
             @if(!$authUser || $authUser->canManageWarehouse())
             <div class="nav-group">
-                <div class="nav-group-title">QUẢN LÝ KHO</div>
+                <div class="nav-group-title">Quản lý kho</div>
                 <ul class="nav-list">
                     <li>
                         <a href="{{ route('admin.categories.index') }}" class="nav-link {{ $currentMenu === 'categories' ? 'active' : '' }}" title="Danh mục sản phẩm">
@@ -71,10 +71,10 @@
             </div>
             @endif
 
-            <!-- Nhóm BÁN HÀNG: Admin & Nhân viên bán hàng -->
+            <!-- Nhóm BÁN HÀNG: Admin và Nhân viên bán hàng -->
             @if(!$authUser || $authUser->canManageSales())
             <div class="nav-group">
-                <div class="nav-group-title">KINH DOANH</div>
+                <div class="nav-group-title">Kinh doanh</div>
                 <ul class="nav-list">
                     <li>
                         <a href="{{ route('admin.orders.index') }}" class="nav-link {{ $currentMenu === 'orders' ? 'active' : '' }}" title="Đơn hàng">
@@ -95,7 +95,7 @@
             <!-- Nhóm KHÁCH HÀNG: Chỉ Quản trị viên (admin) -->
             @if(!$authUser || $authUser->isAdmin())
             <div class="nav-group">
-                <div class="nav-group-title">KHÁCH HÀNG</div>
+                <div class="nav-group-title">Khách hàng</div>
                 <ul class="nav-list">
                     <li>
                         <a href="{{ route('admin.customers.index') }}" class="nav-link {{ $currentMenu === 'customers' ? 'active' : '' }}" title="Khách hàng">
@@ -110,7 +110,7 @@
 
         <!-- Footer Sidebar -->
         <div class="sidebar-footer">
-            <div class="admin-profile-card">
+            <a href="{{ route('admin.profile') }}" class="admin-profile-card {{ request()->routeIs('admin.profile*') ? 'admin-profile-card--active' : '' }}" title="Chỉnh sửa thông tin cá nhân" style="text-decoration: none; color: inherit; cursor: pointer;">
                 <div class="profile-avatar">
                     <i class="bi bi-person"></i>
                 </div>
@@ -118,7 +118,7 @@
                     <div class="profile-name">{{ $authUser->full_name ?? 'Quản trị viên' }}</div>
                     <div class="profile-role">{{ $roleShortLabel }}</div>
                 </div>
-            </div>
+            </a>
 
             <div class="sidebar-actions">
                 <a href="{{ route('home') }}" class="action-link" title="Xem trang chủ">

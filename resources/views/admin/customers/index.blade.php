@@ -9,7 +9,7 @@
 <div class="admin-top-bar">
     <div class="page-main-title">
         <i class="bi bi-people"></i>
-        <span>QUẢN LÝ KHÁCH HÀNG</span>
+        <span>Quản lý khách hàng</span>
     </div>
     <div class="top-bar-right">
         <button class="btn-icon-bell" title="Thông báo hệ thống">
@@ -133,7 +133,7 @@
                     <th style="width: 65px;">ID</th>
                     <th>Khách hàng</th>
                     <th>Tên đăng nhập</th>
-                    <th>Email & Điện thoại</th>
+                    <th>Email và điện thoại</th>
                     <th style="text-align: center;">Đơn đã đặt</th>
                     <th>Trạng thái</th>
                     <th>Ngày đăng ký</th>

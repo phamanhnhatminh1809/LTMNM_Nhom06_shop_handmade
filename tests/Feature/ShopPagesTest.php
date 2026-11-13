@@ -89,7 +89,7 @@ class ShopPagesTest extends TestCase
         $admin = User::where('username', 'admin')->first();
         $response = $this->actingAs($admin)->get('/admin/dashboard');
         $response->assertStatus(200);
-        $response->assertSee('TỔNG QUAN HỆ THỐNG');
+        $response->assertSee('Tổng quan hệ thống');
     }
 
     public function test_admin_products_is_accessible(): void
@@ -97,7 +97,7 @@ class ShopPagesTest extends TestCase
         $admin = User::where('username', 'admin')->first();
         $response = $this->actingAs($admin)->get('/admin/products');
         $response->assertStatus(200);
-        $response->assertSee('QUẢN LÝ SẢN PHẨM');
+        $response->assertSee('Quản lý sản phẩm');
     }
 
     public function test_legacy_route_redirects(): void

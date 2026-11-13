@@ -86,7 +86,7 @@
                 Giỏ hàng của bạn đang trống
             </div>
             <p style="color: var(--color-on-surface-variant); font-size: 14px; margin-bottom: 24px; max-width: 460px; margin-left: auto; margin-right: auto;">
-                Hãy khám phá các sản phẩm thủ công tinh tế của chúng tôi và chọn cho mình những món đồ ưng ý nhất.
+                Hãy khám phá các sản phẩm thủ công của chúng tôi và chọn cho mình những món đồ phù hợp.
             </p>
             <a href="{{ route('products.index') }}" class="btn btn--primary" style="padding: 12px 28px; border-radius: 8px; text-decoration: none; font-weight: 600; display: inline-flex; align-items: center; gap: 8px;">
                 <i class="bi bi-compass"></i>

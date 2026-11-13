@@ -9,7 +9,7 @@
 <div class="admin-top-bar">
     <div class="page-main-title">
         <i class="bi bi-receipt-cutoff"></i>
-        <span>QUẢN LÝ ĐƠN HÀNG</span>
+        <span>Quản lý đơn hàng</span>
     </div>
     <div class="top-bar-right">
         <button class="btn-icon-bell" title="Thông báo hệ thống">
@@ -223,9 +223,9 @@
                                         @csrf
                                         @method('PATCH')
                                         <input type="hidden" name="status" value="shipping">
-                                        <button type="submit" class="btn-inline-action primary" title="Duyệt & Giao hàng">
+                                        <button type="submit" class="btn-inline-action primary" title="Duyệt và giao hàng">
                                             <i class="bi bi-truck"></i>
-                                            <span>Duyệt & Giao</span>
+                                            <span>Duyệt và giao hàng</span>
                                         </button>
                                     </form>
 
