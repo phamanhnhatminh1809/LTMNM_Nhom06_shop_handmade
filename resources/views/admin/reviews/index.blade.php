@@ -55,7 +55,7 @@
 @endif
 
 <!-- Thanh Tìm kiếm & Lọc theo Sản phẩm -->
-<div class="product-filter-bar" style="flex-wrap: wrap; gap: 12px;">
+<div class="product-filter-bar is-inline">
     <form method="GET" action="{{ route('admin.reviews.index') }}" id="reviewFilterForm" style="display: contents;">
         @if($rating)
             <input type="hidden" name="rating" value="{{ $rating }}">
@@ -78,24 +78,26 @@
         </div>
 
         <div class="filter-actions-right" style="flex-wrap: wrap;">
-            <div class="filter-dropdown-wrapper">
-                <select name="product_id"
-                        class="filter-btn-select"
-                        onchange="document.getElementById('reviewFilterForm').submit()"
-                        style="border:none;background:transparent;outline:none;font-size:inherit;font-family:inherit;padding:8px 12px;cursor:pointer;max-width:280px;">
-                    <option value="">Tất cả sản phẩm</option>
-                    @foreach($products as $prod)
-                        <option value="{{ $prod->id }}" {{ $productId === $prod->id ? 'selected' : '' }}>
-                            [{{ $prod->code }}] {{ $prod->name }}
-                        </option>
-                    @endforeach
-                </select>
-            </div>
+            @php
+                $reviewProductOptions = array_merge(
+                    [['value' => '', 'label' => 'Tất cả sản phẩm']],
+                    $products->map(fn ($prod) => [
+                        'value' => $prod->id,
+                        'label' => '[' . trim((string) $prod->code) . '] ' . trim((string) $prod->name),
+                    ])->all()
+                );
+            @endphp
+            <x-select name="product_id"
+                      :options="$reviewProductOptions"
+                      :value="$productId ?? ''"
+                      :searchable="true"
+                      :submit-on-change="true"
+                      icon="bi-box-seam"
+                      style="min-width: 240px; max-width: 300px;" />
 
-            <button type="submit" class="btn-inline-action primary" style="padding: 9px 15px;">
-                <i class="bi bi-search"></i>
+            <x-button variant="inline_primary" type="submit" icon="bi-search" style="padding: 9px 15px;">
                 <span>Lọc</span>
-            </button>
+            </x-button>
 
             @if($keyword || $productId || $rating)
                 <a href="{{ route('admin.reviews.index') }}" class="btn-secondary-outline" style="padding: 8px 14px;">

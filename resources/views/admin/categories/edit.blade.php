@@ -58,7 +58,7 @@
                            id="name"
                            name="name"
                            class="modal-input"
-                           value="{{ old('name', $category->name) }}"
+                           value="{{ trim((string) old('name', $category->name)) }}"
                            required>
                     @error('name')
                         <div class="form-error-text">{{ $message }}</div>
@@ -152,13 +152,12 @@
                 </div>
 
                 <div class="admin-form-actions">
-                    <a href="{{ route('admin.categories.index') }}" class="btn-modal-cancel" style="text-decoration: none;">
+                    <x-button variant="cancel" :href="route('admin.categories.index')">
                         Hủy bỏ
-                    </a>
-                    <button type="submit" class="btn-modal-save">
-                        <i class="bi bi-floppy"></i>
+                    </x-button>
+                    <x-button variant="primary" type="submit" icon="bi-floppy">
                         <span>Cập nhật danh mục</span>
-                    </button>
+                    </x-button>
                 </div>
             </form>
         </div>

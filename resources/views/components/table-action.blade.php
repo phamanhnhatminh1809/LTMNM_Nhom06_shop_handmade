@@ -4,6 +4,9 @@
     'action' => null,
     'method' => 'POST',
     'confirm' => null,
+    'confirmTitle' => null,
+    'confirmLabel' => null,
+    'confirmVariant' => 'danger',
     'icon' => null,
     'variant' => null,
     'label' => null,
@@ -32,7 +35,6 @@
     }
 
     $upperMethod = strtoupper((string) $method);
-    $confirmAttr = $confirm ? ('return confirm(' . json_encode($confirm, JSON_UNESCAPED_UNICODE) . ')') : null;
 @endphp
 
 @if($href)
@@ -43,7 +45,12 @@
     <form action="{{ $action }}"
           method="{{ $upperMethod === 'GET' ? 'GET' : 'POST' }}"
           class="table-action-form"
-          @if($confirmAttr) onsubmit="{{ $confirmAttr }}" @endif>
+          @if($confirm)
+              data-confirm="{{ $confirm }}"
+              data-confirm-title="{{ $confirmTitle ?? ($resolvedLabel !== '' ? $resolvedLabel : 'Xác nhận thao tác') }}"
+              data-confirm-label="{{ $confirmLabel ?? ($resolvedLabel !== '' ? $resolvedLabel : 'Xác nhận') }}"
+              data-confirm-variant="{{ $confirmVariant }}"
+          @endif>
         @if($upperMethod !== 'GET')
             @csrf
             @if($upperMethod !== 'POST')

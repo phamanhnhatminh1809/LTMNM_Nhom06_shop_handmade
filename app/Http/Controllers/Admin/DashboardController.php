@@ -8,9 +8,13 @@ use App\Models\Order;
 use App\Models\Product;
 use App\Models\Role;
 use App\Models\User;
+use App\Services\RevenueReportService;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\View\View;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class DashboardController extends Controller
 {
@@ -138,5 +142,22 @@ class DashboardController extends Controller
         });
 
         return view('admin.dashboard', $dashboardData);
+    }
+
+    /**
+     * Xuất báo cáo doanh thu ra file Excel (.xlsx).
+     */
+    public function exportRevenue(Request $request, RevenueReportService $revenueReportService): BinaryFileResponse
+    {
+        $exportedBy = Auth::user()->full_name ?? Auth::user()->username ?? 'Admin';
+        $report = $revenueReportService->exportRevenueXlsx([
+            'preset'     => $request->query('preset'),
+            'start_date' => $request->query('start_date'),
+            'end_date'   => $request->query('end_date'),
+        ], (string) $exportedBy);
+
+        return response()->download($report['path'], $report['filename'], [
+            'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        ])->deleteFileAfterSend(true);
     }
 }

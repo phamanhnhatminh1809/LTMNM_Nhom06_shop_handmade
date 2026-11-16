@@ -20,30 +20,15 @@
 </div>
 
 @if(session('success'))
-    <div class="admin-alert success" style="margin-bottom: 20px;">
-        <div class="admin-alert-content">
-            <i class="bi bi-check-circle-fill"></i>
-            <span>{{ session('success') }}</span>
-        </div>
-    </div>
+    <x-alert type="success" :message="session('success')" style="margin-bottom: 20px;" />
 @endif
 
 @if(session('password_success'))
-    <div class="admin-alert success" style="margin-bottom: 20px;">
-        <div class="admin-alert-content">
-            <i class="bi bi-check-circle-fill"></i>
-            <span>{{ session('password_success') }}</span>
-        </div>
-    </div>
+    <x-alert type="success" :message="session('password_success')" style="margin-bottom: 20px;" />
 @endif
 
 @if(session('error'))
-    <div class="admin-alert error" style="margin-bottom: 20px;">
-        <div class="admin-alert-content">
-            <i class="bi bi-exclamation-octagon-fill"></i>
-            <span>{{ session('error') }}</span>
-        </div>
-    </div>
+    <x-alert type="error" :message="session('error')" style="margin-bottom: 20px;" />
 @endif
 
 @if($errors->any())
@@ -87,7 +72,7 @@
                                    id="full_name"
                                    name="full_name"
                                    class="modal-input"
-                                   value="{{ old('full_name', $user->full_name) }}"
+                                   value="{{ trim((string) old('full_name', $user->full_name)) }}"
                                    required>
                             @error('full_name')
                                 <div class="form-error-text">{{ $message }}</div>
@@ -157,13 +142,12 @@
                     </div>
 
                     <div class="admin-form-actions" style="margin-top: 10px;">
-                        <a href="{{ route('admin.dashboard') }}" class="btn-cancel" style="text-decoration: none;">
+                        <x-button variant="cancel" :href="route('admin.dashboard')">
                             Hủy bỏ
-                        </a>
-                        <button type="submit" class="btn-submit">
-                            <i class="bi bi-check-lg"></i>
+                        </x-button>
+                        <x-button variant="primary" type="submit" icon="bi-check-lg">
                             <span>Lưu thông tin thay đổi</span>
-                        </button>
+                        </x-button>
                     </div>
                 </form>
             </div>
@@ -227,10 +211,9 @@
                     </div>
 
                     <div class="admin-form-actions">
-                        <button type="submit" class="btn-submit">
-                            <i class="bi bi-shield-lock"></i>
+                        <x-button variant="primary" type="submit" icon="bi-shield-lock">
                             <span>Cập nhật mật khẩu</span>
-                        </button>
+                        </x-button>
                     </div>
                 </form>
             </div>

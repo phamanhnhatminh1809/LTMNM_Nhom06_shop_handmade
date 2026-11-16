@@ -94,25 +94,21 @@
 
             <!-- Thông báo thành công / lỗi chung -->
             @if(session('profile_success'))
-                <div style="background: #ecfdf5; border-left: 4px solid #10b981; color: #065f46; padding: 14px 18px; border-radius: 8px; font-size: 14px;">
-                    <span>{{ session('profile_success') }}</span>
-                </div>
+                <x-alert context="shop" type="success" :message="session('profile_success')" />
             @endif
 
             @if(session('password_success'))
-                <div style="background: #ecfdf5; border-left: 4px solid #10b981; color: #065f46; padding: 14px 18px; border-radius: 8px; font-size: 14px;">
-                    <span>{{ session('password_success') }}</span>
-                </div>
+                <x-alert context="shop" type="success" :message="session('password_success')" />
             @endif
             
             @if($errors->any())
-                <div style="background: #fef2f2; border-left: 4px solid #ef4444; color: #991b1b; padding: 14px 18px; border-radius: 8px; font-size: 14px;">
-                    <ul style="margin: 0; padding-left: 20px;">
+                <x-alert context="shop" type="error" :auto-dismiss="false">
+                    <ul style="margin: 0; padding-left: 18px;">
                         @foreach($errors->all() as $error)
                             <li>{{ $error }}</li>
                         @endforeach
                     </ul>
-                </div>
+                </x-alert>
             @endif
 
             <!-- Card 1: Quản lý thông tin cá nhân -->
@@ -131,7 +127,7 @@
                             <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: var(--color-on-surface);">
                                 Họ và tên <span style="color: #ef4444;">*</span>
                             </label>
-                            <input type="text" name="full_name" value="{{ old('full_name', $user->full_name) }}" required
+                            <input type="text" name="full_name" value="{{ trim((string) old('full_name', $user->full_name)) }}" required
                                    style="width: 100%; padding: 10px 14px; border: 1px solid var(--color-outline, #d1d5db); border-radius: 8px; font-size: 14px; box-sizing: border-box;">
                         </div>
 
@@ -139,7 +135,7 @@
                             <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: var(--color-on-surface);">
                                 Số điện thoại
                             </label>
-                            <input type="text" name="phone" value="{{ old('phone', $user->phone) }}" placeholder="Ví dụ: 0912345678"
+                            <input type="text" name="phone" value="{{ trim((string) old('phone', $user->phone)) }}" placeholder="Ví dụ: 0912345678"
                                    style="width: 100%; padding: 10px 14px; border: 1px solid var(--color-outline, #d1d5db); border-radius: 8px; font-size: 14px; box-sizing: border-box;">
                         </div>
                     </div>
@@ -175,14 +171,21 @@
 
                         <div id="profileProvinceSelectGroup" class="profile-form-grid-2" style="margin-bottom: 12px;">
                             <div>
-                                <select id="province" class="address-select">
+                                <x-select variant="shop"
+                                          id="province"
+                                          :searchable="true"
+                                          placeholder="-- Chọn Tỉnh/Thành phố --">
                                     <option value="">-- Chọn Tỉnh/Thành phố --</option>
-                                </select>
+                                </x-select>
                             </div>
                             <div>
-                                <select id="ward" class="address-select" disabled>
+                                <x-select variant="shop"
+                                          id="ward"
+                                          :searchable="true"
+                                          :disabled="true"
+                                          placeholder="-- Chọn Phường/Xã --">
                                     <option value="">-- Chọn Phường/Xã --</option>
-                                </select>
+                                </x-select>
                             </div>
                         </div>
 

@@ -192,7 +192,7 @@
                                 <input type="hidden" name="{{ $key }}" value="{{ $value }}">
                             @endif
                         @endforeach
-                        <input type="text" name="q" value="{{ $keyword ?? '' }}" placeholder="Tìm kiếm sản phẩm...">
+                        <input type="text" name="q" value="{{ trim((string) ($keyword ?? '')) }}" placeholder="Tìm kiếm sản phẩm...">
                         <button type="submit" title="Tìm kiếm">
                             <i class="bi bi-search"></i>
                         </button>
@@ -205,16 +205,20 @@
                                 <input type="hidden" name="{{ $key }}" value="{{ $value }}">
                             @endif
                         @endforeach
-                        <i class="bi bi-arrow-down-up" style="color: var(--color-outline, #89726d);"></i>
-                        <select name="sort" onchange="document.getElementById('sortForm').submit()"
-                                style="padding: 9px 14px; border-radius: 8px; border: 1px solid #ebdcd7; background: #faf7f5; outline: none; font-size: 13.5px; cursor: pointer; color: var(--color-on-surface);">
-                            <option value="default" {{ request('sort') == 'default' ? 'selected' : '' }}>Mặc định</option>
-                            <option value="price_asc" {{ request('sort') == 'price_asc' ? 'selected' : '' }}>Giá tăng dần</option>
-                            <option value="price_desc" {{ request('sort') == 'price_desc' ? 'selected' : '' }}>Giá giảm dần</option>
-                            <option value="latest" {{ request('sort') == 'latest' ? 'selected' : '' }}>Mới nhất</option>
-                            <option value="oldest" {{ request('sort') == 'oldest' ? 'selected' : '' }}>Cũ nhất</option>
-                            <option value="bestseller" {{ request('sort') == 'bestseller' ? 'selected' : '' }}>Bán chạy nhất</option>
-                        </select>
+                        <x-select variant="shop"
+                                  name="sort"
+                                  :value="request('sort', 'default')"
+                                  :submit-on-change="true"
+                                  icon="bi-arrow-down-up"
+                                  :options="[
+                                      'default'    => 'Mặc định',
+                                      'price_asc'  => 'Giá tăng dần',
+                                      'price_desc' => 'Giá giảm dần',
+                                      'latest'     => 'Mới nhất',
+                                      'oldest'     => 'Cũ nhất',
+                                      'bestseller' => 'Bán chạy nhất',
+                                  ]"
+                                  style="min-width: 185px;" />
                     </form>
                 </div>
 

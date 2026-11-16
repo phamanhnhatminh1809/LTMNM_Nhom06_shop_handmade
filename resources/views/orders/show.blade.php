@@ -2,49 +2,6 @@
 
 @section('title', 'Chi tiết đơn hàng #' . $order->code)
 
-@push('styles')
-<style>
-    /* CSS cho Modal Xác nhận Hủy đơn */
-    .modal-overlay {
-        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-        background: rgba(0, 0, 0, 0.5); z-index: 9999;
-        display: flex; align-items: center; justify-content: center;
-        opacity: 0; visibility: hidden; transition: all 0.3s ease;
-    }
-    .modal-overlay.active {
-        opacity: 1; visibility: visible;
-    }
-    .modal-box {
-        background: #fff; width: 100%; max-width: 400px;
-        border-radius: 12px; padding: 24px; text-align: center;
-        transform: translateY(-20px); transition: all 0.3s ease;
-        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-    }
-    .modal-overlay.active .modal-box {
-        transform: translateY(0);
-    }
-    .modal-icon {
-        width: 60px; height: 60px; margin: 0 auto 16px;
-        background: #fef2f2; color: #ef4444; border-radius: 50%;
-        display: flex; align-items: center; justify-content: center;
-        font-size: 28px;
-    }
-    .modal-title { font-size: 18px; font-weight: 700; margin-bottom: 8px; color: #333; }
-    .modal-desc { font-size: 14px; color: #666; margin-bottom: 24px; }
-    .modal-actions { display: flex; gap: 12px; justify-content: center; }
-    .btn-cancel-modal {
-        padding: 10px 20px; border-radius: 8px; border: 1px solid #d1d5db;
-        background: #fff; color: #4b5563; font-weight: 600; cursor: pointer; flex: 1;
-    }
-    .btn-confirm-modal {
-        padding: 10px 20px; border-radius: 8px; border: none;
-        background: #ef4444; color: #fff; font-weight: 600; cursor: pointer; flex: 1;
-    }
-    .btn-cancel-modal:hover { background: #f3f4f6; }
-    .btn-confirm-modal:hover { background: #dc2626; }
-</style>
-@endpush
-
 @section('content')
 <div class="container" style="padding-top: 28px; padding-bottom: 50px;">
     <!-- Breadcrumb -->
@@ -150,23 +107,9 @@
         @endif
     </div>
 
-    <!-- Thông báo Flash -->
-    @if(session('success'))
-        <div style="background: #ecfdf5; border-left: 4px solid #10b981; color: #065f46; padding: 14px 18px; border-radius: 8px; font-size: 14px; margin-bottom: 20px;">
-            {{ session('success') }}
-        </div>
-    @endif
-
-    @if(session('error'))
-        <div style="background: #fef2f2; border-left: 4px solid #ef4444; color: #991b1b; padding: 14px 18px; border-radius: 8px; font-size: 14px; margin-bottom: 20px;">
-            {{ session('error') }}
-        </div>
-    @endif
-
+    <!-- Thông báo cảnh báo (nếu có) -->
     @if(session('warning'))
-        <div style="background: #fffbeb; border-left: 4px solid #d97706; color: #92400e; padding: 14px 18px; border-radius: 8px; font-size: 14px; margin-bottom: 20px;">
-            {{ session('warning') }}
-        </div>
+        <x-alert context="shop" type="warning" :message="session('warning')" />
     @endif
 
     <div style="display: grid; grid-template-columns: 1fr 340px; gap: 30px; align-items: start;">
@@ -265,14 +208,18 @@
                                                     <label style="display: block; font-size: 12px; font-weight: 700; margin-bottom: 4px; color: var(--color-on-surface);">
                                                         Mức độ hài lòng:
                                                     </label>
-                                                    <select name="rating" required 
-                                                            style="padding: 6px 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 13px; background: #fff;">
-                                                        <option value="5" selected>5/5 sao - Rất hài lòng</option>
-                                                        <option value="4">4/5 sao - Hài lòng</option>
-                                                        <option value="3">3/5 sao - Bình thường</option>
-                                                        <option value="2">2/5 sao - Chưa hài lòng</option>
-                                                        <option value="1">1/5 sao - Rất tệ</option>
-                                                    </select>
+                                                    <x-select variant="shop"
+                                                              name="rating"
+                                                              value="5"
+                                                              :required="true"
+                                                              :options="[
+                                                                  ['value' => '5', 'label' => '5/5 sao - Rất hài lòng', 'icon' => 'bi-star-fill'],
+                                                                  ['value' => '4', 'label' => '4/5 sao - Hài lòng', 'icon' => 'bi-star-fill'],
+                                                                  ['value' => '3', 'label' => '3/5 sao - Bình thường', 'icon' => 'bi-star-half'],
+                                                                  ['value' => '2', 'label' => '2/5 sao - Chưa hài lòng', 'icon' => 'bi-star'],
+                                                                  ['value' => '1', 'label' => '1/5 sao - Rất tệ', 'icon' => 'bi-star'],
+                                                              ]"
+                                                              style="max-width: 260px;" />
                                                 </div>
 
                                                 <div style="margin-bottom: 10px;">

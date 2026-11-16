@@ -615,6 +615,8 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
     margin-bottom: 20px;
 }
 
@@ -626,6 +628,14 @@ body {
     font-weight: 800;
     letter-spacing: 0.04em;
     color: var(--color-on-surface);
+    white-space: nowrap;
+}
+
+.top-bar-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
 }
 
 .page-main-title i {
@@ -1252,6 +1262,7 @@ body {
     font-size: 13px;
     font-weight: 800;
     font-family: var(--font-main);
+    text-decoration: none;
     cursor: pointer;
     display: inline-flex;
     align-items: center;
@@ -1261,6 +1272,7 @@ body {
 }
 
 .btn-export:hover {
+    color: #ffffff;
     opacity: 0.92;
     transform: translateY(-1.5px);
     box-shadow: 0 6px 18px rgba(121, 42, 22, 0.28);
@@ -1803,6 +1815,7 @@ body {
 .total-amount-text {
     font-weight: 800;
     color: #ba1a1a;
+    white-space: nowrap;
 }
 
 /* Badge Trạng Thái */
@@ -1814,6 +1827,7 @@ body {
     border-radius: 20px;
     font-size: 11px;
     font-weight: 700;
+    white-space: nowrap;
 }
 
 .status-badge.pending {
@@ -1964,6 +1978,42 @@ body {
     gap: 10px;
     margin-bottom: 22px;
     box-shadow: 0 4px 18px rgba(121, 42, 22, 0.03);
+}
+
+.product-filter-bar.is-inline {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.product-filter-bar.is-inline .status-tabs-bar {
+    margin-bottom: 0;
+}
+
+.admin-toolbar-search {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 0 1 360px;
+    margin-left: auto;
+    min-width: 0;
+    max-width: 100%;
+}
+
+.admin-toolbar-search .search-input-box {
+    flex: 1;
+    min-width: 0;
+    max-width: none;
+}
+
+@media (max-width: 768px) {
+    .admin-toolbar-search {
+        flex: 1 1 100%;
+        width: 100%;
+        margin-left: 0;
+    }
 }
 
 .product-filter-form {
@@ -3878,8 +3928,13 @@ body {
     font-weight: 800;
     font-family: var(--font-main);
     color: var(--color-on-surface);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
     cursor: pointer;
-    transition: background-color 0.18s, border-color 0.18s;
+    transition: background-color 0.18s, border-color 0.18s, color 0.18s;
 }
 
 .btn-modal-cancel:hover {
@@ -3897,10 +3952,12 @@ body {
     font-weight: 800;
     font-family: var(--font-main);
     color: #ffffff;
+    text-decoration: none;
     cursor: pointer;
     display: inline-flex;
     align-items: center;
     gap: 7px;
+    white-space: nowrap;
     box-shadow: 0 4px 14px rgba(121, 42, 22, 0.22);
     transition: opacity 0.2s, transform 0.15s, box-shadow 0.2s;
 }
@@ -4458,6 +4515,7 @@ body {
     border-radius: 6px;
     display: inline-block;
     letter-spacing: 0.01em;
+    white-space: nowrap;
 }
 
 /* Flash Alerts & Validation Notifications */
@@ -4599,6 +4657,7 @@ body {
     border-radius: 9999px;
     font-size: 12px;
     font-weight: 700;
+    white-space: nowrap;
 }
 
 .role-badge.admin {
@@ -4850,6 +4909,7 @@ body {
     font-weight: 700;
     font-family: var(--font-main);
     text-decoration: none;
+    white-space: nowrap;
     cursor: pointer;
     transition: background-color 0.18s ease, border-color 0.18s ease, color 0.18s ease;
 }
@@ -4880,13 +4940,14 @@ body {
     border-radius: 14px;
     border: 1px solid #ebdcd7;
     box-shadow: 0 4px 16px rgba(152, 65, 43, 0.05);
-    overflow: hidden;
+    overflow: visible;
     margin-bottom: 20px;
 }
 
 .admin-card-header {
     padding: 16px 22px;
     border-bottom: 1px solid #f3e6e1;
+    border-radius: 14px 14px 0 0;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -5411,4 +5472,547 @@ nav[role="navigation"] span {
     transform: translateY(-1px);
     box-shadow: 0 6px 18px rgba(186, 26, 26, 0.35);
 }
+
+/* ==========================================================================
+   MODAL DÙNG CHUNG & NÚT FORM ADMIN (CHỐNG LỖI HIỂN THỊ INLINE KHI THIẾU CSS)
+   ========================================================================== */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(30, 20, 18, 0.58);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    z-index: 2200;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.22s ease, visibility 0.22s ease;
+}
+
+.modal-overlay.active {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+}
+
+.modal-box {
+    background: #ffffff;
+    width: 100%;
+    max-width: 440px;
+    border-radius: 18px;
+    padding: 28px 24px;
+    text-align: center;
+    box-shadow: 0 20px 50px rgba(60, 20, 12, 0.28), 0 4px 14px rgba(0, 0, 0, 0.08);
+    border: 1px solid rgba(235, 220, 215, 0.95);
+    transform: scale(0.95) translateY(10px);
+    transition: transform 0.24s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.modal-overlay.active .modal-box {
+    transform: scale(1) translateY(0);
+}
+
+.modal-confirm-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: #fee2e2;
+    color: var(--color-danger);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 26px;
+    margin: 0 auto 16px;
+}
+
+.modal-confirm-title {
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--color-on-surface);
+    margin: 0 0 8px;
+}
+
+.modal-confirm-desc {
+    font-size: 13.5px;
+    color: var(--color-on-surface-variant);
+    margin: 0 0 22px;
+    line-height: 1.55;
+}
+
+.modal-confirm-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+}
+
+.btn-cancel-modal {
+    padding: 10px 20px;
+    border-radius: 10px;
+    border: 1px solid #dcc1ba;
+    background: #ffffff;
+    color: var(--color-on-surface);
+    font-size: 13.5px;
+    font-weight: 700;
+    font-family: var(--font-main);
+    cursor: pointer;
+    flex: 1;
+    transition: background-color 0.18s ease, border-color 0.18s ease, color 0.18s ease;
+}
+
+.btn-cancel-modal:hover {
+    background-color: #faede7;
+    border-color: #ebdcd7;
+    color: var(--color-primary);
+}
+
+.btn-confirm-modal-danger {
+    padding: 10px 20px;
+    border-radius: 10px;
+    border: none;
+    background: var(--color-danger);
+    color: #ffffff;
+    font-size: 13.5px;
+    font-weight: 800;
+    font-family: var(--font-main);
+    cursor: pointer;
+    flex: 1;
+    transition: background-color 0.18s ease, transform 0.15s ease, box-shadow 0.18s ease;
+}
+
+.btn-confirm-modal-danger:hover {
+    background-color: #93000a;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(186, 26, 26, 0.28);
+}
+
+.modal-actions-end {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 12px;
+}
+
+.btn-primary-action,
+.admin-form-actions .btn-submit {
+    padding: 10px 24px;
+    background-color: var(--color-primary);
+    border: none;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 800;
+    font-family: var(--font-main);
+    color: #ffffff;
+    text-decoration: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    box-shadow: 0 4px 14px rgba(121, 42, 22, 0.22);
+    transition: opacity 0.2s, transform 0.15s, box-shadow 0.2s;
+}
+
+.btn-primary-action:hover,
+.admin-form-actions .btn-submit:hover {
+    opacity: 0.92;
+    transform: translateY(-1.5px);
+    box-shadow: 0 6px 18px rgba(121, 42, 22, 0.28);
+}
+
+.admin-form-actions .btn-cancel {
+    padding: 10px 22px;
+    background-color: #ffffff;
+    border: 1px solid #dcc1ba;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 800;
+    font-family: var(--font-main);
+    color: var(--color-on-surface);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background-color 0.18s, border-color 0.18s, color 0.18s;
+}
+
+.admin-form-actions .btn-cancel:hover {
+    background-color: #faede7;
+    border-color: #ebdcd7;
+    color: var(--color-primary);
+}
+
+/* ==========================================================================
+   ALERT ĐÓNG ĐƯỢC & CUSTOM SELECT DÙNG CHUNG (<x-alert>, <x-select>)
+   ========================================================================== */
+.admin-alert {
+    transition: opacity 0.26s ease, transform 0.26s ease, max-height 0.28s ease, margin-bottom 0.28s ease, padding 0.28s ease;
+    max-height: 280px;
+    overflow: hidden;
+}
+
+.admin-alert.is-dismissing {
+    opacity: 0;
+    transform: translateY(-6px);
+    max-height: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+    margin-bottom: 0;
+    border-width: 0;
+}
+
+.ui-alert__close {
+    flex-shrink: 0;
+    background: transparent;
+    border: none;
+    color: currentColor;
+    opacity: 0.6;
+    cursor: pointer;
+    padding: 2px 4px;
+    border-radius: 6px;
+    font-size: 13px;
+    line-height: 1;
+    transition: opacity 0.16s ease, background-color 0.16s ease;
+}
+
+.ui-alert__close:hover {
+    opacity: 1;
+    background-color: rgba(0, 0, 0, 0.06);
+}
+
+.ui-select {
+    position: relative;
+    width: 100%;
+}
+
+.ui-select__native {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    pointer-events: none;
+    margin: 0;
+    border: 0;
+}
+
+.ui-select__trigger {
+    width: 100%;
+    min-height: 42px;
+    padding: 9px 14px;
+    background-color: #fff9f6;
+    border: 1px solid #ebdcd7;
+    border-radius: 10px;
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--color-on-surface);
+    font-family: var(--font-main);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    cursor: pointer;
+    text-align: left;
+    transition: border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+    box-sizing: border-box;
+}
+
+.ui-select__trigger:hover:not(:disabled) {
+    background-color: #ffffff;
+    border-color: #d9b8ae;
+}
+
+.ui-select.is-open .ui-select__trigger {
+    background-color: #ffffff;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(121, 42, 22, 0.09);
+}
+
+.ui-select.is-disabled .ui-select__trigger,
+.ui-select__trigger:disabled {
+    background-color: #f3f4f6;
+    color: #6b7280;
+    cursor: not-allowed;
+    border-color: #e5e7eb;
+}
+
+.ui-select__leading-icon {
+    color: var(--color-outline);
+    font-size: 14px;
+    flex-shrink: 0;
+}
+
+.ui-select__label {
+    flex: 1;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.ui-select__chevron {
+    font-size: 12px;
+    color: var(--color-outline);
+    flex-shrink: 0;
+    transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.ui-select.is-open .ui-select__chevron {
+    transform: rotate(180deg);
+    color: var(--color-primary);
+}
+
+.ui-select__menu {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    right: 0;
+    min-width: 100%;
+    background: #ffffff;
+    border: 1px solid #ebdcd7;
+    border-radius: 12px;
+    box-shadow: 0 12px 30px rgba(121, 42, 22, 0.14);
+    padding: 6px;
+    z-index: 420;
+    display: none;
+    overflow-y: auto;
+    animation: fadeInDropdown 0.16s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.ui-select.is-open .ui-select__menu {
+    display: block;
+}
+
+.ui-select__search-wrap {
+    position: relative;
+    margin-bottom: 6px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid #f4eae6;
+}
+
+.ui-select__search-wrap i {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(calc(-50% - 3px));
+    font-size: 12px;
+    color: var(--color-outline);
+    pointer-events: none;
+}
+
+.ui-select__search {
+    width: 100%;
+    padding: 7px 10px 7px 30px;
+    border: 1px solid #ebdcd7;
+    border-radius: 8px;
+    background: #fff9f6;
+    font-size: 13px;
+    font-family: var(--font-main);
+    color: var(--color-on-surface);
+    outline: none;
+    box-sizing: border-box;
+}
+
+.ui-select__search:focus {
+    background: #ffffff;
+    border-color: var(--color-primary);
+}
+
+.ui-select__list {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.ui-select__option {
+    width: 100%;
+    padding: 9px 12px;
+    border: none;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--color-on-surface);
+    font-size: 13px;
+    font-weight: 600;
+    font-family: var(--font-main);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    text-align: left;
+    transition: background-color 0.14s ease, color 0.14s ease, padding-left 0.14s ease;
+}
+
+.ui-select__option-text {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+    flex: 1;
+}
+
+.ui-select__option-text > span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.ui-select__option:hover:not(:disabled),
+.ui-select__option:focus-visible:not(:disabled) {
+    background-color: #faede7;
+    color: var(--color-primary);
+    outline: none;
+}
+
+.ui-select__option.is-selected {
+    background-color: #faede7;
+    color: var(--color-primary);
+    font-weight: 800;
+}
+
+.ui-select__option:disabled {
+    opacity: 0.48;
+    cursor: not-allowed;
+}
+
+.ui-select__check {
+    font-size: 14px;
+    color: var(--color-primary);
+    flex-shrink: 0;
+}
+
+.ui-select__empty {
+    padding: 14px 12px;
+    text-align: center;
+    font-size: 12.5px;
+    color: var(--color-outline);
+}
+
+/* Modal xác nhận đa trạng thái & Admin Toast */
+.modal-confirm-icon.is-primary {
+    background: #fff1ec;
+    color: var(--color-primary);
+}
+
+.modal-confirm-icon.is-success {
+    background: #ecfdf5;
+    color: #2f6b3e;
+}
+
+.modal-confirm-icon.is-danger {
+    background: #fee2e2;
+    color: var(--color-danger);
+}
+
+.btn-confirm-modal-success {
+    padding: 10px 20px;
+    border-radius: 10px;
+    border: none;
+    background: #2f6b3e;
+    color: #ffffff;
+    font-size: 13.5px;
+    font-weight: 800;
+    font-family: var(--font-main);
+    cursor: pointer;
+    flex: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    white-space: nowrap;
+    transition: background-color 0.18s ease, transform 0.15s ease, box-shadow 0.18s ease;
+}
+
+.btn-confirm-modal-success:hover {
+    background-color: #245330;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(47, 107, 62, 0.28);
+}
+
+.modal-confirm-actions .btn-modal-save {
+    flex: 1;
+    justify-content: center;
+}
+
+.shop-toast-container {
+    position: fixed;
+    top: 24px;
+    right: 24px;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-width: 380px;
+    width: calc(100vw - 32px);
+    pointer-events: none;
+}
+
+.shop-toast {
+    pointer-events: auto;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 13px 15px;
+    border-radius: 12px;
+    background: #ffffff;
+    color: var(--color-on-surface);
+    border: 1px solid #ebdcd7;
+    border-left: 4px solid var(--color-primary);
+    box-shadow: 0 12px 28px rgba(60, 20, 12, 0.15);
+    font-size: 13.5px;
+    line-height: 1.45;
+    font-family: var(--font-main);
+    opacity: 0;
+    transform: translateX(18px);
+    transition: opacity 0.22s ease, transform 0.22s ease;
+}
+
+.shop-toast.is-visible {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.shop-toast.is-success { border-left-color: #2f6b3e; }
+.shop-toast.is-warning { border-left-color: #c49b4d; }
+.shop-toast.is-error   { border-left-color: var(--color-danger); }
+
+.shop-toast__icon {
+    font-size: 18px;
+    line-height: 1;
+    margin-top: 1px;
+    flex-shrink: 0;
+}
+
+.shop-toast.is-success .shop-toast__icon { color: #2f6b3e; }
+.shop-toast.is-warning .shop-toast__icon { color: #a96d1e; }
+.shop-toast.is-error   .shop-toast__icon { color: var(--color-danger); }
+
+.shop-toast__body {
+    flex: 1;
+    min-width: 0;
+    font-weight: 600;
+}
+
+.shop-toast__close {
+    background: none;
+    border: none;
+    color: var(--color-outline);
+    font-size: 16px;
+    cursor: pointer;
+    padding: 0 2px;
+    line-height: 1;
+}
+
+.shop-toast__close:hover {
+    color: var(--color-on-surface);
+}
+
+
+
 

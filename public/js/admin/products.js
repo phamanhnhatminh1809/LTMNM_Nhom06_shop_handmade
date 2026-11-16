@@ -501,7 +501,7 @@ window.AdminApp.registerModule('products', ({ signal }) => {
 
             const remainingSlots = 5 - uploadedImagesList.length;
             if (remainingSlots <= 0) {
-                alert('Bạn chỉ có thể thêm tối đa 5 ảnh cho mỗi sản phẩm!');
+                if (window.showAdminToast) window.showAdminToast('Bạn chỉ có thể thêm tối đa 5 ảnh cho mỗi sản phẩm!', 'warning');
                 return;
             }
 
@@ -509,7 +509,7 @@ window.AdminApp.registerModule('products', ({ signal }) => {
 
             filesToProcess.forEach(file => {
                 if (!file.type.startsWith('image/')) {
-                    alert(`Tệp "${file.name}" không phải là ảnh hợp lệ!`);
+                    if (window.showAdminToast) window.showAdminToast(`Tệp "${file.name}" không phải là ảnh hợp lệ!`, 'error');
                     return;
                 }
                 const reader = new FileReader();
@@ -531,14 +531,14 @@ window.AdminApp.registerModule('products', ({ signal }) => {
 
             if (!productName) {
                 e.preventDefault();
-                alert('Vui lòng nhập tên sản phẩm!');
+                if (window.showAdminToast) window.showAdminToast('Vui lòng nhập tên sản phẩm!', 'warning');
                 document.getElementById('productNameInput')?.focus();
                 return;
             }
 
             if (!productSku) {
                 e.preventDefault();
-                alert('Vui lòng nhập mã SKU!');
+                if (window.showAdminToast) window.showAdminToast('Vui lòng nhập mã SKU!', 'warning');
                 document.getElementById('productSkuInput')?.focus();
                 return;
             }
@@ -757,7 +757,7 @@ window.AdminApp.registerModule('products', ({ signal }) => {
             const stock = variantStockQuantityInput?.value.trim() || '1';
 
             if (!rawRetailPrice || isNaN(rawRetailPrice.replace(/\./g, ''))) {
-                alert('Vui lòng nhập giá bán hợp lệ!');
+                if (window.showAdminToast) window.showAdminToast('Vui lòng nhập giá bán hợp lệ!', 'warning');
                 variantRetailPriceInput?.focus();
                 return;
             }
@@ -866,7 +866,7 @@ window.AdminApp.registerModule('products', ({ signal }) => {
             const catName = categoryNameInput?.value.trim();
             if (!catName) {
                 e.preventDefault();
-                alert('Vui lòng nhập tên danh mục!');
+                if (window.showAdminToast) window.showAdminToast('Vui lòng nhập tên danh mục!', 'warning');
                 categoryNameInput?.focus();
             }
         });

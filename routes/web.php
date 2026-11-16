@@ -24,6 +24,13 @@ use Illuminate\Support\Facades\Route;
 // ==========================================
 // 1. PUBLIC / CUSTOMER ROUTES
 // ==========================================
+Route::get('/favicon.ico', function () {
+    $path = public_path('assets/images/favicon.svg');
+    abort_unless(file_exists($path), 404);
+
+    return response()->file($path, ['Content-Type' => 'image/svg+xml']);
+});
+
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/products', [ProductController::class, 'index'])->name('products.index');
 Route::get('/products/{id}', [ProductController::class, 'show'])->name('products.show');
@@ -97,6 +104,8 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     // Dashboard (Admin, Nhân viên kho, Nhân viên bán hàng đều vào được khu vực quản trị)
     Route::get('/', [AdminDashboardController::class, 'index'])->name('dashboard');
     Route::get('/dashboard', [AdminDashboardController::class, 'index']);
+    Route::get('/reports/revenue/export', [AdminDashboardController::class, 'exportRevenue'])
+        ->name('reports.revenue.export');
 
     // Hồ sơ cá nhân của Quản trị viên và Nhân viên (đổi tên, email, số điện thoại, mật khẩu)
     Route::get('profile', [AdminProfileController::class, 'edit'])->name('profile');

@@ -85,8 +85,8 @@
 </div>
 
 <!-- Thanh Tabs Lọc Theo Nhóm Quyền & Tìm kiếm -->
-<div class="product-filter-bar" style="flex-wrap: wrap; gap: 12px;">
-    <div class="status-tabs-bar" style="margin-bottom: 0;">
+<div class="product-filter-bar is-inline">
+    <div class="status-tabs-bar">
         <a href="{{ route('admin.staff.index', array_filter(['q' => $keyword, 'role' => 'staff_only'])) }}"
            class="status-tab-pill {{ $roleFilter === 'staff_only' ? 'active' : '' }}">
             <span>Tất cả Nhân sự</span>
@@ -114,9 +114,9 @@
         </a>
     </div>
 
-    <form method="GET" action="{{ route('admin.staff.index') }}" style="display: flex; align-items: center; gap: 8px; margin-left: auto; min-width: 300px;">
+    <form method="GET" action="{{ route('admin.staff.index') }}" class="admin-toolbar-search">
         <input type="hidden" name="role" value="{{ $roleFilter }}">
-        <div class="search-input-box" style="flex: 1;">
+        <div class="search-input-box">
             <i class="bi bi-search"></i>
             <input type="text"
                    name="q"
@@ -124,7 +124,7 @@
                    placeholder="Tìm tên, username, email, SĐT...">
             @if($keyword)
                 <a href="{{ route('admin.staff.index', ['role' => $roleFilter]) }}"
-                   class="btn-clear-search"
+                   class="btn-clear-search show"
                    style="display:flex;align-items:center;justify-content:center;text-decoration:none;"
                    title="Xóa từ khóa">
                     <i class="bi bi-x-lg"></i>
@@ -260,26 +260,26 @@
 </div>
 
 <!-- Modal Xác nhận Xóa Nhân viên -->
-<div class="modal-overlay" id="deleteStaffModal">
-    <div class="modal-box" style="max-width: 420px; text-align: center; padding: 28px 24px;">
-        <div style="width: 56px; height: 56px; border-radius: 50%; background: #fee2e2; color: #ba1a1a; display: flex; align-items: center; justify-content: center; font-size: 26px; margin: 0 auto 16px;">
+<div class="modal-overlay" id="deleteStaffModal" role="dialog" aria-modal="true" aria-labelledby="deleteStaffModalTitle">
+    <div class="modal-box" style="max-width: 420px;">
+        <div class="modal-confirm-icon">
             <i class="bi bi-trash3-fill"></i>
         </div>
-        <h3 style="font-size: 18px; font-weight: 800; color: var(--color-on-surface); margin: 0 0 8px;">
+        <h3 class="modal-confirm-title" id="deleteStaffModalTitle">
             Xóa tài khoản nhân viên?
         </h3>
-        <p style="font-size: 13.5px; color: var(--color-on-surface-variant); margin: 0 0 20px; line-height: 1.5;" id="deleteStaffMessage">
+        <p class="modal-confirm-desc" id="deleteStaffMessage">
             Bạn có chắc chắn muốn xóa tài khoản này khỏi hệ thống? Hành động này không thể hoàn tác.
         </p>
 
         <form id="deleteStaffForm" method="POST" action="">
             @csrf
             @method('DELETE')
-            <div style="display: flex; gap: 12px; justify-content: center;">
-                <button type="button" class="btn-cancel-modal" onclick="closeDeleteStaffModal()" style="padding: 10px 20px; border-radius: 8px; border: 1px solid #d1d5db; background: #fff; cursor: pointer; font-weight: 600; flex: 1;">
+            <div class="modal-confirm-actions">
+                <button type="button" class="btn-cancel-modal" onclick="closeDeleteStaffModal()">
                     Hủy bỏ
                 </button>
-                <button type="submit" style="padding: 10px 20px; border-radius: 8px; border: none; background: #ba1a1a; color: #fff; cursor: pointer; font-weight: 700; flex: 1;">
+                <button type="submit" class="btn-confirm-modal-danger">
                     Đồng ý xóa
                 </button>
             </div>
@@ -293,24 +293,42 @@
         const modal = document.getElementById('deleteStaffModal');
         const form = document.getElementById('deleteStaffForm');
         const msg = document.getElementById('deleteStaffMessage');
+        if (!modal || !form || !msg) return;
 
         form.action = deleteUrl;
-        msg.innerHTML = 'Bạn có chắc chắn muốn xóa tài khoản <strong>«' + name + '»</strong>? Hành động này không thể hoàn tác.';
+        msg.textContent = '';
+        msg.append('Bạn có chắc chắn muốn xóa tài khoản ');
+        const strongName = document.createElement('strong');
+        strongName.textContent = '«' + String(name ?? '') + '»';
+        msg.append(strongName, '? Hành động này không thể hoàn tác.');
+
         modal.classList.add('active');
+        document.body.style.overflow = 'hidden';
     };
 
     window.closeDeleteStaffModal = function() {
         const modal = document.getElementById('deleteStaffModal');
         modal?.classList.remove('active');
+        document.body.style.overflow = '';
     };
 
-    window.AdminApp.mount(() => {
+    window.AdminApp.mount((ctx) => {
+        const modal = document.getElementById('deleteStaffModal');
+        if (!modal) return;
+
         // Đóng khi click ngoài modal box
-        document.getElementById('deleteStaffModal')?.addEventListener('click', function(e) {
+        modal.addEventListener('click', function(e) {
             if (e.target === this) {
                 window.closeDeleteStaffModal();
             }
-        });
+        }, { signal: ctx?.signal });
+
+        // Đóng khi nhấn phím Escape
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && modal.classList.contains('active')) {
+                window.closeDeleteStaffModal();
+            }
+        }, { signal: ctx?.signal });
     });
 </script>
 @endpush

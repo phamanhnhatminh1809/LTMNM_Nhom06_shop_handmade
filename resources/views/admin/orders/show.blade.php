@@ -62,7 +62,11 @@
                 @endif
                 <form action="{{ route('admin.orders.updateStatus', $order) }}"
                       method="POST"
-                      onsubmit="return confirm('Duyệt đơn hàng #{{ $order->code }} và chuyển sang trạng thái Đang giao?')">
+                      data-confirm="Xác nhận duyệt đơn hàng #{{ $order->code }} và chuyển sang trạng thái Đang giao?"
+                      data-confirm-title="Duyệt và giao đơn hàng?"
+                      data-confirm-label="Duyệt và giao hàng"
+                      data-confirm-icon="bi-truck"
+                      data-confirm-variant="primary">
                     @csrf
                     @method('PATCH')
                     <input type="hidden" name="status" value="shipping">
@@ -74,7 +78,11 @@
 
                 <form action="{{ route('admin.orders.updateStatus', $order) }}"
                       method="POST"
-                      onsubmit="return confirm('Xác nhận hủy đơn hàng #{{ $order->code }}?')">
+                      data-confirm="Xác nhận hủy đơn hàng #{{ $order->code }}? Hành động này sẽ hoàn lại tồn kho sản phẩm."
+                      data-confirm-title="Hủy đơn hàng?"
+                      data-confirm-label="Đồng ý hủy"
+                      data-confirm-icon="bi-x-octagon-fill"
+                      data-confirm-variant="danger">
                     @csrf
                     @method('PATCH')
                     <input type="hidden" name="status" value="cancelled">
@@ -86,7 +94,11 @@
             @elseif($order->status === 'shipping')
                 <form action="{{ route('admin.orders.updateStatus', $order) }}"
                       method="POST"
-                      onsubmit="return confirm('Xác nhận đơn hàng #{{ $order->code }} đã giao thành công?')">
+                      data-confirm="Xác nhận đơn hàng #{{ $order->code }} đã giao thành công?"
+                      data-confirm-title="Hoàn thành đơn hàng?"
+                      data-confirm-label="Xác nhận hoàn thành"
+                      data-confirm-icon="bi-check2-circle"
+                      data-confirm-variant="success">
                     @csrf
                     @method('PATCH')
                     <input type="hidden" name="status" value="completed">

@@ -335,6 +335,9 @@
     function runAllInitializers() {
         const ctx = getCurrentContext();
         mountNotificationBell(ctx);
+        if (window.HandmadeUI && typeof window.HandmadeUI.initAll === 'function') {
+            window.HandmadeUI.initAll(ctx.main || document, ctx.signal);
+        }
         runRegisteredModules(ctx);
         flushInlineMounts(ctx);
     }

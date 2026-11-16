@@ -30,10 +30,16 @@
         <!-- Component Dropdown chọn khoảng thời gian -->
         @include('admin.partials.date-filter-modal')
 
-        <button type="button" class="btn-export" onclick="window.print()">
-            <i class="bi bi-download"></i>
-            <span>Xuất báo cáo</span>
-        </button>
+        <a href="{{ route('admin.reports.revenue.export') }}"
+           data-export-base="{{ route('admin.reports.revenue.export') }}"
+           id="btnExportRevenueXlsx"
+           class="btn-export"
+           download
+           data-no-pjax
+           data-no-prefetch>
+            <i class="bi bi-file-earmark-excel"></i>
+            <span>Xuất báo cáo (.xlsx)</span>
+        </a>
     </div>
 </div>
 

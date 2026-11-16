@@ -4,37 +4,10 @@
 
 @push('styles')
 <style>
-    .modal-overlay {
-        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-        background: rgba(0, 0, 0, 0.5); z-index: 9999;
-        display: flex; align-items: center; justify-content: center;
-        opacity: 0; visibility: hidden; transition: all 0.3s ease;
-    }
-    .modal-overlay.active { opacity: 1; visibility: visible; }
-    .modal-box {
-        background: #fff; width: 100%; max-width: 420px;
-        border-radius: 12px; padding: 24px; text-align: center;
-        transform: translateY(-20px); transition: all 0.3s ease;
-        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-    }
-    .modal-overlay.active .modal-box { transform: translateY(0); }
-    .modal-icon {
-        width: 60px; height: 60px; margin: 0 auto 16px;
-        background: #ecfdf5; color: #10b981; border-radius: 50%;
-        display: flex; align-items: center; justify-content: center;
-        font-size: 28px;
-    }
-    .modal-title { font-size: 18px; font-weight: 700; margin-bottom: 8px; color: #333; }
-    .modal-desc { font-size: 14px; color: #666; margin-bottom: 24px; }
-    .modal-actions { display: flex; gap: 12px; justify-content: center; }
-    .btn-cancel-modal {
-        padding: 10px 20px; border-radius: 8px; border: 1px solid #d1d5db;
-        background: #fff; color: #4b5563; font-weight: 600; cursor: pointer; flex: 1;
-    }
-    .btn-confirm-modal {
-        padding: 10px 20px; border-radius: 8px; border: none;
-        background: #10b981; color: #fff; font-weight: 600; cursor: pointer; flex: 1;
-    }
+    .modal-box { max-width: 420px; }
+    .modal-icon { background: #ecfdf5; color: #10b981; }
+    .btn-confirm-modal { background: #10b981; }
+    .btn-confirm-modal:hover { background: #059669; }
     .address-select {
         width: 100%; padding: 10px 14px; border: 1px solid #d1d5db;
         border-radius: 8px; font-size: 14px; background: #fff;
@@ -76,10 +49,6 @@
         <p class="checkout-subtitle">Vui lòng kiểm tra lại danh sách sản phẩm và cung cấp thông tin nhận hàng</p>
     </div>
 
-    @if(session('error'))
-        <div class="alert alert--error">{{ session('error') }}</div>
-    @endif
-
     <form action="{{ route('checkout.process') }}" method="POST" id="checkoutForm">
         @csrf
         <div class="checkout-grid">
@@ -90,11 +59,11 @@
                     <div class="checkout-row-2">
                         <div class="form-group">
                             <label class="form-label">Họ và tên người nhận <span class="required">*</span></label>
-                            <input type="text" name="shipping_name" value="{{ old('shipping_name', $user->full_name ?? '') }}" required placeholder="Ví dụ: Nguyễn Văn A" class="form-input">
+                            <input type="text" name="shipping_name" value="{{ trim((string) old('shipping_name', $user->full_name ?? '')) }}" required placeholder="Ví dụ: Nguyễn Văn A" class="form-input">
                         </div>
                         <div class="form-group">
                             <label class="form-label">Số điện thoại nhận hàng <span class="required">*</span></label>
-                            <input type="text" name="shipping_phone" value="{{ old('shipping_phone', $user->phone ?? '') }}" required placeholder="Ví dụ: 0912345678" class="form-input">
+                            <input type="text" name="shipping_phone" value="{{ trim((string) old('shipping_phone', $user->phone ?? '')) }}" required placeholder="Ví dụ: 0912345678" class="form-input">
                         </div>
                     </div>
 
@@ -124,15 +93,24 @@
                         <div id="provinceSelectGroup">
                             <div class="form-group">
                                 <label class="form-label">Tỉnh / Thành phố <span class="required">*</span></label>
-                                <select id="province" class="address-select" required>
+                                <x-select variant="shop"
+                                          id="province"
+                                          :searchable="true"
+                                          :required="true"
+                                          placeholder="-- Chọn Tỉnh/Thành phố --">
                                     <option value="">-- Chọn Tỉnh/Thành phố --</option>
-                                </select>
+                                </x-select>
                             </div>
                             <div class="form-group">
                                 <label class="form-label">Phường / Xã / Đặc khu <span class="required">*</span></label>
-                                <select id="ward" class="address-select" required disabled>
+                                <x-select variant="shop"
+                                          id="ward"
+                                          :searchable="true"
+                                          :required="true"
+                                          :disabled="true"
+                                          placeholder="-- Chọn Phường/Xã --">
                                     <option value="">-- Chọn Phường/Xã --</option>
-                                </select>
+                                </x-select>
                             </div>
                         </div>
                         <div id="manualAddressNotice" style="display: none; margin-bottom: 10px; padding: 10px 12px; background: #fffbeb; border: 1px solid #fde68a; border-radius: 8px; font-size: 12.5px; color: #92400e;">

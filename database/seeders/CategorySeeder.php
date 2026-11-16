@@ -14,8 +14,8 @@ class CategorySeeder extends Seeder
             ['id' => 2, 'name' => 'Móc khóa',       'slug' => 'moc-khoa',     'icon' => 'bi-key'],
             ['id' => 3, 'name' => 'Trang sức',      'slug' => 'trang-suc',    'icon' => 'bi-gem'],
             ['id' => 4, 'name' => 'Gấu bông',       'slug' => 'gau-bong',     'icon' => 'bi-heart'],
-            ['id' => 5, 'name' => 'Khăn len + Nón', 'slug' => 'khan-len',     'icon' => 'bi-snow'],
-            ['id' => 6, 'name' => 'Hoa handmade',   'slug' => 'hoa-handmade', 'icon' => 'bi-flower1'],
+            ['id' => 5, 'name' => 'Khăn len và nón', 'slug' => 'khan-len',     'icon' => 'bi-snow'],
+            ['id' => 6, 'name' => 'Hoa thủ công',    'slug' => 'hoa-handmade', 'icon' => 'bi-flower1'],
         ];
 
         foreach ($categories as $cat) {

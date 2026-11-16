@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'Shop Handmade') - Đồ thủ công xinh xắn</title>
+    @include('partials.favicon')
     <meta name="description" content="@yield('meta_description', 'Shop Handmade - Đồ thủ công len, móc khóa, túi xách handmade dễ thương.')">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -83,6 +84,7 @@
     @include('partials.footer')
     @include('partials.ai-chatbox')
 
+    <script src="{{ asset('js/ui-components.js') }}?v={{ filemtime(public_path('js/ui-components.js')) }}"></script>
     <script src="{{ asset('js/main.js') }}?v={{ filemtime(public_path('js/main.js')) }}"></script>
     <script src="{{ asset('js/ai-chatbox.js') }}?v={{ filemtime(public_path('js/ai-chatbox.js')) }}"></script>
     @stack('scripts')

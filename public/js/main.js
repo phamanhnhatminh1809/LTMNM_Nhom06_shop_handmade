@@ -145,6 +145,7 @@ document.addEventListener('DOMContentLoaded', function () {
             cartBtn.classList.add('is-bumping');
         }
     }
+    window.updateHeaderCartBadge = updateHeaderCartBadge;
 
     async function sendAddToCartRequest(url, productId, quantity) {
         const response = await fetch(url, {

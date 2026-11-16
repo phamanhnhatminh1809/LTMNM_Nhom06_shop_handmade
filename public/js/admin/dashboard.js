@@ -204,8 +204,30 @@ window.AdminApp.registerModule('dashboard', ({ signal }) => {
     const presetButtons = document.querySelectorAll('.preset-btn');
     const startDateInput = document.getElementById('startDateInput');
     const endDateInput = document.getElementById('endDateInput');
+    const btnExportRevenueXlsx = document.getElementById('btnExportRevenueXlsx');
+
+    const padDate = (n) => String(n).padStart(2, '0');
+    const formatDisplayDate = (d) => `${padDate(d.getDate())}/${padDate(d.getMonth() + 1)}/${d.getFullYear()}`;
+    const toIsoDate = (raw) => {
+        const match = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(String(raw || '').trim());
+        return match ? `${match[3]}-${match[2]}-${match[1]}` : '';
+    };
 
     if (btnDateFilter && dateFilterContainer) {
+        const todayNow = new Date();
+        if (startDateInput && startDateInput.value === '01/10/2023') {
+            startDateInput.value = formatDisplayDate(todayNow);
+        }
+        if (endDateInput && endDateInput.value === '31/10/2023') {
+            endDateInput.value = formatDisplayDate(todayNow);
+        }
+
+        const handleCustomDateInput = () => {
+            presetButtons.forEach(b => b.classList.remove('active'));
+        };
+        startDateInput?.addEventListener('input', handleCustomDateInput, { signal });
+        endDateInput?.addEventListener('input', handleCustomDateInput, { signal });
+
         btnDateFilter.addEventListener('click', (e) => {
             e.stopPropagation();
             dateFilterContainer.classList.toggle('show');
@@ -240,25 +262,23 @@ window.AdminApp.registerModule('dashboard', ({ signal }) => {
 
                 const preset = this.getAttribute('data-preset');
                 const now = new Date();
-                const pad = (n) => String(n).padStart(2, '0');
-                const formatDate = (d) => `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()}`;
 
                 if (preset === 'today') {
-                    startDateInput.value = formatDate(now);
-                    endDateInput.value = formatDate(now);
+                    startDateInput.value = formatDisplayDate(now);
+                    endDateInput.value = formatDisplayDate(now);
                 } else if (preset === '7days') {
                     const past7 = new Date();
-                    past7.setDate(now.getDate() - 7);
-                    startDateInput.value = formatDate(past7);
-                    endDateInput.value = formatDate(now);
+                    past7.setDate(now.getDate() - 6);
+                    startDateInput.value = formatDisplayDate(past7);
+                    endDateInput.value = formatDisplayDate(now);
                 } else if (preset === 'month') {
                     const startMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-                    startDateInput.value = formatDate(startMonth);
-                    endDateInput.value = formatDate(now);
+                    startDateInput.value = formatDisplayDate(startMonth);
+                    endDateInput.value = formatDisplayDate(now);
                 } else if (preset === 'year') {
                     const startYear = new Date(now.getFullYear(), 0, 1);
-                    startDateInput.value = formatDate(startYear);
-                    endDateInput.value = formatDate(now);
+                    startDateInput.value = formatDisplayDate(startYear);
+                    endDateInput.value = formatDisplayDate(now);
                 }
             });
         });
@@ -266,12 +286,29 @@ window.AdminApp.registerModule('dashboard', ({ signal }) => {
         if (btnApplyDateFilter) {
             btnApplyDateFilter.addEventListener('click', () => {
                 const activePreset = document.querySelector('.preset-btn.active');
+                const exportBaseUrl = btnExportRevenueXlsx?.getAttribute('data-export-base') || '';
+                const params = new URLSearchParams();
+
                 if (activePreset) {
                     const spanText = activePreset.querySelector('span').textContent.trim();
+                    const presetKey = activePreset.getAttribute('data-preset') || '';
                     selectedDateText.textContent = spanText;
+                    if (presetKey) {
+                        params.set('preset', presetKey);
+                    }
                 } else if (startDateInput && endDateInput) {
                     selectedDateText.textContent = `${startDateInput.value} - ${endDateInput.value}`;
+                    const isoStart = toIsoDate(startDateInput.value);
+                    const isoEnd = toIsoDate(endDateInput.value);
+                    if (isoStart) params.set('start_date', isoStart);
+                    if (isoEnd) params.set('end_date', isoEnd);
                 }
+
+                if (btnExportRevenueXlsx && exportBaseUrl) {
+                    const qs = params.toString();
+                    btnExportRevenueXlsx.href = qs ? `${exportBaseUrl}?${qs}` : exportBaseUrl;
+                }
+
                 dateFilterContainer.classList.remove('show');
             });
         }

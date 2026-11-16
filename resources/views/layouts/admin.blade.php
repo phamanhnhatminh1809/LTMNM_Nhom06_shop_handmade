@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'Quản trị') - Handmade House</title>
+    @include('partials.favicon')
     <!-- Tối ưu font tải không chặn render (Render-blocking optimization) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -48,6 +49,14 @@
         </main>
     </div>
 
+    <div id="adminToastContainer"
+         class="shop-toast-container"
+         aria-live="polite"
+         aria-atomic="true"></div>
+
+    @include('admin.partials.confirm-modal')
+
+    <script src="{{ asset('js/ui-components.js') }}?v={{ filemtime(public_path('js/ui-components.js')) }}"></script>
     <script src="{{ asset('js/admin/sidebar.js') }}?v={{ filemtime(public_path('js/admin/sidebar.js')) }}"></script>
     <div id="adminPageScripts" hidden>
         @stack('scripts')

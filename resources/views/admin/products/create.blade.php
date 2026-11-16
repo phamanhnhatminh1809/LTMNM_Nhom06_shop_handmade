@@ -87,14 +87,21 @@
                             <label class="modal-label" for="category_id">
                                 Danh mục sản phẩm <span class="required-star">*</span>
                             </label>
-                            <select id="category_id" name="category_id" class="modal-input" required>
-                                <option value="">-- Chọn danh mục sản phẩm --</option>
-                                @foreach($categories as $cat)
-                                    <option value="{{ $cat->id }}" {{ old('category_id') == $cat->id ? 'selected' : '' }}>
-                                        {{ $cat->name }}
-                                    </option>
-                                @endforeach
-                            </select>
+                            @php
+                                $categoryOptions = array_merge(
+                                    [['value' => '', 'label' => '-- Chọn danh mục sản phẩm --']],
+                                    $categories->map(fn ($cat) => [
+                                        'value' => $cat->id,
+                                        'label' => trim((string) $cat->name),
+                                        'icon'  => $cat->display_icon,
+                                    ])->all()
+                                );
+                            @endphp
+                            <x-select id="category_id"
+                                      name="category_id"
+                                      :options="$categoryOptions"
+                                      :value="old('category_id', '')"
+                                      :required="true" />
                             @error('category_id')
                                 <div class="form-error-text">{{ $message }}</div>
                             @enderror
@@ -180,7 +187,7 @@
                                   rows="5"
                                   class="preserve-textarea"
                                   style="min-height: 120px;"
-                                  placeholder="Mô tả câu chuyện chế tác, chất liệu, kích thước và điểm đặc trưng của sản phẩm...">{{ old('description') }}</textarea>
+                                  placeholder="Mô tả câu chuyện chế tác, chất liệu, kích thước và điểm đặc trưng của sản phẩm...">{{ trim((string) old('description')) }}</textarea>
                         @error('description')
                             <div class="form-error-text">{{ $message }}</div>
                         @enderror
@@ -194,7 +201,7 @@
                                   name="instruction_preserve"
                                   rows="3"
                                   class="preserve-textarea"
-                                  placeholder="Hướng dẫn vệ sinh, bảo quản sản phẩm thủ công bền đẹp theo thời gian...">{{ old('instruction_preserve') }}</textarea>
+                                  placeholder="Hướng dẫn vệ sinh, bảo quản sản phẩm thủ công bền đẹp theo thời gian...">{{ trim((string) old('instruction_preserve')) }}</textarea>
                         @error('instruction_preserve')
                             <div class="form-error-text">{{ $message }}</div>
                         @enderror
@@ -282,13 +289,12 @@
                     </div>
 
                     <div class="admin-form-actions">
-                        <a href="{{ route('admin.products.index') }}" class="btn-modal-cancel" style="text-decoration: none;">
+                        <x-button variant="cancel" :href="route('admin.products.index')">
                             Hủy bỏ
-                        </a>
-                        <button type="submit" class="btn-modal-save">
-                            <i class="bi bi-floppy"></i>
+                        </x-button>
+                        <x-button variant="primary" type="submit" icon="bi-floppy">
                             <span>Lưu sản phẩm</span>
-                        </button>
+                        </x-button>
                     </div>
                 </div>
             </div>

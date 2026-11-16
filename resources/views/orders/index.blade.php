@@ -22,19 +22,6 @@
         </p>
     </div>
 
-    <!-- Thông báo Flash -->
-    @if(session('success'))
-        <div style="background: #ecfdf5; border-left: 4px solid #10b981; color: #065f46; padding: 14px 18px; border-radius: 8px; font-size: 14px; margin-bottom: 20px;">
-            {{ session('success') }}
-        </div>
-    @endif
-
-    @if(session('error'))
-        <div style="background: #fef2f2; border-left: 4px solid #ef4444; color: #991b1b; padding: 14px 18px; border-radius: 8px; font-size: 14px; margin-bottom: 20px;">
-            {{ session('error') }}
-        </div>
-    @endif
-
     <!-- Bộ lọc trạng thái (Status Tabs) -->
     <div style="display: flex; gap: 8px; border-bottom: 2px solid var(--color-outline-variant, #f0eae1); margin-bottom: 24px; overflow-x: auto; padding-bottom: 2px;">
         @php

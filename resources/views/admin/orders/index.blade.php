@@ -79,8 +79,8 @@
 </div>
 
 <!-- Thanh Tabs Lọc Trạng thái & Ô tìm kiếm nhanh -->
-<div class="product-filter-bar" style="flex-wrap: wrap; gap: 12px;">
-    <div class="status-tabs-bar" style="margin-bottom: 0;">
+<div class="product-filter-bar is-inline">
+    <div class="status-tabs-bar">
         <a href="{{ route('admin.orders.index') }}"
            class="status-tab-pill {{ $status === '' ? 'active' : '' }}">
             <span>Tất cả</span>
@@ -112,9 +112,11 @@
         </a>
     </div>
 
-    <div class="search-input-box" style="max-width: 300px; margin-left: auto;">
-        <i class="bi bi-search"></i>
-        <input type="text" id="orderQuickSearch" placeholder="Lọc nhanh mã ĐH, tên, SĐT...">
+    <div class="admin-toolbar-search" style="flex: 0 1 300px;">
+        <div class="search-input-box">
+            <i class="bi bi-search"></i>
+            <input type="text" id="orderQuickSearch" placeholder="Lọc nhanh mã ĐH, tên, SĐT...">
+        </div>
     </div>
 </div>
 
@@ -215,7 +217,11 @@
                                     <form action="{{ route('admin.orders.updateStatus', $order) }}"
                                           method="POST"
                                           style="display: inline;"
-                                          onsubmit="return confirm('Xác nhận duyệt và chuyển sang Đang giao đơn #{{ $order->code }}?')">
+                                          data-confirm="Xác nhận duyệt và chuyển sang Đang giao đơn #{{ $order->code }}?"
+                                          data-confirm-title="Duyệt và giao đơn hàng?"
+                                          data-confirm-label="Duyệt và giao hàng"
+                                          data-confirm-icon="bi-truck"
+                                          data-confirm-variant="primary">
                                         @csrf
                                         @method('PATCH')
                                         <input type="hidden" name="status" value="shipping">
@@ -228,7 +234,11 @@
                                     <form action="{{ route('admin.orders.updateStatus', $order) }}"
                                           method="POST"
                                           class="table-action-form"
-                                          onsubmit="return confirm('Xác nhận hủy đơn hàng #{{ $order->code }}?')">
+                                          data-confirm="Xác nhận hủy đơn hàng #{{ $order->code }}? Hành động này sẽ hoàn lại tồn kho sản phẩm."
+                                          data-confirm-title="Hủy đơn hàng?"
+                                          data-confirm-label="Đồng ý hủy"
+                                          data-confirm-icon="bi-x-octagon-fill"
+                                          data-confirm-variant="danger">
                                         @csrf
                                         @method('PATCH')
                                         <input type="hidden" name="status" value="cancelled">
@@ -243,7 +253,11 @@
                                     <form action="{{ route('admin.orders.updateStatus', $order) }}"
                                           method="POST"
                                           style="display: inline;"
-                                          onsubmit="return confirm('Xác nhận đơn hàng #{{ $order->code }} đã giao thành công?')">
+                                          data-confirm="Xác nhận đơn hàng #{{ $order->code }} đã giao thành công tới khách hàng?"
+                                          data-confirm-title="Hoàn thành đơn hàng?"
+                                          data-confirm-label="Xác nhận hoàn thành"
+                                          data-confirm-icon="bi-check2-circle"
+                                          data-confirm-variant="success">
                                         @csrf
                                         @method('PATCH')
                                         <input type="hidden" name="status" value="completed">

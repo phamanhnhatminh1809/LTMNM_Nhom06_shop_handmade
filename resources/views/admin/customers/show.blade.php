@@ -114,7 +114,11 @@
                     @if($customer->is_active)
                         <form action="{{ route('admin.customers.lock', $customer) }}"
                               method="POST"
-                              onsubmit="return confirm('Xác nhận khóa tài khoản của «{{ $customer->full_name }}»? Khách hàng sẽ không thể đăng nhập ngay sau khi khóa.')">
+                              data-confirm="Xác nhận khóa tài khoản của «{{ $customer->full_name }}»? Khách hàng sẽ không thể đăng nhập ngay sau khi khóa."
+                              data-confirm-title="Khóa tài khoản khách hàng?"
+                              data-confirm-label="Khóa tài khoản"
+                              data-confirm-icon="bi-lock-fill"
+                              data-confirm-variant="danger">
                             @csrf
                             @method('PATCH')
                             <button type="submit" class="btn-inline-action danger" style="width: 100%; justify-content: center; padding: 11px 16px; font-size: 13.5px;">
@@ -125,7 +129,11 @@
                     @else
                         <form action="{{ route('admin.customers.unlock', $customer) }}"
                               method="POST"
-                              onsubmit="return confirm('Xác nhận mở khóa tài khoản cho «{{ $customer->full_name }}»?')">
+                              data-confirm="Xác nhận mở khóa tài khoản cho «{{ $customer->full_name }}»?"
+                              data-confirm-title="Mở khóa tài khoản?"
+                              data-confirm-label="Mở khóa"
+                              data-confirm-icon="bi-unlock-fill"
+                              data-confirm-variant="success">
                             @csrf
                             @method('PATCH')
                             <button type="submit" class="btn-inline-action success" style="width: 100%; justify-content: center; padding: 11px 16px; font-size: 13.5px;">

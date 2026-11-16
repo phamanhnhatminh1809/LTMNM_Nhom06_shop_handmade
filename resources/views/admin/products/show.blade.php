@@ -99,18 +99,14 @@
                     <h4 style="font-size: 13px; font-weight: 800; color: var(--color-outline); text-transform: uppercase; margin-bottom: 8px;">
                         Mô tả chi tiết sản phẩm
                     </h4>
-                    <div style="font-size: 14px; line-height: 1.7; color: var(--color-on-surface); white-space: pre-line; background: #fff8f6; padding: 14px 16px; border-radius: 10px; border: 1px solid #f2e2dc;">
-                        {{ $product->description ?: 'Chưa có mô tả chi tiết cho sản phẩm này.' }}
-                    </div>
+                    <div style="font-size: 14px; line-height: 1.7; color: var(--color-on-surface); white-space: pre-line; background: #fff8f6; padding: 14px 16px; border-radius: 10px; border: 1px solid #f2e2dc;">{{ trim((string) ($product->description ?: 'Chưa có mô tả chi tiết cho sản phẩm này.')) }}</div>
                 </div>
 
                 <div>
                     <h4 style="font-size: 13px; font-weight: 800; color: var(--color-outline); text-transform: uppercase; margin-bottom: 8px;">
                         Hướng dẫn sử dụng và bảo quản
                     </h4>
-                    <div style="font-size: 14px; line-height: 1.7; color: var(--color-on-surface-variant); white-space: pre-line; background: #fff8f6; padding: 14px 16px; border-radius: 10px; border: 1px solid #f2e2dc;">
-                        {{ $product->instruction_preserve ?: 'Chưa có hướng dẫn bảo quản riêng.' }}
-                    </div>
+                    <div style="font-size: 14px; line-height: 1.7; color: var(--color-on-surface-variant); white-space: pre-line; background: #fff8f6; padding: 14px 16px; border-radius: 10px; border: 1px solid #f2e2dc;">{{ trim((string) ($product->instruction_preserve ?: 'Chưa có hướng dẫn bảo quản riêng.')) }}</div>
                 </div>
             </div>
         </div>

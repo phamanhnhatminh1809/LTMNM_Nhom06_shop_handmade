@@ -143,23 +143,11 @@
                     <span class="price price--lg" style="font-size: 28px; font-weight: 800; color: #c0392b;">{{ number_format($product->price, 0, ',', '.') }}đ</span>
                 </div>
 
-                <p class="product-info__desc" style="font-size: 15px; line-height: 1.6; color: #444; margin-bottom: 24px;">{!! nl2br(e($product->description)) !!}</p>
+                <p class="product-info__desc" style="font-size: 15px; line-height: 1.6; color: #444; margin-bottom: 24px;">{!! nl2br(e(trim((string) $product->description))) !!}</p>
 
-                @if(!empty($product->instruction_preserve))
+                @if(!empty(trim((string) $product->instruction_preserve)))
                 <div style="margin-bottom: 24px; padding: 14px 16px; background: #fff1ec; border-left: 4px solid #c0392b; border-radius: 4px; font-size: 14px; color: #5c3a21;">
-                    <strong>Hướng dẫn bảo quản:</strong> {{ $product->instruction_preserve }}
-                </div>
-                @endif
-
-                @if(session('success'))
-                <div style="background: #ecfdf5; border-left: 4px solid #10b981; color: #065f46; padding: 12px 16px; border-radius: 6px; font-size: 14px; margin-bottom: 20px;">
-                    {{ session('success') }}
-                </div>
-                @endif
-
-                @if(session('error'))
-                <div style="background: #fef2f2; border-left: 4px solid #ef4444; color: #991b1b; padding: 12px 16px; border-radius: 6px; font-size: 14px; margin-bottom: 20px;">
-                    {{ session('error') }}
+                    <strong>Hướng dẫn bảo quản:</strong> {{ trim((string) $product->instruction_preserve) }}
                 </div>
                 @endif
 

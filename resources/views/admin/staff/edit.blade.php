@@ -67,7 +67,7 @@
                                id="full_name"
                                name="full_name"
                                class="modal-input"
-                               value="{{ old('full_name', $user->full_name) }}"
+                               value="{{ trim((string) old('full_name', $user->full_name)) }}"
                                required>
                         @error('full_name')
                             <div class="form-error-text">{{ $message }}</div>
@@ -97,7 +97,7 @@
                                id="email"
                                name="email"
                                class="modal-input"
-                               value="{{ old('email', $user->email) }}"
+                               value="{{ trim((string) old('email', $user->email)) }}"
                                required>
                         @error('email')
                             <div class="form-error-text">{{ $message }}</div>
@@ -113,7 +113,7 @@
                                name="phone"
                                class="modal-input"
                                style="font-family: var(--font-mono);"
-                               value="{{ old('phone', $user->phone) }}"
+                               value="{{ trim((string) old('phone', $user->phone)) }}"
                                placeholder="VD: 0912345678">
                         @error('phone')
                             <div class="form-error-text">{{ $message }}</div>
@@ -122,21 +122,29 @@
                 </div>
 
                 <!-- Phân quyền vai trò -->
+                @php
+                    $roleIconMap = [
+                        'admin'           => 'bi-shield-fill-check',
+                        'warehouse_staff' => 'bi-box-seam',
+                        'sales_staff'     => 'bi-receipt-cutoff',
+                        'customer'        => 'bi-person',
+                    ];
+                    $roleSelectOptions = $roles->map(fn ($r) => [
+                        'value' => $r->id,
+                        'label' => trim((string) $r->label),
+                        'icon'  => $roleIconMap[$r->name] ?? 'bi-person-badge',
+                    ])->all();
+                @endphp
                 <div class="modal-form-group" style="margin-bottom: 20px;">
                     <label class="modal-label" for="role_id">
                         Vai trò quyền hạn <span class="required-star">*</span>
                     </label>
-                    <select id="role_id"
-                            name="role_id"
-                            class="modal-input"
-                            {{ $isCurrentUser ? 'disabled' : '' }}
-                            required>
-                        @foreach($roles as $r)
-                            <option value="{{ $r->id }}" {{ old('role_id', $user->role_id) == $r->id ? 'selected' : '' }}>
-                                {{ $r->label }}
-                            </option>
-                        @endforeach
-                    </select>
+                    <x-select id="role_id"
+                              name="role_id"
+                              :options="$roleSelectOptions"
+                              :value="old('role_id', $user->role_id)"
+                              :disabled="$isCurrentUser"
+                              :required="true" />
                     @if($isCurrentUser)
                         <input type="hidden" name="role_id" value="{{ $user->role_id }}">
                         <div style="font-size: 12px; color: var(--color-outline); margin-top: 4px;">
@@ -211,14 +219,13 @@
                     </div>
                 </div>
 
-                <div class="modal-actions-end" style="display: flex; gap: 12px; justify-content: flex-end;">
-                    <a href="{{ route('admin.staff.index') }}" class="btn-secondary-outline">
+                <div class="admin-form-actions">
+                    <x-button variant="cancel" :href="route('admin.staff.index')">
                         Hủy bỏ
-                    </a>
-                    <button type="submit" class="btn-primary-action">
-                        <i class="bi bi-check-lg"></i>
+                    </x-button>
+                    <x-button variant="primary" type="submit" icon="bi-check-lg">
                         <span>Lưu thông tin thay đổi</span>
-                    </button>
+                    </x-button>
                 </div>
             </form>
         </div>

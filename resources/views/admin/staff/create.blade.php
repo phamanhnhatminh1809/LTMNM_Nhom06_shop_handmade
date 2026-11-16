@@ -117,17 +117,28 @@
                     </div>
                 </div>
 
+                @php
+                    $roleIconMap = [
+                        'admin'           => 'bi-shield-fill-check',
+                        'warehouse_staff' => 'bi-box-seam',
+                        'sales_staff'     => 'bi-receipt-cutoff',
+                        'customer'        => 'bi-person',
+                    ];
+                    $staffRoleOptions = $staffRoles->map(fn ($r) => [
+                        'value' => $r->id,
+                        'label' => trim((string) $r->label),
+                        'icon'  => $roleIconMap[$r->name] ?? 'bi-person-badge',
+                    ])->all();
+                @endphp
                 <div class="modal-form-group" style="margin-bottom: 16px;">
                     <label class="modal-label" for="role_id">
                         Phân quyền chức vụ <span class="required-star">*</span>
                     </label>
-                    <select id="role_id" name="role_id" class="modal-input" required>
-                        @foreach($staffRoles as $role)
-                            <option value="{{ $role->id }}" {{ (int) old('role_id') === $role->id ? 'selected' : '' }}>
-                                {{ $role->label }}
-                            </option>
-                        @endforeach
-                    </select>
+                    <x-select id="role_id"
+                              name="role_id"
+                              :options="$staffRoleOptions"
+                              :value="old('role_id', $staffRoles->first()?->id)"
+                              :required="true" />
                     @error('role_id')
                         <div class="form-error-text">{{ $message }}</div>
                     @enderror
@@ -163,13 +174,12 @@
                 </div>
 
                 <div class="admin-form-actions">
-                    <a href="{{ route('admin.staff.index') }}" class="btn-modal-cancel" style="text-decoration: none;">
+                    <x-button variant="cancel" :href="route('admin.staff.index')">
                         Hủy bỏ
-                    </a>
-                    <button type="submit" class="btn-modal-save">
-                        <i class="bi bi-person-check"></i>
+                    </x-button>
+                    <x-button variant="primary" type="submit" icon="bi-person-check">
                         <span>Tạo nhân viên và phân quyền</span>
-                    </button>
+                    </x-button>
                 </div>
             </form>
         </div>

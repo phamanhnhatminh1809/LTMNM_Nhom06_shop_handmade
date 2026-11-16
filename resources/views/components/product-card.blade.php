@@ -21,27 +21,16 @@
                 Hết hàng
             </span>
         @endif
-
-        <button type="button"
-                class="product-card__quick-cart"
-                data-quick-add-cart
-                data-product-id="{{ $product->id }}"
-                data-product-name="{{ $product->name }}"
-                aria-label="{{ $isInStock ? 'Thêm nhanh ' . $product->name . ' vào giỏ hàng' : 'Sản phẩm đã hết hàng' }}"
-                title="{{ $isInStock ? 'Thêm nhanh vào giỏ hàng' : 'Sản phẩm hiện đã hết hàng' }}"
-                {{ $isInStock ? '' : 'disabled' }}>
-            <i class="bi {{ $isInStock ? 'bi-cart-plus' : 'bi-bag-x' }}"></i>
-        </button>
     </div>
 
     <div class="product-card__body" style="padding: 14px 16px 16px; display: flex; flex-direction: column; flex: 1; gap: 6px; background: #ffffff;">
         <span class="product-card__cat" style="font-size: 11px; text-transform: uppercase; color: var(--color-outline, #89726d); letter-spacing: 0.5px; font-weight: 700;">
-            {{ $product->category->name ?? 'Handmade' }}
+            {{ trim((string) ($product->category->name ?? 'Handmade')) }}
         </span>
 
         <h3 class="product-card__name" style="margin: 0; font-size: 15px; line-height: 1.4; font-weight: 700; flex: 1;">
             <a href="{{ route('products.show', $product->id) }}" style="color: var(--color-on-surface, #251914); text-decoration: none; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
-                {{ $product->name }}
+                {{ trim((string) $product->name) }}
             </a>
         </h3>
 
@@ -63,9 +52,22 @@
             </span>
         </div>
 
-        <a href="{{ route('products.show', $product->id) }}" class="btn btn--primary btn--sm" style="display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 9px 12px; background: var(--color-primary, #792a16); color: white; border-radius: 8px; text-decoration: none; font-size: 13.5px; font-weight: 700; margin-top: auto; transition: background 0.2s;">
-            <span>Xem chi tiết</span>
-            <i class="bi bi-arrow-right" style="font-size: 13px;"></i>
-        </a>
+        <div class="product-card__actions">
+            <button type="button"
+                    class="btn btn--primary btn--sm product-card__cart-btn"
+                    data-quick-add-cart
+                    data-product-id="{{ $product->id }}"
+                    data-product-name="{{ trim((string) $product->name) }}"
+                    aria-label="{{ $isInStock ? 'Thêm ' . trim((string) $product->name) . ' vào giỏ hàng' : 'Sản phẩm đã hết hàng' }}"
+                    {{ $isInStock ? '' : 'disabled' }}>
+                <i class="bi {{ $isInStock ? 'bi-cart-plus' : 'bi-bag-x' }}" aria-hidden="true"></i>
+                <span>{{ $isInStock ? 'Thêm vào giỏ' : 'Hết hàng' }}</span>
+            </button>
+            <a href="{{ route('products.show', $product->id) }}"
+               class="btn btn--outline btn--sm product-card__detail-btn"
+               title="Xem chi tiết sản phẩm">
+                <span>Chi tiết</span>
+            </a>
+        </div>
     </div>
 </div>

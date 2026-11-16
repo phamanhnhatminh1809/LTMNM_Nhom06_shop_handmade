@@ -91,15 +91,21 @@
                             <label class="modal-label" for="category_id">
                                 Danh mục sản phẩm <span class="required-star">*</span>
                             </label>
-                            <select id="category_id" name="category_id" class="modal-input" required>
-                                <option value="">-- Chọn danh mục sản phẩm --</option>
-                                @foreach($categories as $cat)
-                                    <option value="{{ $cat->id }}"
-                                        {{ old('category_id', $product->category_id) == $cat->id ? 'selected' : '' }}>
-                                        {{ $cat->name }}
-                                    </option>
-                                @endforeach
-                            </select>
+                            @php
+                                $categoryOptions = array_merge(
+                                    [['value' => '', 'label' => '-- Chọn danh mục sản phẩm --']],
+                                    $categories->map(fn ($cat) => [
+                                        'value' => $cat->id,
+                                        'label' => trim((string) $cat->name),
+                                        'icon'  => $cat->display_icon,
+                                    ])->all()
+                                );
+                            @endphp
+                            <x-select id="category_id"
+                                      name="category_id"
+                                      :options="$categoryOptions"
+                                      :value="old('category_id', $product->category_id)"
+                                      :required="true" />
                             @error('category_id')
                                 <div class="form-error-text">{{ $message }}</div>
                             @enderror
@@ -182,7 +188,7 @@
                                   name="description"
                                   rows="5"
                                   class="preserve-textarea"
-                                  style="min-height: 120px;">{{ old('description', $product->description) }}</textarea>
+                                  style="min-height: 120px;">{{ trim((string) old('description', $product->description)) }}</textarea>
                         @error('description')
                             <div class="form-error-text">{{ $message }}</div>
                         @enderror
@@ -195,7 +201,7 @@
                         <textarea id="instruction_preserve"
                                   name="instruction_preserve"
                                   rows="3"
-                                  class="preserve-textarea">{{ old('instruction_preserve', $product->instruction_preserve) }}</textarea>
+                                  class="preserve-textarea">{{ trim((string) old('instruction_preserve', $product->instruction_preserve)) }}</textarea>
                         @error('instruction_preserve')
                             <div class="form-error-text">{{ $message }}</div>
                         @enderror
@@ -310,13 +316,12 @@
                     </div>
 
                     <div class="admin-form-actions">
-                        <a href="{{ route('admin.products.index') }}" class="btn-modal-cancel" style="text-decoration: none;">
+                        <x-button variant="cancel" :href="route('admin.products.index')">
                             Hủy bỏ
-                        </a>
-                        <button type="submit" class="btn-modal-save">
-                            <i class="bi bi-floppy"></i>
+                        </x-button>
+                        <x-button variant="primary" type="submit" icon="bi-floppy">
                             <span>Cập nhật sản phẩm</span>
-                        </button>
+                        </x-button>
                     </div>
                 </div>
             </div>

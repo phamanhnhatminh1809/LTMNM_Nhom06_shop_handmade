@@ -12,18 +12,18 @@ class ReviewSeeder extends Seeder
     public function run(): void
     {
         $comments = [
-            'Sản phẩm rất đẹp, đúng mô tả, đóng gói cẩn thận.',
-            'Chất lượng vượt mong đợi, đường may tỉ mỉ. Sẽ ủng hộ shop tiếp!',
-            'Mua làm quà tặng, ai cũng khen. Rất đáng tiền.',
-            'Giao hàng nhanh, shop tư vấn nhiệt tình. 5 sao!',
-            'Sản phẩm handmade tinh xảo, màu sắc y hình. Rất hài lòng.',
-            'Chất len mềm mịn, không gây kích ứng da. Recommend mọi người.',
-            'Đóng gói đẹp, có thiệp cảm ơn. Trải nghiệm mua hàng tuyệt vời.',
-            'Đúng như mong đợi, sẽ giới thiệu cho bạn bè.',
-            'Hàng thủ công đẹp xuất sắc, rất tỉ mỉ. Cảm ơn shop.',
-            'Chất lượng tốt so với giá, đáng mua.',
-            'Shop hỗ trợ đổi trả nhanh chóng. Rất chuyên nghiệp.',
-            'Sản phẩm đẹp, nhưng giao hàng hơi chậm một chút.',
+            'Sản phẩm đẹp, đúng mô tả và được đóng gói cẩn thận.',
+            'Chất lượng tốt, đường may tỉ mỉ và chắc chắn. Mình sẽ tiếp tục ủng hộ cửa hàng.',
+            'Mua làm quà tặng rất phù hợp, người nhận đều thích.',
+            'Giao hàng đúng hẹn, cửa hàng tư vấn nhiệt tình và rõ ràng.',
+            'Sản phẩm thủ công khéo léo, màu sắc đúng như hình ảnh minh họa.',
+            'Chất len mềm mịn, dễ chịu khi sử dụng, rất đáng mua.',
+            'Đóng gói gọn gàng, kèm thiệp cảm ơn chu đáo.',
+            'Sản phẩm đáp ứng đúng kỳ vọng, phù hợp để giới thiệu cho bạn bè.',
+            'Đồ thủ công được làm cẩn thận, các chi tiết gọn đẹp.',
+            'Chất lượng ổn định so với mức giá, phù hợp với nhu cầu sử dụng.',
+            'Cửa hàng hỗ trợ đổi trả nhanh chóng và rõ ràng.',
+            'Sản phẩm đẹp và chắc chắn, tuy nhiên thời gian giao hàng hơi chậm một chút.',
         ];
 
         $userIds = User::pluck('id')->toArray();
@@ -60,6 +60,6 @@ class ReviewSeeder extends Seeder
             $product->recalculateRating();
         }
 
-        $this->command->info("Đã tạo {$reviewCount} review cho {$products->count()} sản phẩm.");
+        $this->command->info("Đã tạo {$reviewCount} đánh giá cho {$products->count()} sản phẩm.");
     }
 }

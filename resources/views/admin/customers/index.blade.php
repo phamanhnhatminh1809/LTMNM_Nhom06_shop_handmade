@@ -63,8 +63,8 @@
 </div>
 
 <!-- Thanh Tìm kiếm & Lọc Trạng thái -->
-<div class="product-filter-bar" style="flex-wrap: wrap; gap: 12px;">
-    <div class="status-tabs-bar" style="margin-bottom: 0;">
+<div class="product-filter-bar is-inline">
+    <div class="status-tabs-bar">
         <a href="{{ route('admin.customers.index', $keyword ? ['q' => $keyword] : []) }}"
            class="status-tab-pill {{ $status === '' ? 'active' : '' }}">
             <span>Tất cả</span>
@@ -84,11 +84,11 @@
         </a>
     </div>
 
-    <form method="GET" action="{{ route('admin.customers.index') }}" style="display: flex; align-items: center; gap: 8px; margin-left: auto; min-width: 320px;">
+    <form method="GET" action="{{ route('admin.customers.index') }}" class="admin-toolbar-search">
         @if($status)
             <input type="hidden" name="status" value="{{ $status }}">
         @endif
-        <div class="search-input-box" style="flex: 1;">
+        <div class="search-input-box">
             <i class="bi bi-search"></i>
             <input type="text"
                    name="q"
@@ -96,7 +96,7 @@
                    placeholder="Tìm theo tên, email, SĐT, username...">
             @if($keyword)
                 <a href="{{ route('admin.customers.index', $status ? ['status' => $status] : []) }}"
-                   class="btn-clear-search"
+                   class="btn-clear-search show"
                    style="display:flex;align-items:center;justify-content:center;text-decoration:none;"
                    title="Xóa từ khóa">
                     <i class="bi bi-x-lg"></i>
@@ -199,7 +199,11 @@
                                     <form action="{{ route('admin.customers.lock', $customer) }}"
                                           method="POST"
                                           style="display: inline;"
-                                          onsubmit="return confirm('Xác nhận khóa tài khoản khách hàng «{{ $customer->full_name }}»? Tài khoản này sẽ không thể đăng nhập.')">
+                                          data-confirm="Xác nhận khóa tài khoản khách hàng «{{ $customer->full_name }}»? Tài khoản này sẽ không thể đăng nhập."
+                                          data-confirm-title="Khóa tài khoản khách hàng?"
+                                          data-confirm-label="Khóa tài khoản"
+                                          data-confirm-icon="bi-lock-fill"
+                                          data-confirm-variant="danger">
                                         @csrf
                                         @method('PATCH')
                                         <button type="submit" class="btn-inline-action danger" title="Khóa tài khoản">
@@ -211,7 +215,11 @@
                                     <form action="{{ route('admin.customers.unlock', $customer) }}"
                                           method="POST"
                                           style="display: inline;"
-                                          onsubmit="return confirm('Mở khóa tài khoản khách hàng «{{ $customer->full_name }}»?')">
+                                          data-confirm="Xác nhận mở khóa tài khoản khách hàng «{{ $customer->full_name }}»?"
+                                          data-confirm-title="Mở khóa tài khoản?"
+                                          data-confirm-label="Mở khóa"
+                                          data-confirm-icon="bi-unlock-fill"
+                                          data-confirm-variant="success">
                                         @csrf
                                         @method('PATCH')
                                         <button type="submit" class="btn-inline-action success" title="Mở khóa tài khoản">
