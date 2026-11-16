@@ -16,6 +16,7 @@
     <link rel="stylesheet" href="{{ asset('css/base.css') }}?v={{ filemtime(public_path('css/base.css')) }}">
     <link rel="stylesheet" href="{{ asset('css/layout.css') }}?v={{ filemtime(public_path('css/layout.css')) }}">
     <link rel="stylesheet" href="{{ asset('css/components.css') }}?v={{ filemtime(public_path('css/components.css')) }}">
+    <link rel="stylesheet" href="{{ asset('css/ai-chatbox.css') }}?v={{ filemtime(public_path('css/ai-chatbox.css')) }}">
 
     <style>
         html, body { margin: 0; padding: 0; overflow-x: hidden; }
@@ -80,8 +81,10 @@
     </main>
 
     @include('partials.footer')
+    @include('partials.ai-chatbox')
 
     <script src="{{ asset('js/main.js') }}?v={{ filemtime(public_path('js/main.js')) }}"></script>
+    <script src="{{ asset('js/ai-chatbox.js') }}?v={{ filemtime(public_path('js/ai-chatbox.js')) }}"></script>
     @stack('scripts')
 </body>
 </html>

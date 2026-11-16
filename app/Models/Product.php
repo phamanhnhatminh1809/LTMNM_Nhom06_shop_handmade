@@ -129,6 +129,7 @@ class Product extends Model
         $clearCaches = static function (): void {
             Cache::forget('admin_dashboard_stats');
             Cache::forget('admin_review_filter_products');
+            Cache::forget('ai_chat_catalog_context');
         };
 
         static::saved($clearCaches);

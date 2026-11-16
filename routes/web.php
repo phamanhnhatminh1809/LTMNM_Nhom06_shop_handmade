@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\ProductController as AdminProductController;
 use App\Http\Controllers\Admin\ProfileController as AdminProfileController;
 use App\Http\Controllers\Admin\ReviewController as AdminReviewController;
 use App\Http\Controllers\Admin\StaffController as AdminStaffController;
+use App\Http\Controllers\AiChatController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CheckoutController;
@@ -28,6 +29,11 @@ Route::get('/products', [ProductController::class, 'index'])->name('products.ind
 Route::get('/products/{id}', [ProductController::class, 'show'])->name('products.show');
 Route::view('/about', 'pages.about')->name('about');
 Route::view('/contact', 'pages.contact')->name('contact');
+
+// Trợ lý AI tư vấn & gợi ý sản phẩm (Gemini Flash)
+Route::post('/ai-chat/ask', [AiChatController::class, 'ask'])
+    ->middleware('throttle:20,1')
+    ->name('ai.chat.ask');
 
 // Giỏ hàng (Cart)
 Route::get('/cart', [CartController::class, 'index'])->name('cart.index');

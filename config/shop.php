@@ -27,4 +27,19 @@ return [
         'address' => env('SHOP_CONTACT_ADDRESS', 'Lê Trọng Tấn, Phường Tây Thạnh, Quận Tân Phú, TP. Hồ Chí Minh'),
         'hours'   => env('SHOP_CONTACT_HOURS', 'Thứ 2 – Chủ nhật: 08:30 – 21:30'),
     ],
+
+    'ai' => [
+        'api_key'         => trim((string) env('GEMINI_API_KEY', '')),
+        'model'           => trim((string) env('GEMINI_MODEL', 'gemini-3.5-flash')),
+        'fallback_models' => array_values(array_filter(array_map(
+            'trim',
+            explode(',', (string) env('GEMINI_FALLBACK_MODELS', 'gemini-3.5-flash-lite,gemini-3.1-flash-lite,gemini-2.5-flash,gemini-2.5-flash-lite'))
+        ))),
+        'base_url'        => rtrim((string) env('GEMINI_BASE_URL', 'https://generativelanguage.googleapis.com/v1beta'), '/'),
+        'timeout'         => max(5, (int) env('GEMINI_TIMEOUT', 20)),
+        'refusal_message' => env(
+            'SHOP_AI_REFUSAL_MESSAGE',
+            'Xin lỗi bạn, mình là trợ lý AI của Shop Handmade nên chỉ có thể tư vấn và gợi ý các sản phẩm thủ công hoặc thông tin có sẵn trong hệ thống của cửa hàng. Bạn hãy thử hỏi mình về các món đồ handmade như thú bông len, móc khóa, túi xách, nến thơm hoặc quà tặng nhé!'
+        ),
+    ],
 ];

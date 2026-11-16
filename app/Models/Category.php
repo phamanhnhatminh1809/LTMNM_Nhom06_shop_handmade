@@ -70,6 +70,7 @@ class Category extends Model
         $clearCaches = static function (): void {
             Cache::forget('global_categories');
             Cache::forget('admin_dashboard_stats');
+            Cache::forget('ai_chat_catalog_context');
         };
 
         static::saved($clearCaches);
